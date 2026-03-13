@@ -31,29 +31,6 @@ The experience should feel like using a well-designed university portal crossed 
 | `text-muted`   | `#6E6E73` | Secondary text          | Captions, placeholders, nav items, metadata                         |
 | `border`       | `#E8E8ED` | Structural lines        | Dividers, input borders, card outlines                              |
 
-### Available Palettes (for future theme switching)
-
-#### Prussian Blue
-
-```
-background: #F0F4F8  |  surface: #FFFFFF  |  accent: #5B8DD9
-text: #1C2E4A        |  muted: #6A7A9A    |  border: #E0E8F4
-```
-
-#### Navy
-
-```
-background: #F5F7FC  |  surface: #FFFFFF  |  accent: #1B3A6B
-text: #0A1220        |  muted: #4A5E7A    |  border: #DDE4F0
-```
-
-#### Navy Teal
-
-```
-background: #F4F7FF  |  surface: #FFFFFF  |  accent: #00C2A8
-text: #0D1F3C        |  muted: #6B7A99    |  border: #E8EDF9
-```
-
 ### Tailwind Config
 
 Add this to `tailwind.config.js`:
