@@ -1,4 +1,5 @@
 import React from "react";
+import "./Button.css";
 
 /**
  * Button Component
@@ -21,55 +22,22 @@ export default function Button({
   className = "",
   ...props
 }) {
-  // Base styles applied to all buttons
-  const baseStyles = [
-    "font-sans font-bold",
-    "transition-all duration-200 ease-out",
-    "inline-flex items-center justify-center gap-2",
-    "disabled:opacity-50 disabled:cursor-not-allowed",
-    "rounded-full",
-  ].join(" ");
+  // Base class
+  const baseClass = "btn";
 
   // Size variants
-  const sizeStyles = {
-    sm: "px-3 py-2 text-xs",
-    md: "px-6 py-3 text-sm", // 13-14px per spec
-    lg: "px-8 py-4 text-base",
-  };
+  const sizeClass = `btn-${size}`;
 
   // Variant styles
-  const variantStyles = {
-    primary: [
-      "bg-accent text-white",
-      "hover:bg-[#0063c7] hover:scale-105 hover:shadow-[0_8px_28px_rgba(0,113,227,0.4)]",
-      "active:scale-100",
-      "shadow-[0_4px_20px_rgba(0,113,227,0.267)]",
-    ].join(" "),
-    secondary: [
-      "bg-transparent border-2 border-accent text-accent",
-      "hover:bg-accent/8",
-      "active:bg-accent/12",
-    ].join(" "),
-    ghost: [
-      "bg-transparent border-0 text-text-primary",
-      "hover:bg-background",
-      "active:bg-background/80",
-    ].join(" "),
-  };
+  const variantClass = `btn-${variant}`;
 
-  const finalClassName = [
-    baseStyles,
-    sizeStyles[size],
-    variantStyles[variant],
-    disabled && "disabled",
-    className,
-  ]
+  const finalClassName = [baseClass, sizeClass, variantClass, className]
     .filter(Boolean)
     .join(" ");
 
   return (
     <button className={finalClassName} disabled={disabled} {...props}>
-      {icon && <span className="flex items-center">{icon}</span>}
+      {icon && <span className="btn-icon">{icon}</span>}
       {children && <span>{children}</span>}
     </button>
   );

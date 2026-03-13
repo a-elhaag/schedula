@@ -1,0 +1,107 @@
+/* Button Component CSS */
+
+.btn {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  transition: all 200ms ease-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  border-radius: 9999px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Size variants */
+.btn-sm {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.btn-md {
+  padding: 12px 24px;
+  font-size: 13px;
+}
+
+.btn-lg {
+  padding: 16px 32px;
+  font-size: 16px;
+}
+
+/* Variant: Primary */
+.btn-primary {
+  background-color: var(--color-accent);
+  color: var(--color-surface);
+  box-shadow: 0 4px 20px rgba(0, 113, 227, 0.267);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0063c7;
+  transform: scale(1.05);
+  box-shadow: 0 8px 28px rgba(0, 113, 227, 0.4);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(1);
+}
+
+/* Variant: Secondary */
+.btn-secondary {
+  background-color: transparent;
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: rgba(0, 113, 227, 0.08);
+}
+
+.btn-secondary:active:not(:disabled) {
+  background-color: rgba(0, 113, 227, 0.12);
+}
+
+/* Variant: Ghost */
+.btn-ghost {
+  background-color: transparent;
+  border: none;
+  color: var(--color-text-primary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--color-background);
+}
+
+.btn-ghost:active:not(:disabled) {
+  background-color: var(--color-background);
+  opacity: 0.8;
+}
+
+/* Variant: Destructive */
+.btn-destructive {
+  background-color: #d53830;
+  color: var(--color-surface);
+  box-shadow: 0 4px 20px rgba(255, 59, 48, 0.267);
+}
+
+.btn-destructive:hover:not(:disabled) {
+  background-color: #9e1c15;
+  transform: scale(1.05);
+  box-shadow: 0 8px 28px rgba(255, 59, 48, 0.4);
+}
+
+.btn-destructive:active:not(:disabled) {
+  transform: scale(1);
+}
+
+/* Icon styles */
+.btn-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
