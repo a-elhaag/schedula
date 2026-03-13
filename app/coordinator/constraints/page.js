@@ -1,11 +1,11 @@
 import "./styles.css";
 
-export default function LandingPage() {
+export default function CoordinatorConstraintsPage() {
   return (
     <div className="page-container">
       <div className="content-center">
-        <h1>Schedula</h1>
-        <p>University Scheduling SaaS</p>
+        <h1>Constraints</h1>
+        <p>Define scheduling constraints and rules</p>
       </div>
     </div>
   );

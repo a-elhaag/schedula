@@ -1,11 +1,11 @@
 import "./styles.css";
 
-export default function LandingPage() {
+export default function CoordinatorSchedulePublishedPage() {
   return (
     <div className="page-container">
       <div className="content-center">
-        <h1>Schedula</h1>
-        <p>University Scheduling SaaS</p>
+        <h1>Published Schedule</h1>
+        <p>View published schedule</p>
       </div>
     </div>
   );

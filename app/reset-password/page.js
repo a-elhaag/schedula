@@ -1,11 +1,11 @@
 import "./styles.css";
 
-export default function LandingPage() {
+export default function ResetPasswordPage() {
   return (
     <div className="page-container">
       <div className="content-center">
-        <h1>Schedula</h1>
-        <p>University Scheduling SaaS</p>
+        <h1>Reset Password</h1>
+        <p>Enter your new password</p>
       </div>
     </div>
   );

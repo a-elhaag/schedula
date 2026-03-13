@@ -1,11 +1,11 @@
 import "./styles.css";
 
-export default function LandingPage() {
+export default function UnauthorizedPage() {
   return (
     <div className="page-container">
       <div className="content-center">
-        <h1>Schedula</h1>
-        <p>University Scheduling SaaS</p>
+        <h1>Unauthorized</h1>
+        <p>You do not have permission to access this resource</p>
       </div>
     </div>
   );

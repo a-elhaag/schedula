@@ -1,5 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:wght@400&display=swap");
-@import "tailwindcss";
 
 :root {
   /* Color Palette */
@@ -15,27 +14,8 @@
   --foreground: #1d1d1f;
 }
 
-@theme inline {
-  --color-background: var(--color-background);
-  --color-surface: var(--color-surface);
-  --color-accent: var(--color-accent);
-  --color-text-primary: var(--color-text-primary);
-  --color-text-muted: var(--color-text-muted);
-  --color-border: var(--color-border);
-  --font-serif-display: "DM Serif Display", serif;
-  --font-sans: "DM Sans", sans-serif;
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: #0a0a0a;
-    --color-surface: #1a1a1a;
-    --color-text-primary: #ededed;
-    --color-text-muted: #a0a0a0;
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@media (prefers-color-scheme: light) {
+  /* Light mode only */
 }
 
 html {

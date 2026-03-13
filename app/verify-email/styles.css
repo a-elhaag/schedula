@@ -1,0 +1,22 @@
+.page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--color-background);
+}
+
+.content-center {
+  text-align: center;
+}
+
+.content-center h1 {
+  color: var(--color-text-primary);
+  margin-bottom: 16px;
+}
+
+.content-center p {
+  color: var(--color-text-muted);
+  font-size: 16px;
+}
