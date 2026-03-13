@@ -1,13 +1,10 @@
 import Button from "@/components/ui/Button";
+import DesignShowcase from "@/components/REF/DesignShowcase";
 
 export default function Home() {
   return (
     <div>
-      <Button variant="primary" size="md">
-        Download
-      </Button>
-      <Button variant="secondary">Learn More</Button>
-      <Button variant="ghost">Cancel</Button>
+      <DesignShowcase />
     </div>
   );
 }
