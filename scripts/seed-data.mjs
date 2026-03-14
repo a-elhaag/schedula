@@ -425,7 +425,7 @@ async function seedDatabase() {
       "Doaa Mabrouk",
       "Sulaiman Mabrouk",
       "Ahmed Othman",
-      "Sherry Ali",
+      
     ];
 
     const staffDocs = instructorNames.map((name) => ({
