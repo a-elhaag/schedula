@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:setup": "node --env-file=.env scripts/setup-db.mjs"
+    "db:setup": "node --env-file=.env scripts/setup-db.mjs",
+    "db:truncate": "node --env-file=.env scripts/truncate-db.mjs",
+    "db:seed": "node --env-file=.env scripts/seed-data.mjs"
+
   },
   "dependencies": {
     "mongodb": "^7.1.0",
