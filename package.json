@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:setup": "node --env-file=.env scripts/setup-db.mjs"
+    "db:setup": "node --env-file=.env scripts/setup-db.mjs",
+    "db:export": "node --env-file=.env scripts/export-data.mjs"
   },
   "dependencies": {
     "mongodb": "^7.1.0",
