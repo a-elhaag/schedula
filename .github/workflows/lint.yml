@@ -8,11 +8,14 @@ on:
 
 env:
   NODE_OPTIONS: "--max-old-space-size=4096"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     name: Lint Code
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Application
     needs: lint
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - uses: actions/checkout@v4
