@@ -1,0 +1,33 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   ErrorState.css
+   Error state display. Uses CSS variables from globals.css.
+───────────────────────────────────────────────────────────────────────────── */
+
+.error-state {
+  text-align: center;
+  padding: 80px 24px;
+  background: var(--color-surface);
+  border-radius: 44px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.error-state__icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.error-state__title {
+  font-family: "DM Serif Display", serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+}
+
+.error-state__message {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
