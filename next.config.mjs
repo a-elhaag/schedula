@@ -8,7 +8,11 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  // Optimize webpack file watching
+  // Use Turbopack in production (Next.js 16 default)
+  // This prevents conflicts with webpack config
+  turbopack: {},
+
+  // Optimize webpack file watching in development
   webpack: (config, { dev }) => {
     if (dev) {
       config.watchOptions = {
