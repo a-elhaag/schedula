@@ -1,4 +1,5 @@
 import Button from "./Button";
+import { WarningIcon } from "./icons";
 import "./ErrorState.css";
 
 /**
@@ -14,7 +15,9 @@ import "./ErrorState.css";
 export default function ErrorState({ message, onRetry }) {
   return (
     <div className="error-state">
-      <div className="error-state__icon">⚠️</div>
+      <div className="error-state__icon">
+        <WarningIcon size={48} />
+      </div>
       <h3 className="error-state__title">Could not load schedule</h3>
       <p className="error-state__message">{message}</p>
       {/* Uses existing Button component from components/Button.jsx */}

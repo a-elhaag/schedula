@@ -12,18 +12,33 @@ import "./page.css";
 
 export default function Home() {
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [dropdownClosing, setDropdownClosing] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  const handleDropdownClose = () => {
+    setDropdownClosing(true);
+    setTimeout(() => {
+      setOpenDropdown(null);
+      setDropdownClosing(false);
+    }, 180);
+  };
+
+  // Close dropdown when clicking outside — only active while open
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setOpenDropdown(null);
+        setDropdownClosing(true);
+        setTimeout(() => {
+          setOpenDropdown(null);
+          setDropdownClosing(false);
+        }, 180);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
+    if (openDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [openDropdown]);
 
   const components = [
     {
@@ -45,13 +60,13 @@ export default function Home() {
           <div className="dropdown-container" ref={dropdownRef}>
             <button
               onClick={() =>
-                setOpenDropdown(
-                  openDropdown === "components" ? null : "components",
-                )
+                openDropdown === "components" || dropdownClosing
+                  ? handleDropdownClose()
+                  : setOpenDropdown("components")
               }
               className="dropdown-trigger"
             >
-              {openDropdown === "components" ? (
+              {openDropdown === "components" || dropdownClosing ? (
                 <XIcon size={18} />
               ) : (
                 <>
@@ -62,8 +77,10 @@ export default function Home() {
             </button>
 
             {/* Dropdown Menu */}
-            {openDropdown === "components" && (
-              <div className="dropdown-menu">
+            {(openDropdown === "components" || dropdownClosing) && (
+              <div
+                className={`dropdown-menu${dropdownClosing ? " dropdown-menu--closing" : ""}`}
+              >
                 <div className="dropdown-header">
                   <p className="dropdown-header-label">UI Components</p>
                 </div>
@@ -75,7 +92,7 @@ export default function Home() {
                         document
                           .getElementById(comp.id)
                           ?.scrollIntoView({ behavior: "smooth" });
-                        setOpenDropdown(null);
+                        handleDropdownClose();
                       }}
                       className="dropdown-item"
                     >
