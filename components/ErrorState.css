@@ -1,0 +1,45 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   ErrorState.css
+   Error state display. Uses CSS variables from globals.css.
+───────────────────────────────────────────────────────────────────────────── */
+
+.error-state {
+  text-align: center;
+  padding: 80px 24px;
+  background: var(--color-surface);
+  border-radius: 44px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  animation: esFadeIn 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@keyframes esFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-state__icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: var(--color-text-muted);
+}
+
+.error-state__title {
+  font-family: "DM Serif Display", serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+}
+
+.error-state__message {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
