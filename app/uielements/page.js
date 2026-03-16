@@ -2,6 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import Button from "@/components/Button";
+import { Input } from "@/components/Input";
+import { StatCard } from "@/components/StatCard";
+import { SessionCard } from "@/components/SessionCard";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -45,6 +48,21 @@ export default function Home() {
       id: "button",
       label: "Button Component",
       description: "Primary, Secondary, Ghost, Destructive",
+    },
+    {
+      id: "input",
+      label: "Input Component",
+      description: "Standard text, email, and password fields",
+    },
+    {
+      id: "stat-card",
+      label: "Stat Card",
+      description: "Analytics dashboard metric card",
+    },
+    {
+      id: "session-card",
+      label: "Session Card",
+      description: "Course and class scheduling card",
     },
     // Add more components here as we create them
   ];
@@ -326,6 +344,128 @@ import RocketIcon from '@/components/icons/Rocket';
 
 // Disabled State
 <Button disabled>Disabled</Button>`}</pre>
+          </div>
+        </section>
+        {/* Input Component Showcase */}
+        <section id="input" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Input</h3>
+            <p className="section-description">
+              Standard inputs with the signature 20px border radius and focus
+              ring.
+            </p>
+          </div>
+
+          <div className="section">
+            <div className="card">
+              <div
+                className="flex-wrap"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "24px",
+                  maxWidth: "400px",
+                }}
+              >
+                <Input
+                  label="Email Address"
+                  type="email"
+                  placeholder="coordinator@university.edu"
+                />
+                <Input
+                  label="Password"
+                  type="password"
+                  placeholder="••••••••"
+                />
+                <Input
+                  label="Search"
+                  type="text"
+                  placeholder="Search courses or staff..."
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* StatCard Showcase */}
+        <section id="stat-card" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Stat Card</h3>
+            <p className="section-description">
+              Fixed 250x180px analytic cards with soft hover elevation.
+            </p>
+          </div>
+
+          <div className="section">
+            <div
+              className="grid-3-cols"
+              style={{ display: "flex", flexWrap: "wrap", gap: "24px" }}
+            >
+              <div style={{ paddingBottom: "20px" }}>
+                <StatCard
+                  label="Total Students"
+                  value="4,291"
+                  Icon={EyeIcon}
+                  trend="12%"
+                  trendUp={true}
+                />
+              </div>
+              <div style={{ paddingBottom: "20px" }}>
+                <StatCard
+                  label="Rooms Available"
+                  value="14"
+                  Icon={GearIcon}
+                  trend="3%"
+                  trendUp={false}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SessionCard Showcase */}
+        <section id="session-card" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Session Card</h3>
+            <p className="section-description">
+              Course representations with 44px border radius and dynamic left
+              borders.
+            </p>
+          </div>
+
+          <div className="section">
+            <div
+              className="grid-2-cols"
+              style={{ display: "flex", flexWrap: "wrap", gap: "40px" }}
+            >
+              <div style={{ paddingBottom: "30px" }}>
+                <SessionCard
+                  time="09:00 AM - 10:30 AM"
+                  title="CS 101: Introduction to Computer Science"
+                  type="Lecture"
+                  instructor="Dr. Alan Turing"
+                  room="Turing Hall - 402"
+                />
+              </div>
+              <div style={{ paddingBottom: "30px" }}>
+                <SessionCard
+                  time="11:00 AM - 12:30 PM"
+                  title="CS 101L: Python Programming Lab"
+                  type="Lab"
+                  instructor="Ada Lovelace"
+                  room="Computer Lab B"
+                />
+              </div>
+              <div style={{ paddingBottom: "30px" }}>
+                <SessionCard
+                  time="02:00 PM - 03:00 PM"
+                  title="CS 101T: Weekly Discussion Group"
+                  type="Tutorial"
+                  instructor="Grace Hopper"
+                  room="Seminar Room 3"
+                />
+              </div>
+            </div>
           </div>
         </section>
       </main>
