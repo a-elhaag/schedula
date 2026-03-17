@@ -1,0 +1,102 @@
+/* =============================================================================
+   ConfirmStep.css
+   Styles for the availability confirmation/review step component.
+   Uses CSS variables from globals.css - no hardcoded colors.
+============================================================================= */
+
+.confirm-step {
+  background: var(--color-surface);
+  border-radius: 28px;
+  padding: 32px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.confirm-step__title {
+  font-family: "DM Serif Display", serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  margin: 0 0 6px;
+}
+
+.confirm-step__subtitle {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+
+.confirm-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.confirm-empty {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 24px 0;
+}
+
+.confirm-summary__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px 16px;
+  background: var(--color-background);
+  border-radius: 14px;
+}
+
+.confirm-summary__day {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-accent);
+  min-width: 90px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.confirm-summary__slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.confirm-summary__slot {
+  background: rgba(0, 113, 227, 0.1);
+  color: var(--color-accent);
+  border: 1px solid rgba(0, 113, 227, 0.2);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.confirm-warning {
+  background: #FFFBEB;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  color: #92400E;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+@media (max-width: 700px) {
+  .confirm-summary__row { flex-direction: column; gap: 8px; }
+  .confirm-step         { padding: 24px 20px; }
+}
