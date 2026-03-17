@@ -9,6 +9,7 @@ import Checkbox from "@/components/Checkbox";
 import Switch from "@/components/Switch";
 import RadioGroup from "@/components/RadioGroup";
 import ConstraintWeightSlider from "@/components/ConstraintWeightSlider";
+import CSVImportDropzone from "@/components/CSVImportDropzone";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -25,6 +26,7 @@ export default function Home() {
   const [isSwitchOn, setIsSwitchOn] = useState(true);
   const [selectedAudience, setSelectedAudience] = useState("students");
   const [constraintWeight, setConstraintWeight] = useState(65);
+  const [csvFile, setCsvFile] = useState(null);
   const [toast, setToast] = useState({
     open: false,
     variant: "info",
@@ -85,6 +87,11 @@ export default function Home() {
       id: "constraint-weight-slider",
       label: "ConstraintWeightSlider",
       description: "Soft-constraint penalty strength",
+    },
+    {
+      id: "csv-import-dropzone",
+      label: "CSVImportDropzone",
+      description: "CSV file drop area with validation",
     },
     // Add more components here as we create them
   ];
@@ -491,6 +498,29 @@ export default function Home() {
                 description="Disabled preview state for read-only configurations."
               />
             </div>
+          </div>
+        </section>
+
+        <section id="csv-import-dropzone" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">CSVImportDropzone</h3>
+            <p className="section-description">
+              File drop area for CSV imports. Validates file type and shows file
+              info with drag-drop animations.
+            </p>
+          </div>
+
+          <div className="card">
+            <CSVImportDropzone
+              onFileSelect={(file) => {
+                setCsvFile(file);
+                showToast(
+                  "success",
+                  "CSV Selected",
+                  `${file.name} is ready to import.`
+                );
+              }}
+            />
           </div>
         </section>
 
