@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Button from "@/components/Button";
+import Modal from "@/components/Modal";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -12,6 +13,7 @@ import "./page.css";
 
 export default function Home() {
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -30,6 +32,11 @@ export default function Home() {
       id: "button",
       label: "Button Component",
       description: "Primary, Secondary, Ghost, Destructive",
+    },
+    {
+      id: "modal",
+      label: "Modal Component",
+      description: "Base dialog with title, body and footer",
     },
     // Add more components here as we create them
   ];
@@ -273,11 +280,29 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="modal" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Modal</h3>
+            <p className="section-description">
+              Reusable base modal with backdrop click and Escape key support.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="flex-wrap">
+              <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+                Open Modal
+              </Button>
+            </div>
+          </div>
+        </section>
+
         {/* Code Reference */}
         <section className="subsection">
           <h3 className="subsection-title">Usage</h3>
           <div className="code-block">
             <pre>{`import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import DownloadIcon from '@/components/icons/Download';
 import RocketIcon from '@/components/icons/Rocket';
 
@@ -308,9 +333,43 @@ import RocketIcon from '@/components/icons/Rocket';
 <Button size="lg">Large</Button>
 
 // Disabled State
-<Button disabled>Disabled</Button>`}</pre>
+<Button disabled>Disabled</Button>
+
+// Base Modal
+const [isOpen, setIsOpen] = useState(false);
+
+<Modal
+  isOpen={isOpen}
+  onClose={() => setIsOpen(false)}
+  title="Confirm Action"
+  description="This action cannot be undone."
+  footer={<Button onClick={() => setIsOpen(false)}>Close</Button>}
+>
+  Modal body content goes here.
+</Modal>`}</pre>
           </div>
         </section>
+
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Publish Schedule"
+          description="Are you sure you want to publish this schedule snapshot?"
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setIsModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={() => setIsModalOpen(false)}>
+                Confirm
+              </Button>
+            </>
+          }
+        >
+          <p className="section-description">
+            Publishing will make this schedule visible to staff and students.
+          </p>
+        </Modal>
       </main>
     </div>
   );
