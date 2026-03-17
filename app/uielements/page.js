@@ -16,6 +16,8 @@ import Badge from "@/components/Badge";
 import Tag from "@/components/Tag";
 import Spinner from "@/components/Spinner";
 import Skeleton from "@/components/Skeleton";
+import Pagination from "@/components/Pagination";
+import Breadcrumb from "@/components/Breadcrumb";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -40,6 +42,8 @@ export default function Home() {
     { id: 2, label: "Active", variant: "success" },
     { id: 3, label: "Error", variant: "danger" },
   ]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [breadcrumbPath, setBreadcrumbPath] = useState("/coordinator/analytics");
   const [toast, setToast] = useState({
     open: false,
     variant: "info",
@@ -135,6 +139,16 @@ export default function Home() {
       id: "skeleton",
       label: "Skeleton Component",
       description: "Line, block, card shapes for loading state placeholders",
+    },
+    {
+      id: "pagination",
+      label: "Pagination Component",
+      description: "Numbered pages with prev/next navigation",
+    },
+    {
+      id: "breadcrumb",
+      label: "Breadcrumb Component",
+      description: "Path trail for nested page navigation",
     },
     // Add more components here as we create them
   ];
@@ -870,6 +884,130 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Pagination Component */}
+        <section id="pagination" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Pagination</h3>
+            <p className="section-description">
+              Navigate between numbered pages with previous/next buttons. Shows
+              ellipsis for large page ranges with smart page number generation.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">Standard Pagination (Page {currentPage} of 12)</h4>
+              <div style={{ padding: "24px", display: "flex", justifyContent: "center" }}>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={12}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Small Range (5 Pages)</h4>
+              <div style={{ padding: "24px", display: "flex", justifyContent: "center" }}>
+                <Pagination
+                  currentPage={2}
+                  totalPages={5}
+                  onPageChange={() => {}}
+                />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Disabled State</h4>
+              <div style={{ padding: "24px", display: "flex", justifyContent: "center" }}>
+                <Pagination
+                  currentPage={1}
+                  totalPages={5}
+                  disabled
+                  onPageChange={() => {}}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Breadcrumb Component */}
+        <section id="breadcrumb" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Breadcrumb</h3>
+            <p className="section-description">
+              Navigation trail showing the current location in nested page
+              hierarchies. Click any link to navigate (except current page).
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">Coordinator Analytics Path</h4>
+              <div style={{ padding: "16px" }}>
+                <Breadcrumb
+                  items={[
+                    { label: "Home", href: "/" },
+                    { label: "Coordinator", href: "/coordinator" },
+                    { label: "Analytics", href: "/coordinator/analytics" },
+                  ]}
+                  onNavigate={(href) => setBreadcrumbPath(href)}
+                />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Schedule Review Path</h4>
+              <div style={{ padding: "16px" }}>
+                <Breadcrumb
+                  items={[
+                    { label: "Home", href: "/" },
+                    { label: "Coordinator", href: "/coordinator" },
+                    { label: "Schedule", href: "/coordinator/schedule" },
+                    { label: "Review", href: "/coordinator/schedule/review" },
+                  ]}
+                  onNavigate={(href) => setBreadcrumbPath(href)}
+                />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Import & Setup Path</h4>
+              <div style={{ padding: "16px" }}>
+                <Breadcrumb
+                  items={[
+                    { label: "Home", href: "/" },
+                    { label: "Coordinator", href: "/coordinator" },
+                    { label: "Setup", href: "/coordinator/setup" },
+                    { label: "Courses", href: "/coordinator/setup/courses" },
+                  ]}
+                  onNavigate={(href) => setBreadcrumbPath(href)}
+                />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">With Icons (Simulated)</h4>
+              <div style={{ padding: "16px" }}>
+                <Breadcrumb
+                  items={[
+                    { label: "Dashboard", href: "/", icon: "🏠" },
+                    { label: "Coordinator", href: "/coordinator", icon: "👤" },
+                    { label: "Analytics", href: "/coordinator/analytics", icon: "📊" },
+                  ]}
+                  onNavigate={(href) => setBreadcrumbPath(href)}
+                />
+              </div>
+            </div>
+
+            {breadcrumbPath !== "/coordinator/analytics" && (
+              <p className="section-description" style={{ fontSize: "12px", color: "#64748b", marginTop: "12px" }}>
+                Last navigated to: <code style={{ background: "#f1f5f9", padding: "2px 6px", borderRadius: "4px" }}>{breadcrumbPath}</code>
+              </p>
+            )}
           </div>
         </section>
 
