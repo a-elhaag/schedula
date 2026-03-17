@@ -229,6 +229,12 @@
   gap: 24px;
 }
 
+.flex-wrap-gap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
 /* Cards */
 .card {
   background-color: var(--color-surface);

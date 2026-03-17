@@ -1,0 +1,116 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 18px;
+  border: 1px solid;
+  user-select: none;
+  animation: tagSlideIn 200ms ease forwards;
+}
+
+/* Color Variants */
+.tag-default {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+
+.tag-info {
+  background: rgba(0, 113, 227, 0.08);
+  color: var(--color-accent, #0071e3);
+  border-color: rgba(0, 113, 227, 0.3);
+}
+
+.tag-success {
+  background: rgba(34, 197, 94, 0.08);
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.tag-warning {
+  background: rgba(234, 179, 8, 0.08);
+  color: #eab308;
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+.tag-danger {
+  background: rgba(220, 38, 38, 0.08);
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.tag-label {
+  flex: 1;
+  word-break: break-word;
+}
+
+.tag-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 140ms ease;
+  outline: none;
+  flex-shrink: 0;
+  color: currentColor;
+}
+
+.tag-remove-btn:hover:not(:disabled) {
+  transform: scale(1.2);
+  opacity: 0.8;
+}
+
+.tag-remove-btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+.tag-remove-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.tag.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.tag.is-disabled .tag-remove-btn {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@keyframes tagSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag {
+    animation: none;
+  }
+
+  .tag-remove-btn {
+    transition: none;
+  }
+}
