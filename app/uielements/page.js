@@ -14,6 +14,8 @@ import Select from "@/components/Select";
 import MultiSelect from "@/components/MultiSelect";
 import Badge from "@/components/Badge";
 import Tag from "@/components/Tag";
+import Spinner from "@/components/Spinner";
+import Skeleton from "@/components/Skeleton";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -123,6 +125,16 @@ export default function Home() {
       id: "multiselect",
       label: "MultiSelect Component",
       description: "Tag-based multi-select with search and filtering",
+    },
+    {
+      id: "spinner",
+      label: "Spinner Component",
+      description: "Loading indicator with 3 sizes and CSS animation",
+    },
+    {
+      id: "skeleton",
+      label: "Skeleton Component",
+      description: "Line, block, card shapes for loading state placeholders",
     },
     // Add more components here as we create them
   ];
@@ -761,6 +773,101 @@ export default function Home() {
                   disabled
                   onRemove={() => {}}
                 />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Spinner Component */}
+        <section id="spinner" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Spinner</h3>
+            <p className="section-description">
+              Animated loading indicator with 3 sizes. Uses SVG circle
+              animation with rotating and pulsing effects.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">Small</h4>
+              <div style={{ display: "flex", justifyContent: "center", padding: "24px" }}>
+                <Spinner size="sm" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Medium (Default)</h4>
+              <div style={{ display: "flex", justifyContent: "center", padding: "24px" }}>
+                <Spinner size="md" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Large</h4>
+              <div style={{ display: "flex", justifyContent: "center", padding: "24px" }}>
+                <Spinner size="lg" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Multiple Spinners</h4>
+              <div style={{ display: "flex", justifyContent: "center", gap: "32px", padding: "24px" }}>
+                <Spinner size="sm" />
+                <Spinner size="md" />
+                <Spinner size="lg" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Skeleton Component */}
+        <section id="skeleton" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Skeleton</h3>
+            <p className="section-description">
+              Placeholder loading state with animated shimmer effect. Use while
+              fetching content in line, block, or card layouts.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">Line Skeleton (Text)</h4>
+              <div style={{ padding: "16px", gap: "8px", display: "flex", flexDirection: "column" }}>
+                <Skeleton type="line" />
+                <Skeleton type="line" />
+                <Skeleton type="line" width="70%" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Block Skeleton (Image/Media)</h4>
+              <div style={{ padding: "16px" }}>
+                <Skeleton type="block" width="200px" height="140px" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Card Skeleton</h4>
+              <div style={{ padding: "16px" }}>
+                <Skeleton type="card" width="280px" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Content Loading State</h4>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px", padding: "16px" }}>
+                <div style={{ gap: "8px", display: "flex", flexDirection: "column" }}>
+                  <Skeleton type="block" width="100%" height="100px" />
+                  <Skeleton type="line" />
+                  <Skeleton type="line" width="85%" />
+                </div>
+                <div style={{ gap: "8px", display: "flex", flexDirection: "column" }}>
+                  <Skeleton type="block" width="100%" height="100px" />
+                  <Skeleton type="line" />
+                  <Skeleton type="line" width="75%" />
+                </div>
               </div>
             </div>
           </div>
