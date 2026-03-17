@@ -1,6 +1,29 @@
+"use client";
+
+import { useState } from "react";
+import CSVImportDropzone from "@/components/CSVImportDropzone";
+import Toast from "@/components/Toast";
 import "./styles.css";
 
 export default function CoordinatorImportPage() {
+  const [csvFile, setCsvFile] = useState(null);
+  const [toast, setToast] = useState({
+    open: false,
+    variant: "info",
+    title: "",
+    message: "",
+    id: 0,
+  });
+
+  const showToast = (variant, title, message) => {
+    setToast({
+      open: true,
+      variant,
+      title,
+      message,
+      id: Date.now(),
+    });
+  };
   const importStats = [
     { label: "Datasets Ready", value: "6", note: "2 need mapping" },
     { label: "Rows Validated", value: "4,382", note: "97% clean" },
@@ -63,12 +86,59 @@ export default function CoordinatorImportPage() {
         <section className="panel reveal reveal-3">
           <div className="panel-head">
             <div>
+              <h2>{csvFile ? "File Loaded" : "Import New CSV"}</h2>
+              <p>{csvFile ? "Ready to proceed with validation." : "Select a CSV file to begin."}</p>
+            </div>
+          </div>
+
+          <div className="dropzone-container">
+            <CSVImportDropzone
+              onFileSelect={(file) => {
+                setCsvFile(file);
+                showToast(
+                  "success",
+                  "CSV Loaded",
+                  `${file.name} is ready for validation.`
+                );
+              }}
+            />
+          </div>
+
+          {csvFile && (
+            <div className="upload-queue-actions">
+              <button
+                type="button"
+                className="ghost-btn"
+                onClick={() => {
+                  setCsvFile(null);
+                  showToast("info", "Cleared", "CSV selection has been cleared.");
+                }}
+              >
+                Clear File
+              </button>
+              <button
+                type="button"
+                className="primary-btn"
+                onClick={() => {
+                  showToast(
+                    "success",
+                    "Validating",
+                    `Processing ${csvFile.name}. Please wait...`
+                  );
+                }}
+              >
+                Validate & Next
+              </button>
+            </div>
+          )}
+        </section>
+
+        <section className="panel reveal reveal-3">
+          <div className="panel-head">
+            <div>
               <h2>Import Queue</h2>
               <p>Track each file from upload to mapping and validation.</p>
             </div>
-            <button type="button" className="primary-btn">
-              Upload New File
-            </button>
           </div>
 
           <div className="dataset-grid">
@@ -124,6 +194,16 @@ export default function CoordinatorImportPage() {
             </button>
           </article>
         </section>
+
+        <Toast
+          key={toast.id}
+          open={toast.open}
+          variant={toast.variant}
+          title={toast.title}
+          message={toast.message}
+          onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+          duration={3200}
+        />
       </main>
     </div>
   );
