@@ -326,6 +326,30 @@
   }
 }
 
+.dropzone-container {
+  margin-bottom: 24px;
+  animation: slideUp 360ms ease forwards;
+  animation-delay: 180ms;
+}
+
+.upload-queue-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  animation: slideUp 360ms ease forwards;
+  animation-delay: 240ms;
+}
+
+.upload-queue-actions .primary-btn {
+  flex: 1;
+  max-width: 240px;
+}
+
+.upload-queue-actions .ghost-btn {
+  flex: 0 1 auto;
+  min-width: 120px;
+}
+
 @media (max-width: 980px) {
   .stats-grid,
   .dataset-grid,
