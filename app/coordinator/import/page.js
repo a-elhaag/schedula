@@ -1,12 +1,130 @@
 import "./styles.css";
 
 export default function CoordinatorImportPage() {
+  const importStats = [
+    { label: "Datasets Ready", value: "6", note: "2 need mapping" },
+    { label: "Rows Validated", value: "4,382", note: "97% clean" },
+    { label: "Last Sync", value: "14:25", note: "Today" },
+  ];
+
+  const datasets = [
+    {
+      name: "Courses Catalog",
+      file: "courses_spring_2026.csv",
+      rows: 214,
+      status: "Ready",
+      progress: 100,
+    },
+    {
+      name: "Staff Assignments",
+      file: "staff_assignments.xlsx",
+      rows: 96,
+      status: "Mapping",
+      progress: 72,
+    },
+    {
+      name: "Room Inventory",
+      file: "rooms_capacity.csv",
+      rows: 138,
+      status: "Ready",
+      progress: 100,
+    },
+    {
+      name: "Student Groups",
+      file: "student_groups.csv",
+      rows: 512,
+      status: "Review",
+      progress: 58,
+    },
+  ];
+
   return (
-    <div className="page-container">
-      <div className="content-center">
-        <h1>Import Data</h1>
-        <p>Import courses and staff information</p>
-      </div>
+    <div className="import-page">
+      <main className="import-shell">
+        <section className="hero reveal reveal-1">
+          <p className="hero-eyebrow">Coordinator Workspace</p>
+          <h1>Import Data</h1>
+          <p className="hero-subtitle">
+            Bring in course, staff, and room datasets with validation checks
+            before publishing the scheduling baseline.
+          </p>
+        </section>
+
+        <section className="stats-grid reveal reveal-2">
+          {importStats.map((stat) => (
+            <article className="stat-card" key={stat.label}>
+              <p className="stat-label">{stat.label}</p>
+              <p className="stat-value">{stat.value}</p>
+              <p className="stat-note">{stat.note}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className="panel reveal reveal-3">
+          <div className="panel-head">
+            <div>
+              <h2>Import Queue</h2>
+              <p>Track each file from upload to mapping and validation.</p>
+            </div>
+            <button type="button" className="primary-btn">
+              Upload New File
+            </button>
+          </div>
+
+          <div className="dataset-grid">
+            {datasets.map((dataset) => (
+              <article className="dataset-card" key={dataset.name}>
+                <div className="dataset-head">
+                  <p className="dataset-name">{dataset.name}</p>
+                  <span className={`status-badge status-${dataset.status.toLowerCase()}`}>
+                    {dataset.status}
+                  </span>
+                </div>
+
+                <p className="dataset-file">{dataset.file}</p>
+
+                <div className="dataset-meta">
+                  <p>{dataset.rows} rows</p>
+                  <p>{dataset.progress}% complete</p>
+                </div>
+
+                <div className="progress-track">
+                  <div
+                    className="progress-fill"
+                    style={{ "--import-progress": `${dataset.progress}%` }}
+                  />
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="validation reveal reveal-4">
+          <article className="validation-card">
+            <h3>Validation Summary</h3>
+            <p>17 warnings detected in Staff Assignments dataset.</p>
+            <ul>
+              <li>9 missing instructor IDs</li>
+              <li>5 invalid room codes</li>
+              <li>3 duplicate section keys</li>
+            </ul>
+            <button type="button" className="ghost-btn">
+              Resolve Warnings
+            </button>
+          </article>
+
+          <article className="validation-card">
+            <h3>Next Step</h3>
+            <p>
+              After resolving warnings, publish the clean dataset as the source
+              for schedule generation.
+            </p>
+            <button type="button" className="ghost-btn">
+              Publish Dataset Snapshot
+            </button>
+          </article>
+        </section>
+      </main>
     </div>
   );
 }
