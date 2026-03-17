@@ -2,22 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import Button from "@/components/Button";
-import Modal from "@/components/Modal";
-import ConfirmDialog from "@/components/ConfirmDialog";
-import Toast from "@/components/Toast";
-import Checkbox from "@/components/Checkbox";
-import Switch from "@/components/Switch";
-import RadioGroup from "@/components/RadioGroup";
-import ConstraintWeightSlider from "@/components/ConstraintWeightSlider";
-import CSVImportDropzone from "@/components/CSVImportDropzone";
-import Select from "@/components/Select";
-import MultiSelect from "@/components/MultiSelect";
-import Badge from "@/components/Badge";
-import Tag from "@/components/Tag";
-import Spinner from "@/components/Spinner";
-import Skeleton from "@/components/Skeleton";
-import Pagination from "@/components/Pagination";
-import Breadcrumb from "@/components/Breadcrumb";
+import { Input } from "@/components/Input";
+import { StatCard } from "@/components/StatCard";
+import { SessionCard } from "@/components/SessionCard";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -28,51 +15,33 @@ import "./page.css";
 
 export default function Home() {
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
-  const [isSwitchOn, setIsSwitchOn] = useState(true);
-  const [selectedAudience, setSelectedAudience] = useState("students");
-  const [constraintWeight, setConstraintWeight] = useState(65);
-  const [csvFile, setCsvFile] = useState(null);
-  const [selectedDepartment, setSelectedDepartment] = useState("cs");
-  const [selectedCourses, setSelectedCourses] = useState(["math101", "phys101"]);
-  const [tagList, setTagList] = useState([
-    { id: 1, label: "Pending", variant: "warning" },
-    { id: 2, label: "Active", variant: "success" },
-    { id: 3, label: "Error", variant: "danger" },
-  ]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [breadcrumbPath, setBreadcrumbPath] = useState("/coordinator/analytics");
-  const [toast, setToast] = useState({
-    open: false,
-    variant: "info",
-    title: "",
-    message: "",
-    id: 0,
-  });
+  const [dropdownClosing, setDropdownClosing] = useState(false);
   const dropdownRef = useRef(null);
 
-  const showToast = (variant, title, message) => {
-    setToast({
-      open: true,
-      variant,
-      title,
-      message,
-      id: Date.now(),
-    });
+  const handleDropdownClose = () => {
+    setDropdownClosing(true);
+    setTimeout(() => {
+      setOpenDropdown(null);
+      setDropdownClosing(false);
+    }, 180);
   };
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside — only active while open
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setOpenDropdown(null);
+        setDropdownClosing(true);
+        setTimeout(() => {
+          setOpenDropdown(null);
+          setDropdownClosing(false);
+        }, 180);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
+    if (openDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [openDropdown]);
 
   const components = [
     {
@@ -81,74 +50,19 @@ export default function Home() {
       description: "Primary, Secondary, Ghost, Destructive",
     },
     {
-      id: "modal",
-      label: "Modal Component",
-      description: "Base dialog with title, body and footer",
+      id: "input",
+      label: "Input Component",
+      description: "Standard text, email, and password fields",
     },
     {
-      id: "confirm-dialog",
-      label: "ConfirmDialog Component",
-      description: "Destructive action confirmation",
+      id: "stat-card",
+      label: "Stat Card",
+      description: "Analytics dashboard metric card",
     },
     {
-      id: "toast",
-      label: "Toast Component",
-      description: "Timed feedback notification (4 variants)",
-    },
-    {
-      id: "form-controls",
-      label: "Form Controls",
-      description: "Checkbox, Switch, RadioGroup states",
-    },
-    {
-      id: "constraint-weight-slider",
-      label: "ConstraintWeightSlider",
-      description: "Soft-constraint penalty strength",
-    },
-    {
-      id: "csv-import-dropzone",
-      label: "CSVImportDropzone",
-      description: "CSV file drop area with validation",
-    },
-    {
-      id: "select",
-      label: "Select Component",
-      description: "Single select dropdown with search and keyboard nav",
-    },
-    {
-      id: "badge",
-      label: "Badge Component",
-      description: "5 semantic variants for status and labels",
-    },
-    {
-      id: "tag",
-      label: "Tag Component",
-      description: "Removable pill for categorization and multi-select",
-    },
-    {
-      id: "multiselect",
-      label: "MultiSelect Component",
-      description: "Tag-based multi-select with search and filtering",
-    },
-    {
-      id: "spinner",
-      label: "Spinner Component",
-      description: "Loading indicator with 3 sizes and CSS animation",
-    },
-    {
-      id: "skeleton",
-      label: "Skeleton Component",
-      description: "Line, block, card shapes for loading state placeholders",
-    },
-    {
-      id: "pagination",
-      label: "Pagination Component",
-      description: "Numbered pages with prev/next navigation",
-    },
-    {
-      id: "breadcrumb",
-      label: "Breadcrumb Component",
-      description: "Path trail for nested page navigation",
+      id: "session-card",
+      label: "Session Card",
+      description: "Course and class scheduling card",
     },
     // Add more components here as we create them
   ];
@@ -164,13 +78,13 @@ export default function Home() {
           <div className="dropdown-container" ref={dropdownRef}>
             <button
               onClick={() =>
-                setOpenDropdown(
-                  openDropdown === "components" ? null : "components",
-                )
+                openDropdown === "components" || dropdownClosing
+                  ? handleDropdownClose()
+                  : setOpenDropdown("components")
               }
               className="dropdown-trigger"
             >
-              {openDropdown === "components" ? (
+              {openDropdown === "components" || dropdownClosing ? (
                 <XIcon size={18} />
               ) : (
                 <>
@@ -181,8 +95,10 @@ export default function Home() {
             </button>
 
             {/* Dropdown Menu */}
-            {openDropdown === "components" && (
-              <div className="dropdown-menu">
+            {(openDropdown === "components" || dropdownClosing) && (
+              <div
+                className={`dropdown-menu${dropdownClosing ? " dropdown-menu--closing" : ""}`}
+              >
                 <div className="dropdown-header">
                   <p className="dropdown-header-label">UI Components</p>
                 </div>
@@ -194,7 +110,7 @@ export default function Home() {
                         document
                           .getElementById(comp.id)
                           ?.scrollIntoView({ behavior: "smooth" });
-                        setOpenDropdown(null);
+                        handleDropdownClose();
                       }}
                       className="dropdown-item"
                     >
@@ -1063,49 +979,128 @@ const [isOpen, setIsOpen] = useState(false);
 </Modal>`}</pre>
           </div>
         </section>
+        {/* Input Component Showcase */}
+        <section id="input" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Input</h3>
+            <p className="section-description">
+              Standard inputs with the signature 20px border radius and focus
+              ring.
+            </p>
+          </div>
 
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          title="Publish Schedule"
-          description="Are you sure you want to publish this schedule snapshot?"
-          footer={
-            <>
-              <Button variant="ghost" onClick={() => setIsModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button variant="primary" onClick={() => setIsModalOpen(false)}>
-                Confirm
-              </Button>
-            </>
-          }
-        >
-          <p className="section-description">
-            Publishing will make this schedule visible to staff and students.
-          </p>
-        </Modal>
+          <div className="section">
+            <div className="card">
+              <div
+                className="flex-wrap"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "24px",
+                  maxWidth: "400px",
+                }}
+              >
+                <Input
+                  label="Email Address"
+                  type="email"
+                  placeholder="coordinator@university.edu"
+                />
+                <Input
+                  label="Password"
+                  type="password"
+                  placeholder="••••••••"
+                />
+                <Input
+                  label="Search"
+                  type="text"
+                  placeholder="Search courses or staff..."
+                />
+              </div>
+            </div>
+          </div>
+        </section>
 
-        <ConfirmDialog
-          isOpen={isConfirmOpen}
-          onClose={() => setIsConfirmOpen(false)}
-          onConfirm={() => {
-            setIsConfirmOpen(false);
-            showToast("success", "Deleted", "Schedule draft has been permanently deleted.");
-          }}
-          title="Delete Schedule Draft"
-          description="This will permanently remove this draft and all unsaved adjustments."
-          confirmLabel="Delete Permanently"
-        />
+        {/* StatCard Showcase */}
+        <section id="stat-card" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Stat Card</h3>
+            <p className="section-description">
+              Fixed 250x180px analytic cards with soft hover elevation.
+            </p>
+          </div>
 
-        <Toast
-          key={toast.id}
-          open={toast.open}
-          variant={toast.variant}
-          title={toast.title}
-          message={toast.message}
-          onClose={() => setToast((prev) => ({ ...prev, open: false }))}
-          duration={3200}
-        />
+          <div className="section">
+            <div
+              className="grid-3-cols"
+              style={{ display: "flex", flexWrap: "wrap", gap: "24px" }}
+            >
+              <div style={{ paddingBottom: "20px" }}>
+                <StatCard
+                  label="Total Students"
+                  value="4,291"
+                  Icon={EyeIcon}
+                  trend="12%"
+                  trendUp={true}
+                />
+              </div>
+              <div style={{ paddingBottom: "20px" }}>
+                <StatCard
+                  label="Rooms Available"
+                  value="14"
+                  Icon={GearIcon}
+                  trend="3%"
+                  trendUp={false}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SessionCard Showcase */}
+        <section id="session-card" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Session Card</h3>
+            <p className="section-description">
+              Course representations with 44px border radius and dynamic left
+              borders.
+            </p>
+          </div>
+
+          <div className="section">
+            <div
+              className="grid-2-cols"
+              style={{ display: "flex", flexWrap: "wrap", gap: "40px" }}
+            >
+              <div style={{ paddingBottom: "30px" }}>
+                <SessionCard
+                  time="09:00 AM - 10:30 AM"
+                  title="CS 101: Introduction to Computer Science"
+                  type="Lecture"
+                  instructor="Dr. Alan Turing"
+                  room="Turing Hall - 402"
+                />
+              </div>
+              <div style={{ paddingBottom: "30px" }}>
+                <SessionCard
+                  time="11:00 AM - 12:30 PM"
+                  title="CS 101L: Python Programming Lab"
+                  type="Lab"
+                  instructor="Ada Lovelace"
+                  room="Computer Lab B"
+                />
+              </div>
+              <div style={{ paddingBottom: "30px" }}>
+                <SessionCard
+                  time="02:00 PM - 03:00 PM"
+                  title="CS 101T: Weekly Discussion Group"
+                  type="Tutorial"
+                  instructor="Grace Hopper"
+                  room="Seminar Room 3"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );

@@ -27,7 +27,7 @@ async function truncateDatabase() {
     }
 
     console.log(
-      `\n─────────────────────────────────────────\n✅  ${dropped} collection(s) cleared successfully.\n`
+      `\n─────────────────────────────────────────\n✅  ${dropped} collection(s) cleared successfully.\n`,
     );
   } catch (err) {
     console.error("\n❌  Truncate failed:", err.message);

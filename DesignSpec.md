@@ -178,9 +178,36 @@ background: rgba(255, 255, 255, 0.75);
 
 ---
 
-## 6. Components
+## 6. Animation & Motion
 
-### 6.1 Navbar
+Schedula's motion design should feel fluid, grounded, and "morphie" (resembling Apple’s fluid interfaces and spring animations). Motions shouldn't snap strictly linearly or use standard eases that feel rigid.
+
+### Motion Principles
+
+- **Fluid Morphing:** Expansions, open states, and popovers should morph gracefully rather than simply cross-fading flatly.
+- **Spring-like Easing:** Prefer natural, elastic cubic-beziers over generic `ease` or `ease-out`.
+- **Duration:** 400ms to 800ms depending on the travel distance. Shorter for small hovers, longer for layout changes.
+
+### Essential Bezier Curves
+
+```css
+/* Primary spring morph (smooth, swift, fluid) */
+transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+
+/* Slower expansive morph (modals, overlays) */
+animation: 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+/* Infinite shimmers (Skeleton loading) */
+animation: skShimmer 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+```
+
+**Never use:** `linear`, flat `ease-in`, or bouncy elastic effects (e.g. overshoots should be kept minimal if used at all).
+
+---
+
+## 7. Components
+
+### 7.1 Navbar
 
 ```
 height:        52px
@@ -198,7 +225,7 @@ layout:        space-between → [wordmark] [nav links] [CTA]
 
 ---
 
-### 6.2 Session Card
+### 7.2 Session Card
 
 The most important component. Two states: collapsed (card) and expanded (morphed overlay).
 
@@ -264,7 +291,7 @@ Lab:      bg-accent/30, text-accent
 
 ---
 
-### 6.3 Stat Card
+### 7.3 Stat Card
 
 ```
 background:    {surface}
@@ -283,7 +310,7 @@ hover:         scale(1.04), shadow elevation
 
 ---
 
-### 6.4 File Component
+### 7.4 File Component
 
 ```
 background:    {surface}
