@@ -1,22 +1,310 @@
 .page-container {
   display: flex;
   justify-content: center;
-  align-items: center;
   min-height: 100vh;
   width: 100%;
-  background-color: var(--color-background);
+  padding: 28px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(0, 113, 227, 0.12), transparent 46%),
+    radial-gradient(circle at 100% 100%, rgba(0, 113, 227, 0.08), transparent 52%),
+    var(--color-background);
+  animation: backgroundShift 12s ease-in-out infinite alternate;
 }
 
-.content-center {
-  text-align: center;
+.onboarding-shell {
+  width: min(100%, 820px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.content-center h1 {
-  color: var(--color-text-primary);
-  margin-bottom: 16px;
+.onboarding-header {
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  background-color: var(--color-surface);
+  padding: 24px;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.06);
+  animation: cardEnter 560ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
-.content-center p {
+.eyebrow {
+  margin: 0;
   color: var(--color-text-muted);
-  font-size: 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.onboarding-header h1 {
+  color: var(--color-text-primary);
+  margin: 10px 0;
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  animation: contentFadeUp 520ms ease both;
+  animation-delay: 120ms;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  animation: contentFadeUp 520ms ease both;
+  animation-delay: 180ms;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.step-pill {
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  animation: contentFadeUp 520ms ease both;
+}
+
+.step-pill span {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  align-items: center;
+  justify-content: center;
+  background-color: #eef4ff;
+  color: var(--color-accent);
+  font-size: 0.75rem;
+}
+
+.step-pill.active {
+  border-color: rgba(0, 113, 227, 0.32);
+  color: var(--color-text-primary);
+  box-shadow: 0 8px 20px rgba(0, 113, 227, 0.12);
+}
+
+.step-pill.done {
+  border-color: rgba(52, 199, 89, 0.36);
+}
+
+.onboarding-form {
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  background-color: var(--color-surface);
+  padding: 20px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: cardEnter 560ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: 80ms;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: contentFadeUp 440ms ease both;
+}
+
+.panel-forward {
+  animation: slideInForward 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.panel-backward {
+  animation: slideInBackward 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.input {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  background-color: #fff;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.14);
+  transform: translateY(-1px);
+}
+
+.input:disabled {
+  opacity: 0.72;
+}
+
+.toggle-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-primary);
+  font-size: 0.92rem;
+}
+
+.toggle-row input {
+  accent-color: var(--color-accent);
+}
+
+.feedback {
+  margin: 2px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.94rem;
+  line-height: 1.4;
+  animation: feedbackPop 240ms ease-out both;
+}
+
+.feedback.success {
+  background-color: #e8f4ff;
+  color: #0b4f8a;
+  border: 1px solid #b8ddff;
+}
+
+.feedback.error {
+  background-color: #fff0ee;
+  color: #8f281f;
+  border: 1px solid #ffd2cb;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes contentFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInForward {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInBackward {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes feedbackPop {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes backgroundShift {
+  from {
+    background-position: 0% 0%, 100% 100%, 0 0;
+  }
+  to {
+    background-position: 6% 4%, 96% 94%, 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-container,
+  .onboarding-header,
+  .onboarding-header h1,
+  .subtitle,
+  .step-pill,
+  .onboarding-form,
+  .panel,
+  .panel-forward,
+  .panel-backward,
+  .feedback {
+    animation: none !important;
+  }
+
+  .input {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-container {
+    padding: 16px;
+  }
+
+  .onboarding-header,
+  .onboarding-form {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .stepper {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .actions .btn {
+    width: 100%;
+  }
 }

@@ -247,6 +247,12 @@
   gap: 24px;
 }
 
+.flex-wrap-gap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
 /* Cards */
 .card {
   background-color: var(--color-surface);
@@ -282,6 +288,18 @@
   margin-top: 8px;
 }
 
+.form-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.form-controls-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 /* Code Block */
 .code-block {
   background-color: var(--color-surface);
@@ -303,7 +321,8 @@
 /* Responsive */
 @media (max-width: 768px) {
   .grid-2-cols,
-  .grid-4-cols {
+  .grid-4-cols,
+  .form-controls-grid {
     grid-template-columns: 1fr;
   }
 

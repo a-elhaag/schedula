@@ -308,11 +308,631 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="modal" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Modal</h3>
+            <p className="section-description">
+              Reusable base modal with backdrop click and Escape key support.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="flex-wrap">
+              <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+                Open Modal
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        <section id="confirm-dialog" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">ConfirmDialog</h3>
+            <p className="section-description">
+              Specialized destructive confirmation dialog built on top of Modal.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="flex-wrap">
+              <Button variant="destructive" onClick={() => setIsConfirmOpen(true)}>
+                Delete Schedule Draft
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        <section id="toast" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Toast</h3>
+            <p className="section-description">
+              Timed feedback notifications with four status variants.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="flex-wrap">
+              <Button
+                variant="primary"
+                onClick={() =>
+                  showToast("success", "Saved", "Schedule changes were saved successfully.")
+                }
+              >
+                Success Toast
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  showToast("info", "Heads up", "A new analytics report is available.")
+                }
+              >
+                Info Toast
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  showToast("warning", "Warning", "2 sessions still need room assignment.")
+                }
+              >
+                Warning Toast
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() =>
+                  showToast("error", "Error", "Unable to publish schedule right now.")
+                }
+              >
+                Error Toast
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        <section id="form-controls" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Form Controls</h3>
+            <p className="section-description">
+              Checkbox, Switch, and RadioGroup controls with checked,
+              unchecked, and disabled states.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="form-controls-grid">
+              <div className="subsection">
+                <h4 className="variant-title">Checkbox</h4>
+                <div className="form-controls-list">
+                  <Checkbox
+                    label={`Interactive (${isCheckboxChecked ? "Checked" : "Unchecked"})`}
+                    checked={isCheckboxChecked}
+                    onChange={setIsCheckboxChecked}
+                  />
+                  <Checkbox label="Checked Disabled" defaultChecked disabled />
+                  <Checkbox label="Unchecked Disabled" disabled />
+                </div>
+              </div>
+
+              <div className="subsection">
+                <h4 className="variant-title">Switch</h4>
+                <div className="form-controls-list">
+                  <Switch
+                    label={`Interactive (${isSwitchOn ? "Checked" : "Unchecked"})`}
+                    checked={isSwitchOn}
+                    onChange={setIsSwitchOn}
+                  />
+                  <Switch label="Checked Disabled" defaultChecked disabled />
+                  <Switch label="Unchecked Disabled" disabled />
+                </div>
+              </div>
+
+              <div className="subsection">
+                <h4 className="variant-title">RadioGroup</h4>
+                <RadioGroup
+                  legend="Schedule Visibility"
+                  value={selectedAudience}
+                  onChange={setSelectedAudience}
+                  options={[
+                    { value: "students", label: "Students (Checked)" },
+                    { value: "staff", label: "Staff (Unchecked)" },
+                    {
+                      value: "guests",
+                      label: "Guests (Disabled)",
+                      disabled: true,
+                    },
+                  ]}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="constraint-weight-slider" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">ConstraintWeightSlider</h3>
+            <p className="section-description">
+              Labeled slider for adjusting how strongly the solver penalizes a
+              soft constraint.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="form-controls-list">
+              <ConstraintWeightSlider
+                label="Avoid Back-to-Back Lectures"
+                value={constraintWeight}
+                onChange={setConstraintWeight}
+                description="Higher values increase penalties for consecutive sessions."
+              />
+
+              <ConstraintWeightSlider
+                label="Keep Afternoon Slots Light"
+                value={35}
+                disabled
+                description="Disabled preview state for read-only configurations."
+              />
+            </div>
+          </div>
+        </section>
+
+        <section id="csv-import-dropzone" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">CSVImportDropzone</h3>
+            <p className="section-description">
+              File drop area for CSV imports. Validates file type and shows file
+              info with drag-drop animations.
+            </p>
+          </div>
+
+          <div className="card">
+            <CSVImportDropzone
+              onFileSelect={(file) => {
+                setCsvFile(file);
+                showToast(
+                  "success",
+                  "CSV Selected",
+                  `${file.name} is ready to import.`
+                );
+              }}
+            />
+          </div>
+        </section>
+
+        {/* Select Component */}
+        <section id="select" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Select</h3>
+            <p className="section-description">
+              Single select dropdown with keyboard navigation, search, and
+              accessibility support.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="grid-2-cols">
+              <Select
+                label="Department"
+                options={[
+                  { value: "cs", label: "Computer Science" },
+                  { value: "math", label: "Mathematics" },
+                  { value: "phys", label: "Physics" },
+                  { value: "chem", label: "Chemistry" },
+                  { value: "bio", label: "Biology" },
+                ]}
+                value={selectedDepartment}
+                onChange={setSelectedDepartment}
+                placeholder="Choose a department"
+              />
+              <Select
+                label="Department (Disabled)"
+                options={[
+                  { value: "eng", label: "English" },
+                  { value: "hist", label: "History" },
+                ]}
+                disabled
+                placeholder="Select department"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* MultiSelect Component */}
+        <section id="multiselect" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">MultiSelect</h3>
+            <p className="section-description">
+              Tag-based multi-select with dynamic search filtering and
+              removable tags.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="grid-2-cols">
+              <MultiSelect
+                label="Courses"
+                options={[
+                  { value: "math101", label: "Calculus I" },
+                  { value: "math102", label: "Calculus II" },
+                  { value: "phys101", label: "Physics I" },
+                  { value: "phys102", label: "Physics II" },
+                  { value: "chem101", label: "Chemistry I" },
+                ]}
+                value={selectedCourses}
+                onChange={setSelectedCourses}
+                placeholder="Select courses..."
+              />
+              <MultiSelect
+                label="Instructors (Disabled)"
+                options={[
+                  { value: "prof1", label: "Dr. Smith" },
+                  { value: "prof2", label: "Dr. Johnson" },
+                ]}
+                disabled
+                placeholder="Select instructors"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Badge Component */}
+        <section id="badge" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Badge</h3>
+            <p className="section-description">
+              Status badges with 5 semantic variants: default, info, success,
+              warning, and danger.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">All Variants (Medium)</h4>
+              <div className="flex-wrap-gap" style={{ gap: "12px" }}>
+                <Badge variant="default">Default</Badge>
+                <Badge variant="info">Info</Badge>
+                <Badge variant="success">Success</Badge>
+                <Badge variant="warning">Warning</Badge>
+                <Badge variant="danger">Danger</Badge>
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Small Size</h4>
+              <div className="flex-wrap-gap" style={{ gap: "12px" }}>
+                <Badge variant="default" size="sm">
+                  Default
+                </Badge>
+                <Badge variant="info" size="sm">
+                  Info
+                </Badge>
+                <Badge variant="success" size="sm">
+                  Success
+                </Badge>
+                <Badge variant="warning" size="sm">
+                  Warning
+                </Badge>
+                <Badge variant="danger" size="sm">
+                  Danger
+                </Badge>
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Large Size</h4>
+              <div className="flex-wrap-gap" style={{ gap: "12px" }}>
+                <Badge variant="default" size="lg">
+                  Default
+                </Badge>
+                <Badge variant="info" size="lg">
+                  Info
+                </Badge>
+                <Badge variant="success" size="lg">
+                  Success
+                </Badge>
+                <Badge variant="warning" size="lg">
+                  Warning
+                </Badge>
+                <Badge variant="danger" size="lg">
+                  Danger
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Tag Component */}
+        <section id="tag" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Tag</h3>
+            <p className="section-description">
+              Removable pills for categorization, filtering, and multi-select
+              scenarios. Click the × button to remove.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">Removable Tags</h4>
+              <div className="flex-wrap-gap" style={{ gap: "8px" }}>
+                {tagList.map((tag) => (
+                  <Tag
+                    key={tag.id}
+                    label={tag.label}
+                    variant={tag.variant}
+                    onRemove={() =>
+                      setTagList(tagList.filter((t) => t.id !== tag.id))
+                    }
+                  />
+                ))}
+              </div>
+              {tagList.length === 0 && (
+                <p className="section-description">
+                  All tags removed. (Page will reset on page refresh)
+                </p>
+              )}
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Non-removable Tags</h4>
+              <div className="flex-wrap-gap" style={{ gap: "8px" }}>
+                <Tag label="Default" variant="default" />
+                <Tag label="Info" variant="info" />
+                <Tag label="Success" variant="success" />
+                <Tag label="Warning" variant="warning" />
+                <Tag label="Danger" variant="danger" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Disabled Tags</h4>
+              <div className="flex-wrap-gap" style={{ gap: "8px" }}>
+                <Tag
+                  label="Disabled Default"
+                  variant="default"
+                  disabled
+                  onRemove={() => {}}
+                />
+                <Tag
+                  label="Disabled Info"
+                  variant="info"
+                  disabled
+                  onRemove={() => {}}
+                />
+                <Tag
+                  label="Disabled Success"
+                  variant="success"
+                  disabled
+                  onRemove={() => {}}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Spinner Component */}
+        <section id="spinner" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Spinner</h3>
+            <p className="section-description">
+              Animated loading indicator with 3 sizes. Uses SVG circle
+              animation with rotating and pulsing effects.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">Small</h4>
+              <div style={{ display: "flex", justifyContent: "center", padding: "24px" }}>
+                <Spinner size="sm" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Medium (Default)</h4>
+              <div style={{ display: "flex", justifyContent: "center", padding: "24px" }}>
+                <Spinner size="md" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Large</h4>
+              <div style={{ display: "flex", justifyContent: "center", padding: "24px" }}>
+                <Spinner size="lg" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Multiple Spinners</h4>
+              <div style={{ display: "flex", justifyContent: "center", gap: "32px", padding: "24px" }}>
+                <Spinner size="sm" />
+                <Spinner size="md" />
+                <Spinner size="lg" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Skeleton Component */}
+        <section id="skeleton" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Skeleton</h3>
+            <p className="section-description">
+              Placeholder loading state with animated shimmer effect. Use while
+              fetching content in line, block, or card layouts.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">Line Skeleton (Text)</h4>
+              <div style={{ padding: "16px", gap: "8px", display: "flex", flexDirection: "column" }}>
+                <Skeleton type="line" />
+                <Skeleton type="line" />
+                <Skeleton type="line" width="70%" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Block Skeleton (Image/Media)</h4>
+              <div style={{ padding: "16px" }}>
+                <Skeleton type="block" width="200px" height="140px" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Card Skeleton</h4>
+              <div style={{ padding: "16px" }}>
+                <Skeleton type="card" width="280px" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Content Loading State</h4>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px", padding: "16px" }}>
+                <div style={{ gap: "8px", display: "flex", flexDirection: "column" }}>
+                  <Skeleton type="block" width="100%" height="100px" />
+                  <Skeleton type="line" />
+                  <Skeleton type="line" width="85%" />
+                </div>
+                <div style={{ gap: "8px", display: "flex", flexDirection: "column" }}>
+                  <Skeleton type="block" width="100%" height="100px" />
+                  <Skeleton type="line" />
+                  <Skeleton type="line" width="75%" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Pagination Component */}
+        <section id="pagination" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Pagination</h3>
+            <p className="section-description">
+              Navigate between numbered pages with previous/next buttons. Shows
+              ellipsis for large page ranges with smart page number generation.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">Standard Pagination (Page {currentPage} of 12)</h4>
+              <div style={{ padding: "24px", display: "flex", justifyContent: "center" }}>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={12}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Small Range (5 Pages)</h4>
+              <div style={{ padding: "24px", display: "flex", justifyContent: "center" }}>
+                <Pagination
+                  currentPage={2}
+                  totalPages={5}
+                  onPageChange={() => {}}
+                />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Disabled State</h4>
+              <div style={{ padding: "24px", display: "flex", justifyContent: "center" }}>
+                <Pagination
+                  currentPage={1}
+                  totalPages={5}
+                  disabled
+                  onPageChange={() => {}}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Breadcrumb Component */}
+        <section id="breadcrumb" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Breadcrumb</h3>
+            <p className="section-description">
+              Navigation trail showing the current location in nested page
+              hierarchies. Click any link to navigate (except current page).
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">Coordinator Analytics Path</h4>
+              <div style={{ padding: "16px" }}>
+                <Breadcrumb
+                  items={[
+                    { label: "Home", href: "/" },
+                    { label: "Coordinator", href: "/coordinator" },
+                    { label: "Analytics", href: "/coordinator/analytics" },
+                  ]}
+                  onNavigate={(href) => setBreadcrumbPath(href)}
+                />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Schedule Review Path</h4>
+              <div style={{ padding: "16px" }}>
+                <Breadcrumb
+                  items={[
+                    { label: "Home", href: "/" },
+                    { label: "Coordinator", href: "/coordinator" },
+                    { label: "Schedule", href: "/coordinator/schedule" },
+                    { label: "Review", href: "/coordinator/schedule/review" },
+                  ]}
+                  onNavigate={(href) => setBreadcrumbPath(href)}
+                />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Import & Setup Path</h4>
+              <div style={{ padding: "16px" }}>
+                <Breadcrumb
+                  items={[
+                    { label: "Home", href: "/" },
+                    { label: "Coordinator", href: "/coordinator" },
+                    { label: "Setup", href: "/coordinator/setup" },
+                    { label: "Courses", href: "/coordinator/setup/courses" },
+                  ]}
+                  onNavigate={(href) => setBreadcrumbPath(href)}
+                />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">With Icons (Simulated)</h4>
+              <div style={{ padding: "16px" }}>
+                <Breadcrumb
+                  items={[
+                    { label: "Dashboard", href: "/", icon: "🏠" },
+                    { label: "Coordinator", href: "/coordinator", icon: "👤" },
+                    { label: "Analytics", href: "/coordinator/analytics", icon: "📊" },
+                  ]}
+                  onNavigate={(href) => setBreadcrumbPath(href)}
+                />
+              </div>
+            </div>
+
+            {breadcrumbPath !== "/coordinator/analytics" && (
+              <p className="section-description" style={{ fontSize: "12px", color: "#64748b", marginTop: "12px" }}>
+                Last navigated to: <code style={{ background: "#f1f5f9", padding: "2px 6px", borderRadius: "4px" }}>{breadcrumbPath}</code>
+              </p>
+            )}
+          </div>
+        </section>
+
         {/* Code Reference */}
         <section className="subsection">
           <h3 className="subsection-title">Usage</h3>
           <div className="code-block">
             <pre>{`import Button from '@/components/Button';
+import Modal from '@/components/Modal';
 import DownloadIcon from '@/components/icons/Download';
 import RocketIcon from '@/components/icons/Rocket';
 
@@ -343,7 +963,20 @@ import RocketIcon from '@/components/icons/Rocket';
 <Button size="lg">Large</Button>
 
 // Disabled State
-<Button disabled>Disabled</Button>`}</pre>
+<Button disabled>Disabled</Button>
+
+// Base Modal
+const [isOpen, setIsOpen] = useState(false);
+
+<Modal
+  isOpen={isOpen}
+  onClose={() => setIsOpen(false)}
+  title="Confirm Action"
+  description="This action cannot be undone."
+  footer={<Button onClick={() => setIsOpen(false)}>Close</Button>}
+>
+  Modal body content goes here.
+</Modal>`}</pre>
           </div>
         </section>
         {/* Input Component Showcase */}
