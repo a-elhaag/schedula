@@ -8,6 +8,7 @@ import Toast from "@/components/Toast";
 import Checkbox from "@/components/Checkbox";
 import Switch from "@/components/Switch";
 import RadioGroup from "@/components/RadioGroup";
+import ConstraintWeightSlider from "@/components/ConstraintWeightSlider";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -23,6 +24,7 @@ export default function Home() {
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [isSwitchOn, setIsSwitchOn] = useState(true);
   const [selectedAudience, setSelectedAudience] = useState("students");
+  const [constraintWeight, setConstraintWeight] = useState(65);
   const [toast, setToast] = useState({
     open: false,
     variant: "info",
@@ -78,6 +80,11 @@ export default function Home() {
       id: "form-controls",
       label: "Form Controls",
       description: "Checkbox, Switch, RadioGroup states",
+    },
+    {
+      id: "constraint-weight-slider",
+      label: "ConstraintWeightSlider",
+      description: "Soft-constraint penalty strength",
     },
     // Add more components here as we create them
   ];
@@ -455,6 +462,34 @@ export default function Home() {
                   ]}
                 />
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="constraint-weight-slider" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">ConstraintWeightSlider</h3>
+            <p className="section-description">
+              Labeled slider for adjusting how strongly the solver penalizes a
+              soft constraint.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="form-controls-list">
+              <ConstraintWeightSlider
+                label="Avoid Back-to-Back Lectures"
+                value={constraintWeight}
+                onChange={setConstraintWeight}
+                description="Higher values increase penalties for consecutive sessions."
+              />
+
+              <ConstraintWeightSlider
+                label="Keep Afternoon Slots Light"
+                value={35}
+                disabled
+                description="Disabled preview state for read-only configurations."
+              />
             </div>
           </div>
         </section>
