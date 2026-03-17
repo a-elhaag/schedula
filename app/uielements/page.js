@@ -5,6 +5,9 @@ import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Toast from "@/components/Toast";
+import Checkbox from "@/components/Checkbox";
+import Switch from "@/components/Switch";
+import RadioGroup from "@/components/RadioGroup";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -17,6 +20,9 @@ export default function Home() {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
+  const [isSwitchOn, setIsSwitchOn] = useState(true);
+  const [selectedAudience, setSelectedAudience] = useState("students");
   const [toast, setToast] = useState({
     open: false,
     variant: "info",
@@ -67,6 +73,11 @@ export default function Home() {
       id: "toast",
       label: "Toast Component",
       description: "Timed feedback notification (4 variants)",
+    },
+    {
+      id: "form-controls",
+      label: "Form Controls",
+      description: "Checkbox, Switch, RadioGroup states",
     },
     // Add more components here as we create them
   ];
@@ -386,6 +397,64 @@ export default function Home() {
               >
                 Error Toast
               </Button>
+            </div>
+          </div>
+        </section>
+
+        <section id="form-controls" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Form Controls</h3>
+            <p className="section-description">
+              Checkbox, Switch, and RadioGroup controls with checked,
+              unchecked, and disabled states.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="form-controls-grid">
+              <div className="subsection">
+                <h4 className="variant-title">Checkbox</h4>
+                <div className="form-controls-list">
+                  <Checkbox
+                    label={`Interactive (${isCheckboxChecked ? "Checked" : "Unchecked"})`}
+                    checked={isCheckboxChecked}
+                    onChange={setIsCheckboxChecked}
+                  />
+                  <Checkbox label="Checked Disabled" defaultChecked disabled />
+                  <Checkbox label="Unchecked Disabled" disabled />
+                </div>
+              </div>
+
+              <div className="subsection">
+                <h4 className="variant-title">Switch</h4>
+                <div className="form-controls-list">
+                  <Switch
+                    label={`Interactive (${isSwitchOn ? "Checked" : "Unchecked"})`}
+                    checked={isSwitchOn}
+                    onChange={setIsSwitchOn}
+                  />
+                  <Switch label="Checked Disabled" defaultChecked disabled />
+                  <Switch label="Unchecked Disabled" disabled />
+                </div>
+              </div>
+
+              <div className="subsection">
+                <h4 className="variant-title">RadioGroup</h4>
+                <RadioGroup
+                  legend="Schedule Visibility"
+                  value={selectedAudience}
+                  onChange={setSelectedAudience}
+                  options={[
+                    { value: "students", label: "Students (Checked)" },
+                    { value: "staff", label: "Staff (Unchecked)" },
+                    {
+                      value: "guests",
+                      label: "Guests (Disabled)",
+                      disabled: true,
+                    },
+                  ]}
+                />
+              </div>
             </div>
           </div>
         </section>
