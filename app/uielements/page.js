@@ -10,6 +10,8 @@ import Switch from "@/components/Switch";
 import RadioGroup from "@/components/RadioGroup";
 import ConstraintWeightSlider from "@/components/ConstraintWeightSlider";
 import CSVImportDropzone from "@/components/CSVImportDropzone";
+import Select from "@/components/Select";
+import MultiSelect from "@/components/MultiSelect";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -27,6 +29,8 @@ export default function Home() {
   const [selectedAudience, setSelectedAudience] = useState("students");
   const [constraintWeight, setConstraintWeight] = useState(65);
   const [csvFile, setCsvFile] = useState(null);
+  const [selectedDepartment, setSelectedDepartment] = useState("cs");
+  const [selectedCourses, setSelectedCourses] = useState(["math101", "phys101"]);
   const [toast, setToast] = useState({
     open: false,
     variant: "info",
@@ -92,6 +96,16 @@ export default function Home() {
       id: "csv-import-dropzone",
       label: "CSVImportDropzone",
       description: "CSV file drop area with validation",
+    },
+    {
+      id: "select",
+      label: "Select Component",
+      description: "Single select dropdown with search and keyboard nav",
+    },
+    {
+      id: "multiselect",
+      label: "MultiSelect Component",
+      description: "Tag-based multi-select with search and filtering",
     },
     // Add more components here as we create them
   ];
@@ -521,6 +535,82 @@ export default function Home() {
                 );
               }}
             />
+          </div>
+        </section>
+
+        {/* Select Component */}
+        <section id="select" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Select</h3>
+            <p className="section-description">
+              Single select dropdown with keyboard navigation, search, and
+              accessibility support.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="grid-2-cols">
+              <Select
+                label="Department"
+                options={[
+                  { value: "cs", label: "Computer Science" },
+                  { value: "math", label: "Mathematics" },
+                  { value: "phys", label: "Physics" },
+                  { value: "chem", label: "Chemistry" },
+                  { value: "bio", label: "Biology" },
+                ]}
+                value={selectedDepartment}
+                onChange={setSelectedDepartment}
+                placeholder="Choose a department"
+              />
+              <Select
+                label="Department (Disabled)"
+                options={[
+                  { value: "eng", label: "English" },
+                  { value: "hist", label: "History" },
+                ]}
+                disabled
+                placeholder="Select department"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* MultiSelect Component */}
+        <section id="multiselect" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">MultiSelect</h3>
+            <p className="section-description">
+              Tag-based multi-select with dynamic search filtering and
+              removable tags.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="grid-2-cols">
+              <MultiSelect
+                label="Courses"
+                options={[
+                  { value: "math101", label: "Calculus I" },
+                  { value: "math102", label: "Calculus II" },
+                  { value: "phys101", label: "Physics I" },
+                  { value: "phys102", label: "Physics II" },
+                  { value: "chem101", label: "Chemistry I" },
+                ]}
+                value={selectedCourses}
+                onChange={setSelectedCourses}
+                placeholder="Select courses..."
+              />
+              <MultiSelect
+                label="Instructors (Disabled)"
+                options={[
+                  { value: "prof1", label: "Dr. Smith" },
+                  { value: "prof2", label: "Dr. Johnson" },
+                ]}
+                disabled
+                placeholder="Select instructors"
+              />
+            </div>
           </div>
         </section>
 
