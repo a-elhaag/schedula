@@ -12,6 +12,8 @@ import ConstraintWeightSlider from "@/components/ConstraintWeightSlider";
 import CSVImportDropzone from "@/components/CSVImportDropzone";
 import Select from "@/components/Select";
 import MultiSelect from "@/components/MultiSelect";
+import Badge from "@/components/Badge";
+import Tag from "@/components/Tag";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -31,6 +33,11 @@ export default function Home() {
   const [csvFile, setCsvFile] = useState(null);
   const [selectedDepartment, setSelectedDepartment] = useState("cs");
   const [selectedCourses, setSelectedCourses] = useState(["math101", "phys101"]);
+  const [tagList, setTagList] = useState([
+    { id: 1, label: "Pending", variant: "warning" },
+    { id: 2, label: "Active", variant: "success" },
+    { id: 3, label: "Error", variant: "danger" },
+  ]);
   const [toast, setToast] = useState({
     open: false,
     variant: "info",
@@ -101,6 +108,16 @@ export default function Home() {
       id: "select",
       label: "Select Component",
       description: "Single select dropdown with search and keyboard nav",
+    },
+    {
+      id: "badge",
+      label: "Badge Component",
+      description: "5 semantic variants for status and labels",
+    },
+    {
+      id: "tag",
+      label: "Tag Component",
+      description: "Removable pill for categorization and multi-select",
     },
     {
       id: "multiselect",
@@ -610,6 +627,141 @@ export default function Home() {
                 disabled
                 placeholder="Select instructors"
               />
+            </div>
+          </div>
+        </section>
+
+        {/* Badge Component */}
+        <section id="badge" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Badge</h3>
+            <p className="section-description">
+              Status badges with 5 semantic variants: default, info, success,
+              warning, and danger.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">All Variants (Medium)</h4>
+              <div className="flex-wrap-gap" style={{ gap: "12px" }}>
+                <Badge variant="default">Default</Badge>
+                <Badge variant="info">Info</Badge>
+                <Badge variant="success">Success</Badge>
+                <Badge variant="warning">Warning</Badge>
+                <Badge variant="danger">Danger</Badge>
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Small Size</h4>
+              <div className="flex-wrap-gap" style={{ gap: "12px" }}>
+                <Badge variant="default" size="sm">
+                  Default
+                </Badge>
+                <Badge variant="info" size="sm">
+                  Info
+                </Badge>
+                <Badge variant="success" size="sm">
+                  Success
+                </Badge>
+                <Badge variant="warning" size="sm">
+                  Warning
+                </Badge>
+                <Badge variant="danger" size="sm">
+                  Danger
+                </Badge>
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Large Size</h4>
+              <div className="flex-wrap-gap" style={{ gap: "12px" }}>
+                <Badge variant="default" size="lg">
+                  Default
+                </Badge>
+                <Badge variant="info" size="lg">
+                  Info
+                </Badge>
+                <Badge variant="success" size="lg">
+                  Success
+                </Badge>
+                <Badge variant="warning" size="lg">
+                  Warning
+                </Badge>
+                <Badge variant="danger" size="lg">
+                  Danger
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Tag Component */}
+        <section id="tag" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Tag</h3>
+            <p className="section-description">
+              Removable pills for categorization, filtering, and multi-select
+              scenarios. Click the × button to remove.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="subsection">
+              <h4 className="variant-title">Removable Tags</h4>
+              <div className="flex-wrap-gap" style={{ gap: "8px" }}>
+                {tagList.map((tag) => (
+                  <Tag
+                    key={tag.id}
+                    label={tag.label}
+                    variant={tag.variant}
+                    onRemove={() =>
+                      setTagList(tagList.filter((t) => t.id !== tag.id))
+                    }
+                  />
+                ))}
+              </div>
+              {tagList.length === 0 && (
+                <p className="section-description">
+                  All tags removed. (Page will reset on page refresh)
+                </p>
+              )}
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Non-removable Tags</h4>
+              <div className="flex-wrap-gap" style={{ gap: "8px" }}>
+                <Tag label="Default" variant="default" />
+                <Tag label="Info" variant="info" />
+                <Tag label="Success" variant="success" />
+                <Tag label="Warning" variant="warning" />
+                <Tag label="Danger" variant="danger" />
+              </div>
+            </div>
+
+            <div className="subsection">
+              <h4 className="variant-title">Disabled Tags</h4>
+              <div className="flex-wrap-gap" style={{ gap: "8px" }}>
+                <Tag
+                  label="Disabled Default"
+                  variant="default"
+                  disabled
+                  onRemove={() => {}}
+                />
+                <Tag
+                  label="Disabled Info"
+                  variant="info"
+                  disabled
+                  onRemove={() => {}}
+                />
+                <Tag
+                  label="Disabled Success"
+                  variant="success"
+                  disabled
+                  onRemove={() => {}}
+                />
+              </div>
             </div>
           </div>
         </section>
