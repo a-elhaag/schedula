@@ -1,0 +1,7 @@
+.confirm-dialog-note {
+  margin: 0;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-muted, #475569);
+}

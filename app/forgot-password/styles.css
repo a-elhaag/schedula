@@ -4,19 +4,199 @@
   align-items: center;
   min-height: 100vh;
   width: 100%;
-  background-color: var(--color-background);
+  padding: 24px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(0, 113, 227, 0.12), transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(0, 113, 227, 0.08), transparent 50%),
+    var(--color-background);
+  animation: backgroundShift 12s ease-in-out infinite alternate;
 }
 
-.content-center {
-  text-align: center;
+.forgot-card {
+  width: 100%;
+  max-width: 480px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+  animation: cardEnter 560ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
-.content-center h1 {
+.forgot-card h1 {
   color: var(--color-text-primary);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  font-size: clamp(2rem, 4vw, 2.4rem);
+  animation: contentFadeUp 520ms ease both;
+  animation-delay: 120ms;
 }
 
-.content-center p {
+.subtitle {
   color: var(--color-text-muted);
-  font-size: 16px;
+  font-size: 1rem;
+  margin-bottom: 24px;
+  animation: contentFadeUp 520ms ease both;
+  animation-delay: 180ms;
+}
+
+.forgot-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: contentFadeUp 520ms ease both;
+  animation-delay: 240ms;
+}
+
+.field-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.email-input {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  background-color: #fff;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease;
+}
+
+.email-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.14);
+  transform: translateY(-1px);
+}
+
+.email-input:disabled {
+  opacity: 0.75;
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 8px;
+  transition: transform 150ms ease;
+}
+
+.submit-btn:hover {
+  transform: translateY(-1px);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.feedback {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  animation: feedbackPop 240ms ease-out both;
+}
+
+.feedback.success {
+  background-color: #e8f4ff;
+  color: #0b4f8a;
+  border: 1px solid #b8ddff;
+}
+
+.feedback.error {
+  background-color: #fff0ee;
+  color: #8f281f;
+  border: 1px solid #ffd2cb;
+}
+
+.back-link {
+  margin-top: 16px;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  animation: contentFadeUp 520ms ease both;
+  animation-delay: 320ms;
+}
+
+.back-link a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes contentFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes feedbackPop {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes backgroundShift {
+  from {
+    background-position: 0% 0%, 100% 100%, 0 0;
+  }
+  to {
+    background-position: 6% 4%, 96% 94%, 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-container,
+  .forgot-card,
+  .forgot-card h1,
+  .subtitle,
+  .forgot-form,
+  .back-link,
+  .feedback {
+    animation: none !important;
+  }
+
+  .email-input,
+  .submit-btn {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .page-container {
+    padding: 16px;
+  }
+
+  .forgot-card {
+    padding: 24px 18px;
+  }
 }
