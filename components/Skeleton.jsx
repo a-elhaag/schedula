@@ -1,50 +1,49 @@
-"use client";
-
-import React from "react";
 import "./Skeleton.css";
 
-export default function Skeleton({ type = "line", width = "100%", height }) {
-  const validTypes = ["line", "block", "card"];
-  const skeletonType = validTypes.includes(type) ? type : "line";
-
-  const baseStyle = {
-    width,
-  };
-
-  // Set height based on type if not provided
-  if (!height) {
-    switch (skeletonType) {
-      case "line":
-        baseStyle.height = "16px";
-        break;
-      case "block":
-        baseStyle.height = "120px";
-        break;
-      case "card":
-        baseStyle.height = "240px";
-        break;
-      default:
-        baseStyle.height = "16px";
-    }
-  } else {
-    baseStyle.height = height;
-  }
-
-  if (skeletonType === "card") {
-    return (
-      <div className="skeleton skeleton-card" style={{ width }}>
-        <div className="skeleton-card-header" />
-        <div className="skeleton-card-content">
-          <div className="skeleton skeleton-line" />
-          <div className="skeleton skeleton-line" style={{ width: "85%" }} />
-          <div className="skeleton skeleton-line" style={{ width: "70%" }} />
-        </div>
-        <div className="skeleton-card-footer" />
-      </div>
-    );
-  }
-
+/**
+ * Skeleton Component
+ *
+ * Loading placeholder shown while schedule data is being fetched.
+ * Matches the layout of the student schedule page.
+ *
+ * @component
+ * @example
+ * <Skeleton />
+ */
+export default function Skeleton() {
   return (
-    <div className={`skeleton skeleton-${skeletonType}`} style={baseStyle} />
+    <div className="skeleton-wrap">
+      {/* Hero */}
+      <div className="skeleton skeleton--title" />
+      <div className="skeleton skeleton--subtitle" />
+
+      {/* Student strip */}
+      <div className="skeleton-strip">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="skeleton skeleton--strip-item" />
+        ))}
+      </div>
+
+      {/* Stats row */}
+      <div className="skeleton-stats">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="skeleton skeleton--stat" />
+        ))}
+      </div>
+
+      {/* Day tabs */}
+      <div className="skeleton-tabs">
+        {[1, 2, 3, 4, 5].map(i => (
+          <div key={i} className="skeleton skeleton--tab" />
+        ))}
+      </div>
+
+      {/* Session cards */}
+      <div className="skeleton-cards">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="skeleton skeleton--card" />
+        ))}
+      </div>
+    </div>
   );
 }
