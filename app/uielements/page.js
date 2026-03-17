@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import Toast from "@/components/Toast";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -14,7 +16,25 @@ import "./page.css";
 export default function Home() {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [toast, setToast] = useState({
+    open: false,
+    variant: "info",
+    title: "",
+    message: "",
+    id: 0,
+  });
   const dropdownRef = useRef(null);
+
+  const showToast = (variant, title, message) => {
+    setToast({
+      open: true,
+      variant,
+      title,
+      message,
+      id: Date.now(),
+    });
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -37,6 +57,16 @@ export default function Home() {
       id: "modal",
       label: "Modal Component",
       description: "Base dialog with title, body and footer",
+    },
+    {
+      id: "confirm-dialog",
+      label: "ConfirmDialog Component",
+      description: "Destructive action confirmation",
+    },
+    {
+      id: "toast",
+      label: "Toast Component",
+      description: "Timed feedback notification (4 variants)",
     },
     // Add more components here as we create them
   ];
@@ -297,6 +327,69 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="confirm-dialog" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">ConfirmDialog</h3>
+            <p className="section-description">
+              Specialized destructive confirmation dialog built on top of Modal.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="flex-wrap">
+              <Button variant="destructive" onClick={() => setIsConfirmOpen(true)}>
+                Delete Schedule Draft
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        <section id="toast" className="subsection">
+          <div className="section-header">
+            <h3 className="subsection-title">Toast</h3>
+            <p className="section-description">
+              Timed feedback notifications with four status variants.
+            </p>
+          </div>
+
+          <div className="card">
+            <div className="flex-wrap">
+              <Button
+                variant="primary"
+                onClick={() =>
+                  showToast("success", "Saved", "Schedule changes were saved successfully.")
+                }
+              >
+                Success Toast
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  showToast("info", "Heads up", "A new analytics report is available.")
+                }
+              >
+                Info Toast
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  showToast("warning", "Warning", "2 sessions still need room assignment.")
+                }
+              >
+                Warning Toast
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() =>
+                  showToast("error", "Error", "Unable to publish schedule right now.")
+                }
+              >
+                Error Toast
+              </Button>
+            </div>
+          </div>
+        </section>
+
         {/* Code Reference */}
         <section className="subsection">
           <h3 className="subsection-title">Usage</h3>
@@ -370,6 +463,28 @@ const [isOpen, setIsOpen] = useState(false);
             Publishing will make this schedule visible to staff and students.
           </p>
         </Modal>
+
+        <ConfirmDialog
+          isOpen={isConfirmOpen}
+          onClose={() => setIsConfirmOpen(false)}
+          onConfirm={() => {
+            setIsConfirmOpen(false);
+            showToast("success", "Deleted", "Schedule draft has been permanently deleted.");
+          }}
+          title="Delete Schedule Draft"
+          description="This will permanently remove this draft and all unsaved adjustments."
+          confirmLabel="Delete Permanently"
+        />
+
+        <Toast
+          key={toast.id}
+          open={toast.open}
+          variant={toast.variant}
+          title={toast.title}
+          message={toast.message}
+          onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+          duration={3200}
+        />
       </main>
     </div>
   );
