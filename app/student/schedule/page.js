@@ -159,6 +159,7 @@ export default function StudentSchedulePage() {
     try {
       const res = await fetch(
         `/api/student/schedule?userId=${CURRENT_USER_ID}`,
+        { credentials: "include" }
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to load schedule");

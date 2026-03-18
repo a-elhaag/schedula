@@ -88,6 +88,7 @@ export default function ProfessorAvailabilityPage() {
       try {
         const res = await fetch(
           `/api/staff/availability?userId=${auth.userId}`,
+          { credentials: "include" }
         );
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? "Failed to load");
@@ -121,6 +122,7 @@ export default function ProfessorAvailabilityPage() {
 
       const res = await fetch("/api/staff/availability", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: auth.userId, slots }),
       });
