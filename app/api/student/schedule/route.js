@@ -119,17 +119,13 @@ export async function GET(request) {
       grouped[day].sort((a, b) => a.time.localeCompare(b.time));
     }
 
-    return Response.json(
-      {
-        student:     buildStudentInfo(user, faculty, institution),
-        sessions:    grouped,
-        term:        termLabel,
-        isPublished: schedule.is_published,
-        workingDays: institution?.active_term?.working_days ?? [],
-        versionHash: schedule.version_hash ?? schedule._id.toString(),
-      },
-      { headers: { "Cache-Control": "private, max-age=60, stale-while-revalidate=300" } }
-    );
+    return Response.json({
+      student:     buildStudentInfo(user, faculty, institution),
+      sessions:    grouped,
+      term:        termLabel,
+      isPublished: schedule.is_published,
+      workingDays: institution?.active_term?.working_days ?? [],
+    });
 
   } catch (err) {
     console.error("[student/schedule] error:", err);

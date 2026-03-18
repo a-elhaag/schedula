@@ -13,10 +13,10 @@
 
 .content-center h1 {
   color: var(--color-text-primary);
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .content-center p {
   color: var(--color-text-muted);
-  font-size: 1rem;
+  font-size: 16px;
 }

@@ -5,18 +5,18 @@
 }
 
 .spinner-sm {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 24px;
+  height: 24px;
 }
 
 .spinner-md {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 40px;
+  height: 40px;
 }
 
 .spinner-lg {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 56px;
+  height: 56px;
 }
 
 .spinner-svg {
@@ -36,17 +36,39 @@
 }
 
 @keyframes spinnerRotate {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes spinnerPulse {
-  0%   { stroke-dashoffset: 0; opacity: 1; }
-  50%  { stroke-dashoffset: 31.415; opacity: 0.6; }
-  100% { stroke-dashoffset: 62.83; opacity: 1; }
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  50% {
+    stroke-dashoffset: 31.415;
+    opacity: 0.6;
+  }
+
+  100% {
+    stroke-dashoffset: 62.83;
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .spinner-svg    { animation: none; }
-  .spinner-circle { animation: none; opacity: 0.6; }
+  .spinner-svg {
+    animation: none;
+  }
+
+  .spinner-circle {
+    animation: none;
+    opacity: 0.6;
+  }
 }
