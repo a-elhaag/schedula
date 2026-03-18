@@ -37,6 +37,8 @@ export async function POST(request) {
   const token = typeof body?.token === "string" ? body.token.trim() : "";
   const password = typeof body?.password === "string" ? body.password : "";
   const name = typeof body?.name === "string" ? body.name.trim() : "";
+  const email =
+    typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
 
   if (token.length < TOKEN_MIN_LENGTH) {
     return NextResponse.json(
@@ -65,6 +67,13 @@ export async function POST(request) {
     if (!user) {
       return NextResponse.json(
         { message: "This invite link is invalid or has expired." },
+        { status: 400 },
+      );
+    }
+
+    if (email && email !== user.email.toLowerCase()) {
+      return NextResponse.json(
+        { message: "This invite link does not match the provided email." },
         { status: 400 },
       );
     }
