@@ -42,7 +42,7 @@ function getRequiredRoles(pathname) {
   return null;
 }
 
-export async function middleware(request) {
+export async function proxy(request) {
   const pathname = request.nextUrl.pathname;
 
   // Skip API routes (they handle their own auth)
