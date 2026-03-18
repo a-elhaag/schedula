@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { generateToken } from "@/lib/auth";
-import { getBaseUrl, sendEmail } from "@/lib/email";
+import { buildEmailTemplate, getBaseUrl, sendEmail } from "@/lib/email";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -55,11 +55,16 @@ export async function POST(request) {
         emailVerifyToken,
       )}&email=${encodeURIComponent(email)}`;
 
+      const template = buildEmailTemplate({
+        type: "verify",
+        actionUrl: verificationLink,
+      });
+
       const emailResult = await sendEmail({
         to: email,
-        subject: "Verify your Schedula email",
-        text: `Verify your email to activate your Schedula account: ${verificationLink}`,
-        html: `<p>Verify your email to activate your Schedula account:</p><p><a href="${verificationLink}">Verify email</a></p>`,
+        subject: template.subject,
+        text: template.text,
+        html: template.html,
       });
 
       return NextResponse.json({
