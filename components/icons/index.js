@@ -11,5 +11,3 @@ export { BoltIcon } from "./Bolt";
 export { GraduationCapIcon } from "./GraduationCap";
 export { CalendarIcon } from "./Calendar";
 export { SunIcon } from "./Sun";
-export { UserIcon } from "./User";
-export { HomeIcon } from "./Home";
