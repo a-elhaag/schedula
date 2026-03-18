@@ -11,6 +11,8 @@
     "db:export": "node --env-file=.env scripts/export-data.mjs"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.1.0",
     "next": "16.1.6",
     "react": "19.2.3",

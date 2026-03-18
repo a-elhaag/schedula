@@ -1,10 +1,23 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState, useRef, useEffect } from "react";
 import Button from "@/components/Button";
 import { Input } from "@/components/Input";
 import { StatCard } from "@/components/StatCard";
-import { SessionCard } from "@/components/SessionCard";
+import SessionCard from "@/components/SessionCard";
+import Checkbox from "@/components/Checkbox";
+import Switch from "@/components/Switch";
+import RadioGroup from "@/components/RadioGroup";
+import Select from "@/components/Select";
+import Modal from "@/components/Modal";
+import MultiSelect from "@/components/MultiSelect";
+import ConstraintWeightSlider from "@/components/ConstraintWeightSlider";
+import CSVImportDropzone from "@/components/CSVImportDropzone";
+import Toast from "@/components/Toast";
+import Badge from "@/components/Badge";
+import Pagination from "@/components/Pagination";
 import DownloadIcon from "@/components/icons/Download";
 import EyeIcon from "@/components/icons/Eye";
 import CopyIcon from "@/components/icons/Copy";
@@ -16,6 +29,12 @@ import "./page.css";
 export default function Home() {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [dropdownClosing, setDropdownClosing] = useState(false);
+  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
+  const [isSwitchOn, setIsSwitchOn] = useState(false);
+  const [selectedRadio, setSelectedRadio] = useState("option1");
+  const [selectedSelect, setSelectedSelect] = useState("item1");
+  const [selectedAudience, setSelectedAudience] = useState(["students"]);
+  const [constraintWeight, setConstraintWeight] = useState(0.5);
   const dropdownRef = useRef(null);
 
   const handleDropdownClose = () => {
@@ -335,7 +354,10 @@ export default function Home() {
 
           <div className="card">
             <div className="flex-wrap">
-              <Button variant="destructive" onClick={() => setIsConfirmOpen(true)}>
+              <Button
+                variant="destructive"
+                onClick={() => setIsConfirmOpen(true)}
+              >
                 Delete Schedule Draft
               </Button>
             </div>
@@ -355,7 +377,11 @@ export default function Home() {
               <Button
                 variant="primary"
                 onClick={() =>
-                  showToast("success", "Saved", "Schedule changes were saved successfully.")
+                  showToast(
+                    "success",
+                    "Saved",
+                    "Schedule changes were saved successfully.",
+                  )
                 }
               >
                 Success Toast
@@ -363,7 +389,11 @@ export default function Home() {
               <Button
                 variant="secondary"
                 onClick={() =>
-                  showToast("info", "Heads up", "A new analytics report is available.")
+                  showToast(
+                    "info",
+                    "Heads up",
+                    "A new analytics report is available.",
+                  )
                 }
               >
                 Info Toast
@@ -371,7 +401,11 @@ export default function Home() {
               <Button
                 variant="ghost"
                 onClick={() =>
-                  showToast("warning", "Warning", "2 sessions still need room assignment.")
+                  showToast(
+                    "warning",
+                    "Warning",
+                    "2 sessions still need room assignment.",
+                  )
                 }
               >
                 Warning Toast
@@ -379,7 +413,11 @@ export default function Home() {
               <Button
                 variant="destructive"
                 onClick={() =>
-                  showToast("error", "Error", "Unable to publish schedule right now.")
+                  showToast(
+                    "error",
+                    "Error",
+                    "Unable to publish schedule right now.",
+                  )
                 }
               >
                 Error Toast
@@ -392,8 +430,8 @@ export default function Home() {
           <div className="section-header">
             <h3 className="subsection-title">Form Controls</h3>
             <p className="section-description">
-              Checkbox, Switch, and RadioGroup controls with checked,
-              unchecked, and disabled states.
+              Checkbox, Switch, and RadioGroup controls with checked, unchecked,
+              and disabled states.
             </p>
           </div>
 
@@ -490,7 +528,7 @@ export default function Home() {
                 showToast(
                   "success",
                   "CSV Selected",
-                  `${file.name} is ready to import.`
+                  `${file.name} is ready to import.`,
                 );
               }}
             />
@@ -540,8 +578,8 @@ export default function Home() {
           <div className="section-header">
             <h3 className="subsection-title">MultiSelect</h3>
             <p className="section-description">
-              Tag-based multi-select with dynamic search filtering and
-              removable tags.
+              Tag-based multi-select with dynamic search filtering and removable
+              tags.
             </p>
           </div>
 
@@ -713,36 +751,61 @@ export default function Home() {
           <div className="section-header">
             <h3 className="subsection-title">Spinner</h3>
             <p className="section-description">
-              Animated loading indicator with 3 sizes. Uses SVG circle
-              animation with rotating and pulsing effects.
+              Animated loading indicator with 3 sizes. Uses SVG circle animation
+              with rotating and pulsing effects.
             </p>
           </div>
 
           <div className="card">
             <div className="subsection">
               <h4 className="variant-title">Small</h4>
-              <div style={{ display: "flex", justifyContent: "center", padding: "24px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "24px",
+                }}
+              >
                 <Spinner size="sm" />
               </div>
             </div>
 
             <div className="subsection">
               <h4 className="variant-title">Medium (Default)</h4>
-              <div style={{ display: "flex", justifyContent: "center", padding: "24px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "24px",
+                }}
+              >
                 <Spinner size="md" />
               </div>
             </div>
 
             <div className="subsection">
               <h4 className="variant-title">Large</h4>
-              <div style={{ display: "flex", justifyContent: "center", padding: "24px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "24px",
+                }}
+              >
                 <Spinner size="lg" />
               </div>
             </div>
 
             <div className="subsection">
               <h4 className="variant-title">Multiple Spinners</h4>
-              <div style={{ display: "flex", justifyContent: "center", gap: "32px", padding: "24px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "32px",
+                  padding: "24px",
+                }}
+              >
                 <Spinner size="sm" />
                 <Spinner size="md" />
                 <Spinner size="lg" />
@@ -764,7 +827,14 @@ export default function Home() {
           <div className="card">
             <div className="subsection">
               <h4 className="variant-title">Line Skeleton (Text)</h4>
-              <div style={{ padding: "16px", gap: "8px", display: "flex", flexDirection: "column" }}>
+              <div
+                style={{
+                  padding: "16px",
+                  gap: "8px",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
                 <Skeleton type="line" />
                 <Skeleton type="line" />
                 <Skeleton type="line" width="70%" />
@@ -787,13 +857,32 @@ export default function Home() {
 
             <div className="subsection">
               <h4 className="variant-title">Content Loading State</h4>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px", padding: "16px" }}>
-                <div style={{ gap: "8px", display: "flex", flexDirection: "column" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                  gap: "16px",
+                  padding: "16px",
+                }}
+              >
+                <div
+                  style={{
+                    gap: "8px",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
                   <Skeleton type="block" width="100%" height="100px" />
                   <Skeleton type="line" />
                   <Skeleton type="line" width="85%" />
                 </div>
-                <div style={{ gap: "8px", display: "flex", flexDirection: "column" }}>
+                <div
+                  style={{
+                    gap: "8px",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
                   <Skeleton type="block" width="100%" height="100px" />
                   <Skeleton type="line" />
                   <Skeleton type="line" width="75%" />
@@ -815,8 +904,16 @@ export default function Home() {
 
           <div className="card">
             <div className="subsection">
-              <h4 className="variant-title">Standard Pagination (Page {currentPage} of 12)</h4>
-              <div style={{ padding: "24px", display: "flex", justifyContent: "center" }}>
+              <h4 className="variant-title">
+                Standard Pagination (Page {currentPage} of 12)
+              </h4>
+              <div
+                style={{
+                  padding: "24px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
                 <Pagination
                   currentPage={currentPage}
                   totalPages={12}
@@ -827,7 +924,13 @@ export default function Home() {
 
             <div className="subsection">
               <h4 className="variant-title">Small Range (5 Pages)</h4>
-              <div style={{ padding: "24px", display: "flex", justifyContent: "center" }}>
+              <div
+                style={{
+                  padding: "24px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
                 <Pagination
                   currentPage={2}
                   totalPages={5}
@@ -838,7 +941,13 @@ export default function Home() {
 
             <div className="subsection">
               <h4 className="variant-title">Disabled State</h4>
-              <div style={{ padding: "24px", display: "flex", justifyContent: "center" }}>
+              <div
+                style={{
+                  padding: "24px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
                 <Pagination
                   currentPage={1}
                   totalPages={5}
@@ -912,7 +1021,11 @@ export default function Home() {
                   items={[
                     { label: "Dashboard", href: "/", icon: "🏠" },
                     { label: "Coordinator", href: "/coordinator", icon: "👤" },
-                    { label: "Analytics", href: "/coordinator/analytics", icon: "📊" },
+                    {
+                      label: "Analytics",
+                      href: "/coordinator/analytics",
+                      icon: "📊",
+                    },
                   ]}
                   onNavigate={(href) => setBreadcrumbPath(href)}
                 />
@@ -920,8 +1033,24 @@ export default function Home() {
             </div>
 
             {breadcrumbPath !== "/coordinator/analytics" && (
-              <p className="section-description" style={{ fontSize: "12px", color: "#64748b", marginTop: "12px" }}>
-                Last navigated to: <code style={{ background: "#f1f5f9", padding: "2px 6px", borderRadius: "4px" }}>{breadcrumbPath}</code>
+              <p
+                className="section-description"
+                style={{
+                  fontSize: "12px",
+                  color: "#64748b",
+                  marginTop: "12px",
+                }}
+              >
+                Last navigated to:{" "}
+                <code
+                  style={{
+                    background: "#f1f5f9",
+                    padding: "2px 6px",
+                    borderRadius: "4px",
+                  }}
+                >
+                  {breadcrumbPath}
+                </code>
               </p>
             )}
           </div>

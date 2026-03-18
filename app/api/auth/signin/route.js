@@ -1,0 +1,110 @@
+import { NextResponse } from "next/server";
+import { getDb } from "@/lib/db";
+import { signToken, comparePassword } from "@/lib/auth";
+import { ObjectId } from "mongodb";
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export async function POST(request) {
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { message: "Invalid request payload." },
+      { status: 400 },
+    );
+  }
+
+  const email =
+    typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+  const password = typeof body?.password === "string" ? body.password : "";
+
+  if (!EMAIL_PATTERN.test(email)) {
+    return NextResponse.json(
+      { message: "Please provide a valid email address." },
+      { status: 400 },
+    );
+  }
+
+  if (!password) {
+    return NextResponse.json(
+      { message: "Please provide a password." },
+      { status: 400 },
+    );
+  }
+
+  // Consistent delay to reduce timing attacks
+  await new Promise((resolve) => setTimeout(resolve, 350));
+
+  try {
+    const db = await getDb();
+    const usersCollection = db.collection("users");
+
+    // Find user by email
+    const user = await usersCollection.findOne({ email });
+
+    if (!user) {
+      // User not found — return generic error to prevent email enumeration
+      return NextResponse.json(
+        { message: "Invalid email or password." },
+        { status: 401 },
+      );
+    }
+
+    // Check if user has joined (invite_status === 'joined')
+    if (user.invite_status !== "joined") {
+      return NextResponse.json(
+        {
+          message:
+            "Your account is not yet activated. Please verify your email.",
+        },
+        { status: 403 },
+      );
+    }
+
+    // Verify password against hash
+    const passwordMatches = await comparePassword(password, user.password_hash);
+
+    if (!passwordMatches) {
+      return NextResponse.json(
+        { message: "Invalid email or password." },
+        { status: 401 },
+      );
+    }
+
+    // Generate JWT token (30-minute TTL)
+    const token = signToken({
+      sub: user._id.toString(),
+      email: user.email,
+      role: user.role,
+      institution: user.institution_id.toString(),
+    });
+
+    // Create response with httpOnly cookie
+    const response = NextResponse.json(
+      {
+        ok: true,
+        user: { id: user._id.toString(), email: user.email, role: user.role },
+      },
+      { status: 200 },
+    );
+
+    response.cookies.set("auth_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 30 * 60, // 30 minutes
+      path: "/",
+    });
+
+    return response;
+  } catch (error) {
+    console.error("[signin] Error:", error);
+    return NextResponse.json(
+      { message: "An error occurred during sign in." },
+      { status: 500 },
+    );
+  }
+}

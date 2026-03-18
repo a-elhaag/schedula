@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Schedula - Component Library",
-  description: "Component showcase and library for Schedula",
+  title: "Schedula - Schedule Management",
+  description: "Schedule management system for institutions",
 };
 
 export default function RootLayout({ children }) {
