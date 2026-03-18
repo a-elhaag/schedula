@@ -11,7 +11,7 @@ export async function POST(request) {
   } catch {
     return NextResponse.json(
       { message: "Invalid request payload." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -20,7 +20,7 @@ export async function POST(request) {
   if (token.length < TOKEN_MIN_LENGTH) {
     return NextResponse.json(
       { message: "This verification link is invalid or has expired." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

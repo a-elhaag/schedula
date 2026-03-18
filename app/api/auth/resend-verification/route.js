@@ -12,16 +12,17 @@ export async function POST(request) {
   } catch {
     return NextResponse.json(
       { message: "Invalid request payload." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
-  const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+  const email =
+    typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
 
   if (!EMAIL_PATTERN.test(email)) {
     return NextResponse.json(
       { message: "Please provide a valid email address." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
