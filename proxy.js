@@ -27,6 +27,12 @@ const PROTECTED_ROUTES = {
   "/onboarding": ["coordinator", "professor", "ta", "student"],
 };
 
+function withRequestId(response) {
+  // Add a correlation ID for every proxied response.
+  response.headers.set("x-request-id", crypto.randomUUID());
+  return response;
+}
+
 function isPublicRoute(pathname) {
   return PUBLIC_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(route + "/"),
@@ -47,19 +53,19 @@ export async function proxy(request) {
 
   // Skip API routes (they handle their own auth)
   if (pathname.startsWith("/api/")) {
-    return NextResponse.next();
+    return withRequestId(NextResponse.next());
   }
 
   // Allow public routes
   if (isPublicRoute(pathname)) {
-    return NextResponse.next();
+    return withRequestId(NextResponse.next());
   }
 
   // Get required roles for protected route
   const requiredRoles = getRequiredRoles(pathname);
   if (!requiredRoles) {
     // Route doesn't match any protected pattern, allow it
-    return NextResponse.next();
+    return withRequestId(NextResponse.next());
   }
 
   // Extract and verify token
@@ -67,20 +73,26 @@ export async function proxy(request) {
 
   if (!authToken) {
     // No token — redirect to signin
-    return NextResponse.redirect(new URL("/signin", request.url));
+    return withRequestId(
+      NextResponse.redirect(new URL("/signin", request.url)),
+    );
   }
 
   const payload = await verifyTokenEdge(authToken);
 
   if (!payload) {
     // Invalid or expired token — redirect to signin
-    return NextResponse.redirect(new URL("/signin", request.url));
+    return withRequestId(
+      NextResponse.redirect(new URL("/signin", request.url)),
+    );
   }
 
   // Check role
   if (!requiredRoles.includes(payload.role)) {
     // User doesn't have required role
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
+    return withRequestId(
+      NextResponse.redirect(new URL("/unauthorized", request.url)),
+    );
   }
 
   // Token valid and role matches — allow request
@@ -90,11 +102,13 @@ export async function proxy(request) {
   requestHeaders.set("x-user-email", payload.email);
   requestHeaders.set("x-user-role", payload.role);
 
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  return withRequestId(
+    NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    }),
+  );
 }
 
 export const config = {
