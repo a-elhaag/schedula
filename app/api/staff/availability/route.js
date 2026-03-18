@@ -1,5 +1,16 @@
 import { getDb } from "../../../../lib/db";
 import { ObjectId } from "mongodb";
+import { createHash } from "crypto";
+
+function computeAvailabilityHash(slots) {
+  const sorted = [...slots].sort((a, b) =>
+    `${a.day}${a.slot}`.localeCompare(`${b.day}${b.slot}`)
+  );
+  return createHash("sha256")
+    .update(JSON.stringify(sorted))
+    .digest("hex")
+    .slice(0, 16);
+}
 
 /**
  * GET  /api/staff/availability?userId=xxx
@@ -50,9 +61,10 @@ export async function GET(request) {
         role:  capitalise(user.role),
         email: user.email,
       },
-      term:      termLabel,
-      slots:     existing?.slots ?? [],
-      submitted: !!existing,
+      term:        termLabel,
+      slots:       existing?.slots ?? [],
+      submitted:   !!existing,
+      versionHash: existing?.version_hash ?? null,
     });
 
   } catch (err) {
@@ -101,6 +113,8 @@ export async function POST(request) {
       s => validDays.includes(s.day) && validSlots.includes(s.slot)
     );
 
+    const versionHash = computeAvailabilityHash(cleanSlots);
+
     // Upsert availability document
     await db.collection("availability").updateOne(
       {
@@ -114,6 +128,7 @@ export async function POST(request) {
           institution_id: user.institution_id,
           term_label:     termLabel,
           slots:          cleanSlots,
+          version_hash:   versionHash,
           submitted_at:   new Date(),
           updated_at:     new Date(),
         },
@@ -122,10 +137,11 @@ export async function POST(request) {
     );
 
     return Response.json({
-      success:    true,
-      term:       termLabel,
-      slotCount:  cleanSlots.length,
-      message:    "Availability saved successfully",
+      success:     true,
+      term:        termLabel,
+      slotCount:   cleanSlots.length,
+      message:     "Availability saved successfully",
+      versionHash,
     });
 
   } catch (err) {

@@ -3,7 +3,7 @@
   justify-content: center;
   min-height: 100vh;
   width: 100%;
-  padding: 28px;
+  padding: 1.75rem;
   background:
     radial-gradient(circle at 0% 0%, rgba(0, 113, 227, 0.12), transparent 46%),
     radial-gradient(circle at 100% 100%, rgba(0, 113, 227, 0.08), transparent 52%),
@@ -12,19 +12,19 @@
 }
 
 .onboarding-shell {
-  width: min(100%, 820px);
+  width: min(100%, 51.25rem);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .onboarding-header {
   border: 1px solid var(--color-border);
-  border-radius: 24px;
+  border-radius: 1.5rem;
   background-color: var(--color-surface);
-  padding: 24px;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.06);
-  animation: cardEnter 560ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  padding: 1.5rem;
+  box-shadow: 0 1.125rem 2.25rem rgba(0, 0, 0, 0.06);
+  animation: cardEnter 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .eyebrow {
@@ -38,9 +38,9 @@
 
 .onboarding-header h1 {
   color: var(--color-text-primary);
-  margin: 10px 0;
+  margin: 0.625rem 0;
   font-size: clamp(2rem, 4vw, 2.6rem);
-  animation: contentFadeUp 520ms ease both;
+  animation: contentFadeUp 480ms ease both;
   animation-delay: 120ms;
 }
 
@@ -48,14 +48,14 @@
   margin: 0;
   color: var(--color-text-muted);
   font-size: 1rem;
-  animation: contentFadeUp 520ms ease both;
+  animation: contentFadeUp 480ms ease both;
   animation-delay: 180ms;
 }
 
 .stepper {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 0.625rem;
 }
 
 .step-pill {
@@ -63,32 +63,38 @@
   border: 1px solid var(--color-border);
   background-color: var(--color-surface);
   color: var(--color-text-muted);
-  padding: 10px 12px;
+  padding: 0.625rem 0.75rem;
   font-size: 0.85rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  animation: contentFadeUp 520ms ease both;
+  gap: 0.5rem;
+  animation: contentFadeUp 480ms ease both;
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
 }
 
 .step-pill span {
   display: inline-flex;
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
   border-radius: 9999px;
   align-items: center;
   justify-content: center;
   background-color: #eef4ff;
   color: var(--color-accent);
   font-size: 0.75rem;
+  flex-shrink: 0;
 }
 
 .step-pill.active {
   border-color: rgba(0, 113, 227, 0.32);
   color: var(--color-text-primary);
-  box-shadow: 0 8px 20px rgba(0, 113, 227, 0.12);
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 113, 227, 0.12);
+  transform: translateY(-0.0625rem);
 }
 
 .step-pill.done {
@@ -97,40 +103,40 @@
 
 .onboarding-form {
   border: 1px solid var(--color-border);
-  border-radius: 24px;
+  border-radius: 1.5rem;
   background-color: var(--color-surface);
-  padding: 20px;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+  box-shadow: 0 0.875rem 1.875rem rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  animation: cardEnter 560ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  gap: 0.875rem;
+  animation: cardEnter 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: 80ms;
 }
 
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.75rem;
   animation: contentFadeUp 440ms ease both;
 }
 
 .panel-forward {
-  animation: slideInForward 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: slideInForward 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .panel-backward {
-  animation: slideInBackward 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: slideInBackward 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .field-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.375rem;
 }
 
 .field-label {
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -138,22 +144,23 @@
 .input {
   width: 100%;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 12px 14px;
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.875rem;
   font-size: 1rem;
   color: var(--color-text-primary);
   background-color: #fff;
   transition:
-    border-color 120ms ease,
-    box-shadow 120ms ease,
-    transform 120ms ease;
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 200ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
+  box-sizing: border-box;
 }
 
 .input:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.14);
-  transform: translateY(-1px);
+  box-shadow: 0 0 0 0.25rem rgba(0, 113, 227, 0.14);
+  transform: translateY(-0.0625rem);
 }
 
 .input:disabled {
@@ -163,9 +170,9 @@
 .toggle-row {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   color: var(--color-text-primary);
-  font-size: 0.92rem;
+  font-size: 0.9375rem;
 }
 
 .toggle-row input {
@@ -173,10 +180,10 @@
 }
 
 .feedback {
-  margin: 2px 0 0;
-  padding: 12px 14px;
-  border-radius: 12px;
-  font-size: 0.94rem;
+  margin: 0.125rem 0 0;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
   line-height: 1.4;
   animation: feedbackPop 240ms ease-out both;
 }
@@ -197,13 +204,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
 }
 
 @keyframes cardEnter {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.98);
+    transform: translateY(1.25rem) scale(0.98);
   }
   to {
     opacity: 1;
@@ -214,7 +221,7 @@
 @keyframes contentFadeUp {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(0.5rem);
   }
   to {
     opacity: 1;
@@ -225,7 +232,7 @@
 @keyframes slideInForward {
   from {
     opacity: 0;
-    transform: translateX(18px);
+    transform: translateX(1.125rem);
   }
   to {
     opacity: 1;
@@ -236,7 +243,7 @@
 @keyframes slideInBackward {
   from {
     opacity: 0;
-    transform: translateX(-18px);
+    transform: translateX(-1.125rem);
   }
   to {
     opacity: 1;
@@ -247,7 +254,7 @@
 @keyframes feedbackPop {
   from {
     opacity: 0;
-    transform: translateY(4px) scale(0.98);
+    transform: translateY(0.25rem) scale(0.98);
   }
   to {
     opacity: 1;
@@ -256,54 +263,26 @@
 }
 
 @keyframes backgroundShift {
-  from {
-    background-position: 0% 0%, 100% 100%, 0 0;
-  }
-  to {
-    background-position: 6% 4%, 96% 94%, 0 0;
-  }
+  from { background-position: 0% 0%, 100% 100%, 0 0; }
+  to   { background-position: 6% 4%, 96% 94%, 0 0; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .page-container,
-  .onboarding-header,
-  .onboarding-header h1,
-  .subtitle,
-  .step-pill,
-  .onboarding-form,
-  .panel,
-  .panel-forward,
-  .panel-backward,
-  .feedback {
-    animation: none !important;
-  }
-
-  .input {
-    transition: none !important;
-    transform: none !important;
-  }
-}
-
-@media (max-width: 640px) {
+@media (max-width: 40rem) {
   .page-container {
-    padding: 16px;
+    padding: 1rem;
   }
-
   .onboarding-header,
   .onboarding-form {
-    padding: 16px;
-    border-radius: 18px;
+    padding: 1rem;
+    border-radius: 1.125rem;
   }
-
   .stepper {
     grid-template-columns: 1fr;
   }
-
   .actions {
     flex-direction: column-reverse;
     align-items: stretch;
   }
-
   .actions .btn {
     width: 100%;
   }

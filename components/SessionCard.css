@@ -2,39 +2,49 @@
    SessionCard.css
    Styles for the SessionCard component (collapsed card + expanded overlay).
    Uses CSS variables from globals.css — no hardcoded colors.
+   All dimensions in rem. Motion-rich hover and expand/collapse transitions.
 ───────────────────────────────────────────────────────────────────────────── */
 
 /* ── Collapsed card ── */
 .session-card {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 18px 22px;
+  gap: 1.125rem;
+  padding: 1.125rem 1.375rem;
   background: var(--color-background);
-  border-radius: 36px;
-  border-left: 4px solid var(--color-accent);
+  border-radius: 2.25rem;
+  border-left: 0.25rem solid var(--color-accent);
   cursor: pointer;
   transition:
-    transform 400ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 400ms cubic-bezier(0.16, 1, 0.3, 1),
-    border-left-width 400ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform 380ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow 380ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-left-width 300ms ease,
+    border-left-color 300ms ease,
+    background 220ms ease;
   opacity: 0;
-  animation: scFadeUp 800ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: scFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform;
 }
 
 .session-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border-left-width: 8px;
+  transform: translateY(-0.125rem) scale(1.015);
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.1);
+  border-left-width: 0.5rem;
+  background: var(--color-surface);
+}
+
+.session-card:active {
+  transform: scale(0.985);
+  transition-duration: 80ms;
 }
 
 .session-card__time {
   font-family: "DM Sans", sans-serif;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-text-muted);
   white-space: nowrap;
-  min-width: 130px;
+  min-width: 8.125rem;
   flex-shrink: 0;
 }
 
@@ -42,17 +52,18 @@
   flex: 1;
   min-width: 0;
 }
+
 .session-card__header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 5px;
+  gap: 0.5rem;
+  margin-bottom: 0.3125rem;
   flex-wrap: wrap;
 }
 
 .session-card__title {
   font-family: "DM Sans", sans-serif;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--color-text-primary);
   letter-spacing: -0.01em;
@@ -61,44 +72,48 @@
 
 .session-card__meta {
   display: flex;
-  gap: 14px;
+  gap: 0.875rem;
   flex-wrap: wrap;
 }
+
 .session-card__meta-item {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 0.3125rem;
   font-family: "DM Sans", sans-serif;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
 }
 
 .session-card__chevron {
   color: var(--color-text-muted);
   opacity: 0;
-  transition: opacity 200ms ease;
   flex-shrink: 0;
+  transition:
+    opacity 200ms ease,
+    transform 300ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1)),
+    color 200ms ease;
 }
 
 .session-card:hover .session-card__chevron {
   opacity: 1;
   color: var(--color-accent);
+  transform: translateX(0.25rem);
 }
 
 /* ── Type badges ── */
 .session-badge {
   font-family: "DM Sans", sans-serif;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 3px 10px;
+  padding: 0.1875rem 0.625rem;
   border-radius: 9999px;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-/* accent/10, accent/18, accent/28 per DesignSpec */
 .badge-lecture {
   background: rgba(0, 113, 227, 0.1);
   color: var(--color-accent);
@@ -114,10 +129,10 @@
 
 .session-code-badge {
   font-family: ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 0.625rem;
   color: var(--color-text-muted);
   background: var(--color-background);
-  padding: 3px 10px;
+  padding: 0.1875rem 0.625rem;
   border-radius: 9999px;
   border: 1px solid var(--color-border);
 }
@@ -126,72 +141,73 @@
 .session-overlay {
   position: fixed;
   inset: 0;
-  /* Neutral frosted glass — white tint, no colour distortion */
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 200;
-  padding: 24px;
-  animation: scOverlayIn 380ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  padding: 1.5rem;
+  animation: scOverlayIn 300ms ease forwards;
 }
 
 .session-overlay__card {
   background: var(--color-surface);
-  border-radius: 52px;
-  padding: 36px 40px;
-  max-width: 580px;
+  border-radius: 3.25rem;
+  padding: 2.25rem 2.5rem;
+  max-width: 36.25rem;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow:
-    0 2px 4px rgba(29, 29, 31, 0.04),
-    0 8px 24px rgba(29, 29, 31, 0.08),
-    0 32px 90px rgba(29, 29, 31, 0.14);
-  animation: scCardExpand 560ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    0 0.125rem 0.25rem rgba(29, 29, 31, 0.04),
+    0 0.5rem 1.5rem rgba(29, 29, 31, 0.08),
+    0 2rem 5.625rem rgba(29, 29, 31, 0.14);
+  animation: scCardExpand 480ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: center bottom;
+  will-change: transform, opacity;
 }
 
 /* ── Closing state (exit animations) ── */
 .session-overlay--closing {
-  animation: scOverlayOut 260ms cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  animation: scOverlayOut 240ms cubic-bezier(0.4, 0, 0.6, 1) forwards;
   pointer-events: none;
 }
 .session-overlay--closing .session-overlay__card {
-  animation: scCardCollapse 220ms cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  animation: scCardCollapse 200ms cubic-bezier(0.4, 0, 0.6, 1) forwards;
 }
 
 .session-overlay__header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 
 .session-overlay__time {
   font-family: "DM Sans", sans-serif;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-text-muted);
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .session-overlay__title {
   font-family: "DM Serif Display", serif;
-  font-size: 26px;
+  font-size: 1.625rem;
   font-weight: 400;
   letter-spacing: -0.03em;
   color: var(--color-text-primary);
-  margin: 0 0 10px;
+  margin: 0 0 0.625rem;
   line-height: 1.2;
 }
 
 .session-overlay__badges {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
@@ -200,35 +216,45 @@
   border-radius: 9999px !important;
   border: 1.5px solid var(--color-border) !important;
   background: var(--color-background) !important;
-  padding: 8px !important;
+  padding: 0.5rem !important;
   flex-shrink: 0;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease,
+    transform 200ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1)) !important;
 }
 
 .session-overlay__close-btn:hover:not(:disabled) {
   background: #ff3b30 !important;
   border-color: #ff3b30 !important;
   color: #ffffff !important;
+  transform: scale(1.1) rotate(90deg) !important;
+}
+
+.session-overlay__close-btn:active:not(:disabled) {
+  transform: scale(0.92) rotate(90deg) !important;
 }
 
 .session-overlay__divider {
   height: 1px;
   background: var(--color-border);
-  margin: 0 0 20px;
+  margin: 0 0 1.25rem;
 }
 
 .session-overlay__meta {
   display: flex;
-  gap: 22px;
-  margin-bottom: 18px;
+  gap: 1.375rem;
+  margin-bottom: 1.125rem;
   flex-wrap: wrap;
 }
 
 .session-overlay__meta-item {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 0.4375rem;
   font-family: "DM Sans", sans-serif;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text-primary);
 }
@@ -239,38 +265,43 @@
 
 .session-overlay__about {
   font-family: "DM Sans", sans-serif;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--color-text-muted);
   line-height: 1.7;
-  margin: 0 0 24px;
+  margin: 0 0 1.5rem;
 }
 
 .session-overlay__stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 0.625rem;
 }
 
 .session-overlay__stat {
   background: var(--color-background);
-  border-radius: 24px;
-  padding: 14px 10px;
+  border-radius: 1.5rem;
+  padding: 0.875rem 0.625rem;
   text-align: center;
+  transition: transform 300ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.session-overlay__stat:hover {
+  transform: scale(1.05);
 }
 
 .session-overlay__stat-value {
   display: block;
   font-family: "DM Sans", sans-serif;
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--color-accent);
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
   line-height: 1;
 }
 
 .session-overlay__stat-label {
   font-family: "DM Sans", sans-serif;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -281,7 +312,7 @@
 @keyframes scFadeUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(1.25rem);
   }
   to {
     opacity: 1;
@@ -289,31 +320,20 @@
   }
 }
 
-/* Backdrop — fades in; frosted blur transitions with opacity */
 @keyframes scOverlayIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-/* Backdrop — fades out */
 @keyframes scOverlayOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
 
-/* Detail card — springs up */
 @keyframes scCardExpand {
   from {
     opacity: 0;
-    transform: scale(0.92) translateY(22px);
+    transform: scale(0.88) translateY(1.5rem);
   }
   to {
     opacity: 1;
@@ -321,7 +341,6 @@
   }
 }
 
-/* Detail card — snaps away */
 @keyframes scCardCollapse {
   from {
     opacity: 1;
@@ -329,16 +348,16 @@
   }
   to {
     opacity: 0;
-    transform: scale(0.95) translateY(14px);
+    transform: scale(0.94) translateY(0.875rem);
   }
 }
 
 /* ── Responsive ── */
-@media (max-width: 700px) {
+@media (max-width: 43.75rem) {
   .session-card {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 0.5rem;
   }
   .session-card__time {
     min-width: auto;
@@ -347,7 +366,7 @@
     grid-template-columns: repeat(2, 1fr);
   }
   .session-overlay__card {
-    padding: 28px 22px;
-    border-radius: 36px;
+    padding: 1.75rem 1.375rem;
+    border-radius: 2.25rem;
   }
 }

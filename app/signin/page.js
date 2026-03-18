@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
+import { Input } from "@/components/Input";
 import "./styles.css";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -42,6 +43,7 @@ export default function SignInPage() {
     try {
       const response = await fetch("/api/auth/signin", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -70,7 +72,7 @@ export default function SignInPage() {
       setMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong. Please try again in a moment."
+          : "Something went wrong. Please try again in a moment.",
       );
     }
   }
@@ -82,32 +84,26 @@ export default function SignInPage() {
         <p className="subtitle">Sign in to your Schedula account.</p>
 
         <form className="signin-form" onSubmit={handleSubmit} noValidate>
-          <label htmlFor="email" className="field-label">
-            Email address
-          </label>
-          <input
+          <Input
             id="email"
+            label="Email address"
             type="email"
             autoComplete="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="name@university.edu"
             disabled={isSubmitting || isSuccess}
-            className="auth-input"
           />
 
-          <label htmlFor="password" className="field-label">
-            Password
-          </label>
-          <input
+          <Input
             id="password"
+            label="Password"
             type="password"
             autoComplete="current-password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             placeholder="Enter your password"
             disabled={isSubmitting || isSuccess}
-            className="auth-input"
           />
 
           <p className="actions-row">
