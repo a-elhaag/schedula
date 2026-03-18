@@ -92,7 +92,9 @@ export default function SignUpPage() {
       }
 
       setStatus("success");
-      setMessage(data?.message ?? "Account created successfully. Redirecting...");
+      setMessage(
+        data?.message ?? "Account created successfully. Redirecting...",
+      );
       setName("");
       setEmail("");
       setPassword("");
@@ -106,7 +108,7 @@ export default function SignUpPage() {
       setMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong. Please try again in a moment."
+          : "Something went wrong. Please try again in a moment.",
       );
     }
   }

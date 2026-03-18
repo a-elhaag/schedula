@@ -71,7 +71,7 @@ export default function SignInPage() {
       setMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong. Please try again in a moment."
+          : "Something went wrong. Please try again in a moment.",
       );
     }
   }
