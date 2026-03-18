@@ -6,13 +6,37 @@ import {
   sendPasswordResetEmail,
 } from "@/lib/auth-helpers";
 import { logger } from "@/lib/logger";
+import { checkRateLimit } from "@/lib/rate-limiter";
 
 const ANTI_ENUMERATION_DELAY_MS = 300;
 const DEFAULT_MESSAGE =
   "If an account exists for this email, a password reset link has been sent.";
 
+function getClientIp(request) {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0] ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
 export async function POST(request) {
   const requestId = request.headers.get("x-request-id") || "unknown";
+  const clientIp = getClientIp(request);
+
+  // Check rate limit
+  const allowed = await checkRateLimit("forgotPassword", clientIp);
+  if (!allowed) {
+    logger.warn(
+      { requestId, clientIp },
+      "Password reset rate limit exceeded",
+    );
+    return NextResponse.json(
+      { message: DEFAULT_MESSAGE },
+      { status: 429 },
+    );
+  }
+
   let body;
 
   try {
