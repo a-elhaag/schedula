@@ -3,10 +3,14 @@ const nextConfig = {
   /* config options here */
   reactCompiler: true,
 
-  // Use Turbopack and pin the workspace root to avoid lockfile ambiguity
-  turbopack: {
-    root: process.cwd(),
+  // Disable ESLint during builds to reduce CPU load
+  eslint: {
+    ignoreDuringBuilds: true,
   },
+
+  // Use Turbopack in production (Next.js 16 default)
+  // This prevents conflicts with webpack config
+  turbopack: {},
 
   // Optimize webpack file watching in development
   webpack: (config, { dev }) => {

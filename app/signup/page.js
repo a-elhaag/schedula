@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
-import { Input } from "@/components/Input";
 import "./styles.css";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -75,7 +74,6 @@ export default function SignUpPage() {
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -93,32 +91,21 @@ export default function SignUpPage() {
       }
 
       setStatus("success");
-      setMessage(
-        data?.message ?? "Account created successfully. Redirecting...",
-      );
+      setMessage(data?.message ?? "Account created successfully. Redirecting...");
       setName("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
 
-      const verificationToken =
-        typeof data?.verificationToken === "string"
-          ? data.verificationToken
-          : "";
-
-      const verifyUrl = verificationToken
-        ? `/verify-email?token=${encodeURIComponent(verificationToken)}&email=${encodeURIComponent(normalizedEmail)}`
-        : `/verify-email?email=${encodeURIComponent(normalizedEmail)}`;
-
       setTimeout(() => {
-        router.push(verifyUrl);
+        router.push("/verify-email");
       }, 500);
     } catch (error) {
       setStatus("error");
       setMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong. Please try again in a moment.",
+          : "Something went wrong. Please try again in a moment."
       );
     }
   }
@@ -126,61 +113,71 @@ export default function SignUpPage() {
   return (
     <div className="page-container">
       <div className="signup-card">
-        <h1>Coordinator Sign Up</h1>
-        <p className="subtitle">
-          Create the coordinator account for your department.
-        </p>
+        <h1>Sign Up</h1>
+        <p className="subtitle">Create your Schedula account.</p>
 
         <form className="signup-form" onSubmit={handleSubmit} noValidate>
           <div className="field-group">
-            <Input
+            <label htmlFor="name" className="field-label">
+              Full name
+            </label>
+            <input
               id="name"
-              label="Full name"
               type="text"
               autoComplete="name"
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder="Your full name"
               disabled={isSubmitting || isSuccess}
+              className="auth-input"
             />
           </div>
 
           <div className="field-group">
-            <Input
+            <label htmlFor="email" className="field-label">
+              Email address
+            </label>
+            <input
               id="email"
-              label="Email address"
               type="email"
               autoComplete="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="name@university.edu"
               disabled={isSubmitting || isSuccess}
+              className="auth-input"
             />
           </div>
 
           <div className="field-group">
-            <Input
+            <label htmlFor="password" className="field-label">
+              Password
+            </label>
+            <input
               id="password"
-              label="Password"
               type="password"
               autoComplete="new-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               placeholder="At least 8 characters"
               disabled={isSubmitting || isSuccess}
+              className="auth-input"
             />
           </div>
 
           <div className="field-group">
-            <Input
+            <label htmlFor="confirm-password" className="field-label">
+              Confirm password
+            </label>
+            <input
               id="confirm-password"
-              label="Confirm password"
               type="password"
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
               placeholder="Re-enter your password"
               disabled={isSubmitting || isSuccess}
+              className="auth-input"
             />
           </div>
 

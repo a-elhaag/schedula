@@ -4,7 +4,7 @@
   align-items: center;
   min-height: 100vh;
   width: 100%;
-  padding: 1.5rem;
+  padding: 24px;
   background:
     radial-gradient(circle at 0% 0%, rgba(0, 113, 227, 0.12), transparent 45%),
     radial-gradient(circle at 100% 100%, rgba(0, 113, 227, 0.08), transparent 50%),
@@ -14,42 +14,42 @@
 
 .verify-card {
   width: 100%;
-  max-width: 32.5rem;
+  max-width: 520px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 1.25rem;
-  padding: 2rem;
-  box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.06);
-  animation: cardEnter 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+  animation: cardEnter 560ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .verify-card h1 {
   color: var(--color-text-primary);
-  margin-bottom: 0.75rem;
+  margin-bottom: 12px;
   font-size: clamp(2rem, 4vw, 2.4rem);
-  animation: contentFadeUp 480ms ease both;
+  animation: contentFadeUp 520ms ease both;
   animation-delay: 120ms;
 }
 
 .subtitle {
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
   color: var(--color-text-muted);
   font-size: 1rem;
-  animation: contentFadeUp 480ms ease both;
+  animation: contentFadeUp 520ms ease both;
   animation-delay: 180ms;
 }
 
 .verify-status {
-  animation: contentFadeUp 480ms ease both;
+  animation: contentFadeUp 520ms ease both;
   animation-delay: 230ms;
 }
 
 .resend-form {
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
-  margin-top: 0.75rem;
-  animation: contentFadeUp 480ms ease both;
+  gap: 10px;
+  margin-top: 12px;
+  animation: contentFadeUp 520ms ease both;
   animation-delay: 280ms;
 }
 
@@ -62,23 +62,22 @@
 .email-input {
   width: 100%;
   border: 1px solid var(--color-border);
-  border-radius: 0.75rem;
-  padding: 0.75rem 0.875rem;
+  border-radius: 12px;
+  padding: 12px 14px;
   font-size: 1rem;
   color: var(--color-text-primary);
   background-color: #fff;
   transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease,
-    transform 200ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
-  box-sizing: border-box;
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease;
 }
 
 .email-input:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 0.25rem rgba(0, 113, 227, 0.14);
-  transform: translateY(-0.0625rem);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.14);
+  transform: translateY(-1px);
 }
 
 .email-input:disabled {
@@ -87,14 +86,23 @@
 
 .submit-btn {
   width: 100%;
-  margin-top: 0.375rem;
+  margin-top: 6px;
+  transition: transform 150ms ease;
+}
+
+.submit-btn:hover {
+  transform: translateY(-1px);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
 }
 
 .feedback {
-  margin-top: 0.875rem;
-  padding: 0.75rem 0.875rem;
-  border-radius: 0.75rem;
-  font-size: 0.9375rem;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.95rem;
   line-height: 1.4;
   animation: feedbackPop 240ms ease-out both;
 }
@@ -118,10 +126,10 @@
 }
 
 .back-link {
-  margin-top: 1rem;
-  font-size: 0.9375rem;
+  margin-top: 16px;
+  font-size: 0.95rem;
   color: var(--color-text-muted);
-  animation: contentFadeUp 480ms ease both;
+  animation: contentFadeUp 520ms ease both;
   animation-delay: 340ms;
 }
 
@@ -138,7 +146,7 @@
 @keyframes cardEnter {
   from {
     opacity: 0;
-    transform: translateY(1.25rem) scale(0.97);
+    transform: translateY(20px) scale(0.98);
   }
   to {
     opacity: 1;
@@ -149,7 +157,7 @@
 @keyframes contentFadeUp {
   from {
     opacity: 0;
-    transform: translateY(0.5rem);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -160,7 +168,7 @@
 @keyframes feedbackPop {
   from {
     opacity: 0;
-    transform: translateY(0.25rem) scale(0.98);
+    transform: translateY(4px) scale(0.98);
   }
   to {
     opacity: 1;
@@ -169,15 +177,39 @@
 }
 
 @keyframes backgroundShift {
-  from { background-position: 0% 0%, 100% 100%, 0 0; }
-  to   { background-position: 6% 4%, 96% 94%, 0 0; }
+  from {
+    background-position: 0% 0%, 100% 100%, 0 0;
+  }
+  to {
+    background-position: 6% 4%, 96% 94%, 0 0;
+  }
 }
 
-@media (max-width: 32.5rem) {
-  .page-container {
-    padding: 1rem;
+@media (prefers-reduced-motion: reduce) {
+  .page-container,
+  .verify-card,
+  .verify-card h1,
+  .subtitle,
+  .verify-status,
+  .resend-form,
+  .back-link,
+  .feedback {
+    animation: none !important;
   }
+
+  .email-input,
+  .submit-btn {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .page-container {
+    padding: 16px;
+  }
+
   .verify-card {
-    padding: 1.5rem 1.125rem;
+    padding: 24px 18px;
   }
 }

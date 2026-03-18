@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Button from "./Button";
-import { XIcon, UserIcon, HomeIcon } from "./icons/index";
+import { XIcon } from "./icons/index";
 import "./SessionCard.css";
 
 const TYPE_CONFIG = {
@@ -76,11 +76,31 @@ export default function SessionCard({ session, index }) {
           </div>
           <div className="session-card__meta">
             <span className="session-card__meta-item">
-              <UserIcon size={13} />
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
               {session.instructor}
             </span>
             <span className="session-card__meta-item">
-              <HomeIcon size={13} />
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
               {session.room}
             </span>
           </div>
@@ -139,11 +159,31 @@ export default function SessionCard({ session, index }) {
             {/* Meta */}
             <div className="session-overlay__meta">
               <div className="session-overlay__meta-item">
-                <UserIcon size={15} />
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
                 <span>{session.instructor}</span>
               </div>
               <div className="session-overlay__meta-item">
-                <HomeIcon size={15} />
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
                 <span>{session.room}</span>
               </div>
             </div>

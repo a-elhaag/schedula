@@ -2,15 +2,14 @@
    WeeklyAvailabilityGrid.css
    Styles for the drag-to-select weekly availability grid component.
    Uses CSS variables from globals.css - no hardcoded colors.
-   All dimensions in rem.
 ============================================================================= */
 
 /* Grid wrapper card */
 .grid-wrapper {
   background: var(--color-surface);
-  border-radius: 1.75rem;
-  padding: 1.5rem;
-  box-shadow: 0 0.125rem 0.75rem rgba(0, 0, 0, 0.06);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 /* Legend row */
@@ -18,31 +17,31 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 20px;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 12px;
 }
 
 .grid-legend__items {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .grid-legend__item {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: 6px;
   font-family: "DM Sans", sans-serif;
-  font-size: 0.75rem;
+  font-size: 12px;
   color: var(--color-text-muted);
 }
 
 .grid-legend__dot {
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 0.25rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
   flex-shrink: 0;
 }
 
@@ -51,33 +50,28 @@
 
 .grid-legend__hint { font-style: italic; opacity: 0.7; }
 
-.grid-legend__actions { display: flex; gap: 0.5rem; }
+.grid-legend__actions { display: flex; gap: 8px; }
 
 .grid-action-btn {
   font-family: "DM Sans", sans-serif;
-  font-size: 0.75rem;
+  font-size: 12px;
   font-weight: 600;
   color: var(--color-accent);
   background: rgba(0, 113, 227, 0.08);
   border: 1px solid rgba(0, 113, 227, 0.2);
   border-radius: 9999px;
-  padding: 0.3125rem 0.875rem;
+  padding: 5px 14px;
   cursor: pointer;
-  transition:
-    background 200ms ease,
-    transform 200ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
+  transition: all 200ms ease;
 }
 
-.grid-action-btn:hover {
-  background: rgba(0, 113, 227, 0.14);
-  transform: translateY(-0.0625rem);
-}
+.grid-action-btn:hover { background: rgba(0, 113, 227, 0.14); }
 
 /* Grid layout */
 .availability-grid {
   display: grid;
-  grid-template-columns: 3.5rem repeat(6, 1fr);
-  gap: 0.25rem;
+  grid-template-columns: 56px repeat(6, 1fr);
+  gap: 4px;
   overflow-x: auto;
 }
 
@@ -89,31 +83,26 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.125rem;
-  padding: 0.625rem 0.375rem;
-  border-radius: 0.75rem;
+  gap: 2px;
+  padding: 10px 6px;
+  border-radius: 12px;
   cursor: pointer;
-  transition:
-    background 200ms ease,
-    transform 200ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
+  transition: background 200ms ease;
   background: var(--color-background);
 }
 
-.grid-day-header:hover {
-  background: rgba(0, 113, 227, 0.06);
-  transform: translateY(-0.0625rem);
-}
+.grid-day-header:hover { background: rgba(0, 113, 227, 0.06); }
 
 .grid-day-header__name {
   font-family: "DM Sans", sans-serif;
-  font-size: 0.75rem;
+  font-size: 12px;
   font-weight: 700;
   color: var(--color-text-primary);
 }
 
 .grid-day-header__count {
   font-family: "DM Sans", sans-serif;
-  font-size: 0.625rem;
+  font-size: 10px;
   color: var(--color-text-muted);
 }
 
@@ -122,31 +111,27 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 0.625rem;
+  padding-right: 10px;
   font-family: "DM Sans", sans-serif;
-  font-size: 0.6875rem;
+  font-size: 11px;
   font-weight: 600;
   color: var(--color-text-muted);
   cursor: pointer;
-  border-radius: 0.5rem;
+  border-radius: 8px;
   transition: color 200ms ease;
-  height: 2.5rem;
+  height: 40px;
 }
 
 .grid-time-label:hover { color: var(--color-accent); }
 
 /* Cells */
 .grid-cell {
-  height: 2.5rem;
-  border-radius: 0.625rem;
+  height: 40px;
+  border-radius: 10px;
   background: var(--color-background);
   border: 1.5px solid var(--color-border);
   cursor: pointer;
-  transition:
-    background 140ms ease,
-    border-color 140ms ease,
-    transform 200ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1)),
-    box-shadow 200ms ease;
+  transition: all 120ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,26 +140,21 @@
 .grid-cell:hover:not(.grid-cell--selected) {
   background: rgba(0, 113, 227, 0.08);
   border-color: rgba(0, 113, 227, 0.3);
-  transform: scale(1.06);
 }
 
 .grid-cell--selected {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  box-shadow: 0 0.125rem 0.5rem rgba(0, 113, 227, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.25);
 }
 
-.grid-cell--selected:hover {
-  background: #0063c7;
-  border-color: #0063c7;
-  transform: scale(1.04);
-}
+.grid-cell--selected:hover { background: #0063c7; border-color: #0063c7; }
 
 /* Selected indicator dot */
 .grid-cell__check {
   display: block;
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 8px;
+  height: 8px;
   border-radius: 9999px;
   background: #ffffff;
 }
@@ -184,17 +164,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1rem;
-  padding-top: 1rem;
+  margin-top: 16px;
+  padding-top: 16px;
   border-top: 1px solid var(--color-border);
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .grid-footer__count,
 .grid-footer__hours {
   font-family: "DM Sans", sans-serif;
-  font-size: 0.8125rem;
+  font-size: 13px;
   color: var(--color-text-muted);
 }
 
@@ -205,7 +185,7 @@
 }
 
 /* Responsive */
-@media (max-width: 43.75rem) {
-  .availability-grid { grid-template-columns: 3rem repeat(6, 1fr); }
-  .grid-cell         { height: 2.125rem; }
+@media (max-width: 700px) {
+  .availability-grid { grid-template-columns: 48px repeat(6, 1fr); }
+  .grid-cell         { height: 34px; }
 }
