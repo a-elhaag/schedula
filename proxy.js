@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { verifyTokenEdge } from "@/lib/edge-auth";
 
 /**
- * middleware.js
+ * proxy.js
  * Role-based route protection with JWT token verification.
  * Public routes bypass auth. Protected routes require valid token and role.
  */
