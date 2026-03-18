@@ -1,6 +1,27 @@
 import { NextResponse } from "next/server";
+import { getDb } from "@/lib/db";
+import { hashPassword } from "@/lib/password";
+import { generateToken } from "@/lib/auth";
+import { buildEmailTemplate, getBaseUrl, sendEmail } from "@/lib/email";
+import {
+  validateEmail,
+  generateEmailVerificationToken,
+  sendEmailVerification,
+  EMAIL_VERIFY_TTL_MS,
+} from "@/lib/auth-helpers";
+import { logger } from "@/lib/logger";
+import { checkRateLimit } from "@/lib/rate-limiter";
+import { ObjectId } from "mongodb";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DEFAULT_INSTITUTION_ID = "69b538e5aa373449d761b122"; // Software Engineering Department
+
+function getClientIp(request) {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0] ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
 
 function validatePassword(password) {
   const hasUpper = /[A-Z]/.test(password);
@@ -19,32 +40,49 @@ function validatePassword(password) {
 }
 
 export async function POST(request) {
+  const requestId = request.headers.get("x-request-id") || "unknown";
+  const clientIp = getClientIp(request);
+
+  // Check rate limit
+  const allowed = await checkRateLimit("signup", clientIp);
+  if (!allowed) {
+    logger.warn(
+      { requestId, clientIp },
+      "Sign up rate limit exceeded",
+    );
+    return NextResponse.json(
+      { message: "Too many sign up attempts. Please try again later." },
+      { status: 429 },
+    );
+  }
+
   let body;
 
   try {
     body = await request.json();
   } catch {
+    logger.warn({ requestId }, "Invalid request payload");
     return NextResponse.json(
       { message: "Invalid request payload." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   const name = typeof body?.name === "string" ? body.name.trim() : "";
-  const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+  const email = body?.email ? String(body.email).trim().toLowerCase() : "";
   const password = typeof body?.password === "string" ? body.password : "";
 
   if (name.length < 2) {
     return NextResponse.json(
       { message: "Please provide your full name." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
-  if (!EMAIL_PATTERN.test(email)) {
+  if (!validateEmail(email)) {
     return NextResponse.json(
       { message: "Please provide a valid email address." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -56,8 +94,81 @@ export async function POST(request) {
   // Keep a consistent delay to reduce timing differences.
   await new Promise((resolve) => setTimeout(resolve, 350));
 
-  return NextResponse.json({
-    ok: true,
-    message: "Account created. Please verify your email to continue.",
-  });
+  try {
+    const db = await getDb();
+    const usersCollection = db.collection("users");
+
+    // Check if user already exists
+    const existingUser = await usersCollection.findOne({ email });
+    if (existingUser) {
+      logger.info({ requestId, email }, "Sign up attempted with existing email");
+      return NextResponse.json(
+        { message: "An account with this email already exists." },
+        { status: 409 },
+      );
+    }
+
+    // Hash the password
+    const passwordHash = await hashPassword(password);
+
+    // Generate initial verification token
+    const emailVerifyToken = generateToken();
+    const emailVerifyExpiresAt = new Date(Date.now() + EMAIL_VERIFY_TTL_MS);
+
+    // Create user document
+    const newUser = {
+      institution_id: new ObjectId(DEFAULT_INSTITUTION_ID),
+      email,
+      password_hash: passwordHash,
+      role: "coordinator", // Coordinator-only signup
+      name,
+      invite_status: "pending", // User must verify email
+      email_verify_token: emailVerifyToken,
+      email_verify_expires_at: emailVerifyExpiresAt,
+      email_verified_at: null,
+      invited_by: null,
+      invite_token: null,
+      invite_expires_at: null,
+      created_at: new Date(),
+    };
+
+    // Insert user into database
+    const result = await usersCollection.insertOne(newUser);
+    const userId = result.insertedId.toString();
+
+    const emailResult = await sendEmailVerification(email, emailVerifyToken, request);
+
+    if (emailResult?.skipped && process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { message: "Unable to send verification email right now." },
+        { status: 503 },
+      );
+    }
+
+    // Create response
+    const response = NextResponse.json(
+      {
+        ok: true,
+        message: "Account created. Please verify your email to continue.",
+        user: { id: userId, email, role: "coordinator" },
+        verificationToken:
+          emailResult?.skipped && process.env.NODE_ENV !== "production"
+            ? emailVerifyToken
+            : undefined,
+      },
+      { status: 201 },
+    );
+
+    logger.info({ requestId, userId, email }, "Sign up successful");
+    return response;
+  } catch (error) {
+    logger.error(
+      { requestId, email, error: error.message, stack: error.stack },
+      "Sign up error",
+    );
+    return NextResponse.json(
+      { message: "An error occurred during sign up." },
+      { status: 500 },
+    );
+  }
 }

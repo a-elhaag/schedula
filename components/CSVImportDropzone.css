@@ -4,24 +4,30 @@
 
 .csv-dropzone {
   border: 2px dashed #cbd5e1;
-  border-radius: 16px;
+  border-radius: 1rem;
   background: #f8fafc;
-  padding: 40px 24px;
+  padding: 2.5rem 1.5rem;
   text-align: center;
   cursor: pointer;
-  transition: all 200ms ease;
+  transition:
+    border-color 220ms ease,
+    background 220ms ease,
+    transform 280ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow 220ms ease;
   position: relative;
+  will-change: transform;
 }
 
 .csv-dropzone:hover {
   border-color: var(--color-accent, #0071e3);
   background: rgba(0, 113, 227, 0.04);
+  transform: translateY(-0.0625rem);
 }
 
 .csv-dropzone.is-drag-active {
   border-color: var(--color-accent, #0071e3);
   background: rgba(0, 113, 227, 0.08);
-  box-shadow: 0 8px 24px rgba(0, 113, 227, 0.15);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 113, 227, 0.15);
   transform: scale(1.01);
   animation: dropzone-pulse 400ms ease-out;
 }
@@ -41,12 +47,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
   cursor: pointer;
 }
 
 .csv-dropzone-icon {
-  font-size: 40px;
+  font-size: 2.5rem;
   animation: dropzone-icon-bounce 600ms cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 
@@ -61,7 +67,7 @@
 .csv-dropzone-title {
   margin: 0;
   font-family: "DM Sans", sans-serif;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-text-primary, #0f172a);
 }
@@ -69,108 +75,74 @@
 .csv-dropzone-text {
   margin: 0;
   font-family: "DM Sans", sans-serif;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text-muted, #64748b);
 }
 
 .csv-dropzone-size {
-  margin: 6px 0 0;
+  margin: 0.375rem 0 0;
   font-family: "DM Sans", sans-serif;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #10b981;
   font-weight: 600;
 }
 
 .csv-dropzone-error {
-  margin-top: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
+  margin-top: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.625rem;
   background: #fee2e2;
-  border-left: 4px solid #dc2626;
+  border-left: 0.25rem solid #dc2626;
   font-family: "DM Sans", sans-serif;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #991b1b;
   animation: error-slide 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .csv-dropzone-clear {
-  margin-top: 12px;
-  padding: 8px 16px;
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 10px;
+  border-radius: 0.625rem;
   background: #f1f5f9;
   color: var(--color-text-primary, #0f172a);
   font-family: "DM Sans", sans-serif;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 160ms ease;
+  transition:
+    background 160ms ease,
+    transform 200ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
 }
 
 .csv-dropzone-clear:hover {
   background: #e2e8f0;
+  transform: scale(1.04);
 }
 
 @keyframes dropzone-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(0, 113, 227, 0.3);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(0, 113, 227, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 113, 227, 0);
-  }
+  0%   { box-shadow: 0 0 0 0 rgba(0, 113, 227, 0.3); }
+  70%  { box-shadow: 0 0 0 0.625rem rgba(0, 113, 227, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 113, 227, 0); }
 }
 
 @keyframes dropzone-icon-bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-0.25rem); }
 }
 
 @keyframes dropzone-icon-lift {
-  from {
-    transform: translateY(0) scale(1);
-  }
-  to {
-    transform: translateY(-8px) scale(1.1);
-  }
+  from { transform: translateY(0) scale(1); }
+  to   { transform: translateY(-0.5rem) scale(1.1); }
 }
 
 @keyframes dropzone-icon-check {
-  0% {
-    transform: scale(0) rotate(-45deg);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2) rotate(10deg);
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
+  0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
+  50%  { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
 @keyframes error-slide {
-  from {
-    opacity: 0;
-    transform: translateX(-12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .csv-dropzone,
-  .csv-dropzone-icon,
-  .csv-dropzone-error {
-    animation: none;
-  }
+  from { opacity: 0; transform: translateX(-0.75rem); }
+  to   { opacity: 1; transform: translateX(0); }
 }
