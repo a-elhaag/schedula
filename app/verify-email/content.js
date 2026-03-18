@@ -11,14 +11,19 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export default function VerifyEmailPage() {
   const searchParams = useSearchParams();
 
-  const token = useMemo(() => searchParams.get("token")?.trim() ?? "", [searchParams]);
+  const token = useMemo(
+    () => searchParams.get("token")?.trim() ?? "",
+    [searchParams],
+  );
   const emailFromQuery = useMemo(
     () => searchParams.get("email")?.trim().toLowerCase() ?? "",
-    [searchParams]
+    [searchParams],
   );
 
   const [email, setEmail] = useState(emailFromQuery);
-  const [verifyStatus, setVerifyStatus] = useState(token ? "idle" : "missing-token");
+  const [verifyStatus, setVerifyStatus] = useState(
+    token ? "idle" : "missing-token",
+  );
   const [verifyMessage, setVerifyMessage] = useState("");
   const [resendStatus, setResendStatus] = useState("idle");
   const [resendMessage, setResendMessage] = useState("");
@@ -33,7 +38,9 @@ export default function VerifyEmailPage() {
   async function submitVerification() {
     if (!token) {
       setVerifyStatus("missing-token");
-      setVerifyMessage("This verification link is missing a token. Please request a new email.");
+      setVerifyMessage(
+        "This verification link is missing a token. Please request a new email.",
+      );
       return;
     }
 
@@ -53,17 +60,21 @@ export default function VerifyEmailPage() {
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(data?.message ?? "Unable to verify your email right now.");
+        throw new Error(
+          data?.message ?? "Unable to verify your email right now.",
+        );
       }
 
       setVerifyStatus("success");
-      setVerifyMessage(data?.message ?? "Email verified successfully. You can now sign in.");
+      setVerifyMessage(
+        data?.message ?? "Email verified successfully. You can now sign in.",
+      );
     } catch (error) {
       setVerifyStatus("error");
       setVerifyMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong while verifying your email."
+          : "Something went wrong while verifying your email.",
       );
     }
   }
@@ -103,20 +114,22 @@ export default function VerifyEmailPage() {
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(data?.message ?? "Unable to resend verification email right now.");
+        throw new Error(
+          data?.message ?? "Unable to resend verification email right now.",
+        );
       }
 
       setResendStatus("success");
       setResendMessage(
         data?.message ??
-          "If an account exists for this email, a new verification link has been sent."
+          "If an account exists for this email, a new verification link has been sent.",
       );
     } catch (error) {
       setResendStatus("error");
       setResendMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong. Please try again in a moment."
+          : "Something went wrong. Please try again in a moment.",
       );
     }
   }
@@ -128,7 +141,9 @@ export default function VerifyEmailPage() {
         <p className="subtitle">We are confirming your account email.</p>
 
         <div className="verify-status">
-          {isVerifying ? <p className="feedback neutral">Verifying your email...</p> : null}
+          {isVerifying ? (
+            <p className="feedback neutral">Verifying your email...</p>
+          ) : null}
           {verifySuccess ? (
             <p className="feedback success" role="status">
               {verifyMessage}

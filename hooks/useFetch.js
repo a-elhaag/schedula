@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * useFetch() hook
@@ -9,7 +9,7 @@
  *   const { data, error, isLoading } = useFetch('/api/endpoint', { method: 'POST', body: {...} });
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
 export function useFetch(url, options = {}) {
   const [data, setData] = useState(null);
@@ -26,16 +26,16 @@ export function useFetch(url, options = {}) {
         const mergedOptions = {
           ...options,
           ...customOptions,
-          credentials: 'include', // Always send auth_token cookie
+          credentials: "include", // Always send auth_token cookie
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             ...options.headers,
             ...customOptions.headers,
           },
         };
 
         // Convert body object to JSON string if needed
-        if (mergedOptions.body && typeof mergedOptions.body === 'object') {
+        if (mergedOptions.body && typeof mergedOptions.body === "object") {
           mergedOptions.body = JSON.stringify(mergedOptions.body);
         }
 
@@ -49,14 +49,14 @@ export function useFetch(url, options = {}) {
         setData(result);
         return result;
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+        const errorMsg = err instanceof Error ? err.message : "Unknown error";
         setError(errorMsg);
         throw err;
       } finally {
         setIsLoading(false);
       }
     },
-    [url, options]
+    [url, options],
   );
 
   // Auto-execute if no method specified (GET by default)

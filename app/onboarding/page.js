@@ -130,7 +130,8 @@ export default function OnboardingPage() {
 
       setTimeout(() => {
         const redirectTo =
-          typeof data?.redirectTo === "string" && data.redirectTo.startsWith("/")
+          typeof data?.redirectTo === "string" &&
+          data.redirectTo.startsWith("/")
             ? data.redirectTo
             : "/coordinator/setup";
 
@@ -139,7 +140,9 @@ export default function OnboardingPage() {
     } catch (error) {
       setStatus("error");
       setMessage(
-        error instanceof Error ? error.message : "Something went wrong. Please try again."
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.",
       );
     }
   }
@@ -150,7 +153,9 @@ export default function OnboardingPage() {
         <header className="onboarding-header">
           <p className="eyebrow">Welcome</p>
           <h1>Setup Your Workspace</h1>
-          <p className="subtitle">Step {currentStep} of 3: {stepTitle}</p>
+          <p className="subtitle">
+            Step {currentStep} of 3: {stepTitle}
+          </p>
         </header>
 
         <section className="stepper" aria-label="Onboarding steps">
@@ -169,7 +174,10 @@ export default function OnboardingPage() {
 
         <form className="onboarding-form" onSubmit={handleSubmit} noValidate>
           {currentStep === 1 ? (
-            <div className={`panel panel-${transitionDirection}`} key={`step-1-${transitionDirection}`}>
+            <div
+              className={`panel panel-${transitionDirection}`}
+              key={`step-1-${transitionDirection}`}
+            >
               <label className="field-label" htmlFor="role">
                 Select your role
               </label>
@@ -189,7 +197,10 @@ export default function OnboardingPage() {
           ) : null}
 
           {currentStep === 2 ? (
-            <div className={`panel panel-${transitionDirection}`} key={`step-2-${transitionDirection}`}>
+            <div
+              className={`panel panel-${transitionDirection}`}
+              key={`step-2-${transitionDirection}`}
+            >
               <div className="field-group">
                 <label className="field-label" htmlFor="institution">
                   Institution
@@ -198,7 +209,9 @@ export default function OnboardingPage() {
                   id="institution"
                   className="input"
                   value={formData.institution}
-                  onChange={(event) => updateField("institution", event.target.value)}
+                  onChange={(event) =>
+                    updateField("institution", event.target.value)
+                  }
                   placeholder="Egyptian Chinese University"
                   disabled={isSubmitting || isSuccess}
                 />
@@ -212,7 +225,9 @@ export default function OnboardingPage() {
                   id="faculty"
                   className="input"
                   value={formData.faculty}
-                  onChange={(event) => updateField("faculty", event.target.value)}
+                  onChange={(event) =>
+                    updateField("faculty", event.target.value)
+                  }
                   placeholder="Faculty of Engineering"
                   disabled={isSubmitting || isSuccess}
                 />
@@ -226,7 +241,9 @@ export default function OnboardingPage() {
                   id="department"
                   className="input"
                   value={formData.department}
-                  onChange={(event) => updateField("department", event.target.value)}
+                  onChange={(event) =>
+                    updateField("department", event.target.value)
+                  }
                   placeholder="Software Engineering"
                   disabled={isSubmitting || isSuccess}
                 />
@@ -241,7 +258,9 @@ export default function OnboardingPage() {
                     id="yearLevel"
                     className="input"
                     value={formData.yearLevel}
-                    onChange={(event) => updateField("yearLevel", event.target.value)}
+                    onChange={(event) =>
+                      updateField("yearLevel", event.target.value)
+                    }
                     disabled={isSubmitting || isSuccess}
                   >
                     <option value="">Choose year level</option>
@@ -256,7 +275,10 @@ export default function OnboardingPage() {
           ) : null}
 
           {currentStep === 3 ? (
-            <div className={`panel panel-${transitionDirection}`} key={`step-3-${transitionDirection}`}>
+            <div
+              className={`panel panel-${transitionDirection}`}
+              key={`step-3-${transitionDirection}`}
+            >
               <div className="field-group">
                 <label className="field-label" htmlFor="preferredStart">
                   Preferred start time
@@ -266,7 +288,9 @@ export default function OnboardingPage() {
                   type="time"
                   className="input"
                   value={formData.preferredStart}
-                  onChange={(event) => updateField("preferredStart", event.target.value)}
+                  onChange={(event) =>
+                    updateField("preferredStart", event.target.value)
+                  }
                   disabled={isSubmitting || isSuccess}
                 />
               </div>
@@ -280,7 +304,9 @@ export default function OnboardingPage() {
                   type="time"
                   className="input"
                   value={formData.preferredEnd}
-                  onChange={(event) => updateField("preferredEnd", event.target.value)}
+                  onChange={(event) =>
+                    updateField("preferredEnd", event.target.value)
+                  }
                   disabled={isSubmitting || isSuccess}
                 />
               </div>
@@ -290,7 +316,9 @@ export default function OnboardingPage() {
                   id="notifications"
                   type="checkbox"
                   checked={formData.notifications}
-                  onChange={(event) => updateField("notifications", event.target.checked)}
+                  onChange={(event) =>
+                    updateField("notifications", event.target.checked)
+                  }
                   disabled={isSubmitting || isSuccess}
                 />
                 Email notifications for schedule updates
@@ -321,11 +349,19 @@ export default function OnboardingPage() {
             </Button>
 
             {currentStep < 3 ? (
-              <Button type="button" onClick={handleNext} disabled={isSubmitting || isSuccess}>
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={isSubmitting || isSuccess}
+              >
                 Continue
               </Button>
             ) : (
-              <Button type="submit" disabled={isSubmitting || isSuccess} aria-busy={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting || isSuccess}
+                aria-busy={isSubmitting}
+              >
                 {isSubmitting ? "Saving..." : "Finish setup"}
               </Button>
             )}
