@@ -1,11 +1,35 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { logger } from "@/lib/logger";
+import { checkRateLimit } from "@/lib/rate-limiter";
 
 const TOKEN_MIN_LENGTH = 16;
 
+function getClientIp(request) {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0] ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
 export async function POST(request) {
   const requestId = request.headers.get("x-request-id") || "unknown";
+  const clientIp = getClientIp(request);
+
+  // Check rate limit
+  const allowed = await checkRateLimit("verifyEmail", clientIp);
+  if (!allowed) {
+    logger.warn(
+      { requestId, clientIp },
+      "Email verification rate limit exceeded",
+    );
+    return NextResponse.json(
+      { message: "Too many verification attempts. Please try again later." },
+      { status: 429 },
+    );
+  }
+
   let body;
 
   try {

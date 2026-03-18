@@ -10,9 +10,18 @@ import {
   EMAIL_VERIFY_TTL_MS,
 } from "@/lib/auth-helpers";
 import { logger } from "@/lib/logger";
+import { checkRateLimit } from "@/lib/rate-limiter";
 import { ObjectId } from "mongodb";
 
 const DEFAULT_INSTITUTION_ID = "69b538e5aa373449d761b122"; // Software Engineering Department
+
+function getClientIp(request) {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0] ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
 
 function validatePassword(password) {
   const hasUpper = /[A-Z]/.test(password);
@@ -32,6 +41,21 @@ function validatePassword(password) {
 
 export async function POST(request) {
   const requestId = request.headers.get("x-request-id") || "unknown";
+  const clientIp = getClientIp(request);
+
+  // Check rate limit
+  const allowed = await checkRateLimit("signup", clientIp);
+  if (!allowed) {
+    logger.warn(
+      { requestId, clientIp },
+      "Sign up rate limit exceeded",
+    );
+    return NextResponse.json(
+      { message: "Too many sign up attempts. Please try again later." },
+      { status: 429 },
+    );
+  }
+
   let body;
 
   try {

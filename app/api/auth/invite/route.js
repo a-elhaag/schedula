@@ -4,12 +4,36 @@ import { verifyToken } from "@/lib/jwt";
 import { generateToken } from "@/lib/auth";
 import { validateEmail, sendInviteEmail, INVITE_TTL_MS } from "@/lib/auth-helpers";
 import { logger } from "@/lib/logger";
+import { checkRateLimit } from "@/lib/rate-limiter";
 import { ObjectId } from "mongodb";
 
 const ROLE_OPTIONS = ["professor", "ta", "student"];
 
+function getClientIp(request) {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0] ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
 export async function POST(request) {
   const requestId = request.headers.get("x-request-id") || "unknown";
+  const clientIp = getClientIp(request);
+
+  // Check rate limit
+  const allowed = await checkRateLimit("invite", clientIp);
+  if (!allowed) {
+    logger.warn(
+      { requestId, clientIp },
+      "Invite rate limit exceeded",
+    );
+    return NextResponse.json(
+      { message: "Too many invite attempts. Please try again later." },
+      { status: 429 },
+    );
+  }
+
   let body;
 
   try {

@@ -4,9 +4,33 @@ import { signToken } from "@/lib/jwt";
 import { comparePassword } from "@/lib/password";
 import { validateEmail } from "@/lib/auth-helpers";
 import { logger } from "@/lib/logger";
+import { checkRateLimit } from "@/lib/rate-limiter";
+
+function getClientIp(request) {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0] ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
 
 export async function POST(request) {
   const requestId = request.headers.get("x-request-id") || "unknown";
+  const clientIp = getClientIp(request);
+
+  // Check rate limit
+  const allowed = await checkRateLimit("signin", clientIp);
+  if (!allowed) {
+    logger.warn(
+      { requestId, clientIp },
+      "Sign in rate limit exceeded",
+    );
+    return NextResponse.json(
+      { message: "Too many sign in attempts. Please try again later." },
+      { status: 429 },
+    );
+  }
+
   let body;
 
   try {
