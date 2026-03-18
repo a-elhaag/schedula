@@ -11,6 +11,7 @@
     "db:export": "node --env-file=.env scripts/export-data.mjs"
   },
   "dependencies": {
+    "@azure/communication-email": "^1.0.0",
     "bcrypt": "^6.0.0",
     "jose": "^5.5.0",
     "jsonwebtoken": "^9.0.3",

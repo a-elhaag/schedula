@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { verifyToken } from "@/lib/jwt";
 import { generateToken } from "@/lib/auth";
+import { getBaseUrl, sendEmail } from "@/lib/email";
 import { ObjectId } from "mongodb";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -88,12 +89,26 @@ export async function POST(request) {
 
     await usersCollection.insertOne(newUser);
 
+    const baseUrl = getBaseUrl(request);
+    const inviteLink = `${baseUrl}/accept-invite?token=${encodeURIComponent(
+      inviteToken,
+    )}&email=${encodeURIComponent(email)}`;
+
+    const emailResult = await sendEmail({
+      to: email,
+      subject: "Your Schedula invite",
+      text: `You have been invited to Schedula. Set your password to activate your account: ${inviteLink}`,
+      html: `<p>You have been invited to Schedula.</p><p>Set your password to activate your account:</p><p><a href="${inviteLink}">Accept invite</a></p>`,
+    });
+
     return NextResponse.json(
       {
         ok: true,
         message: "Invite created successfully.",
         inviteToken:
-          process.env.NODE_ENV === "production" ? undefined : inviteToken,
+          emailResult?.skipped && process.env.NODE_ENV !== "production"
+            ? inviteToken
+            : undefined,
       },
       { status: 201 },
     );

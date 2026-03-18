@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
+import { generateToken } from "@/lib/auth";
+import { getBaseUrl, sendEmail } from "@/lib/email";
 
 const TOKEN_MIN_LENGTH = 16;
 
@@ -68,14 +70,18 @@ export async function POST(request) {
     }
 
     const passwordHash = await hashPassword(password);
+    const emailVerifyToken = generateToken();
+    const emailVerifyExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     await usersCollection.updateOne(
       { _id: user._id },
       {
         $set: {
           password_hash: passwordHash,
-          invite_status: "joined",
-          email_verified_at: new Date(),
+          invite_status: "pending",
+          email_verified_at: null,
+          email_verify_token: emailVerifyToken,
+          email_verify_expires_at: emailVerifyExpiresAt,
           invite_token: null,
           invite_expires_at: null,
           ...(name ? { name } : {}),
@@ -83,9 +89,25 @@ export async function POST(request) {
       },
     );
 
+    const baseUrl = getBaseUrl(request);
+    const verificationLink = `${baseUrl}/verify-email?token=${encodeURIComponent(
+      emailVerifyToken,
+    )}&email=${encodeURIComponent(user.email)}`;
+
+    const emailResult = await sendEmail({
+      to: user.email,
+      subject: "Verify your Schedula email",
+      text: `Verify your email to activate your Schedula account: ${verificationLink}`,
+      html: `<p>Verify your email to activate your Schedula account:</p><p><a href="${verificationLink}">Verify email</a></p>`,
+    });
+
     return NextResponse.json({
       ok: true,
-      message: "Invite accepted. You can now sign in.",
+      message: "Invite accepted. Please verify your email to continue.",
+      verificationToken:
+        emailResult?.skipped && process.env.NODE_ENV !== "production"
+          ? emailVerifyToken
+          : undefined,
     });
   } catch (error) {
     console.error("[accept-invite] Error:", error);
