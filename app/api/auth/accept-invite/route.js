@@ -106,6 +106,13 @@ export async function POST(request) {
       html: template.html,
     });
 
+    if (emailResult?.skipped && process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { message: "Unable to send verification email right now." },
+        { status: 503 },
+      );
+    }
+
     return NextResponse.json({
       ok: true,
       message: "Invite accepted. Please verify your email to continue.",

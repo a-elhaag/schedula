@@ -15,7 +15,6 @@ const PUBLIC_ROUTES = [
   "/forgot-password",
   "/reset-password",
   "/verify-email",
-  "/onboarding",
   "/unauthorized",
   "/api/auth",
 ];
@@ -25,6 +24,7 @@ const PROTECTED_ROUTES = {
   "/coordinator": ["coordinator"],
   "/staff": ["professor", "ta"], // Staff includes professors and TAs
   "/student": ["student"],
+  "/onboarding": ["coordinator", "professor", "ta", "student"],
 };
 
 function isPublicRoute(pathname) {

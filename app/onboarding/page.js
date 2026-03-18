@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
 import "./styles.css";
@@ -19,6 +19,7 @@ export default function OnboardingPage() {
   const [transitionDirection, setTransitionDirection] = useState("forward");
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
+  const [authReady, setAuthReady] = useState(false);
 
   const [formData, setFormData] = useState({
     role: "student",
@@ -35,6 +36,44 @@ export default function OnboardingPage() {
   const isSuccess = status === "success";
   const isError = status === "error";
   const requiresYearLevel = formData.role === "student";
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch("/api/auth/me", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          if (!cancelled) {
+            router.push("/signin");
+          }
+          return;
+        }
+
+        const data = await response.json().catch(() => null);
+        const role = data?.user?.role;
+
+        if (!cancelled && ROLE_OPTIONS.includes(role)) {
+          setFormData((prev) => ({ ...prev, role }));
+          setAuthReady(true);
+        }
+      } catch {
+        if (!cancelled) {
+          router.push("/signin");
+        }
+      }
+    }
+
+    loadCurrentUser();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   const stepTitle = useMemo(() => {
     const step = STEPS.find((item) => item.id === currentStep);
@@ -173,7 +212,13 @@ export default function OnboardingPage() {
         </section>
 
         <form className="onboarding-form" onSubmit={handleSubmit} noValidate>
-          {currentStep === 1 ? (
+          {!authReady ? (
+            <div className="panel panel-forward">
+              <p className="subtitle">Loading your account...</p>
+            </div>
+          ) : null}
+
+          {authReady && currentStep === 1 ? (
             <div
               className={`panel panel-${transitionDirection}`}
               key={`step-1-${transitionDirection}`}
@@ -185,8 +230,8 @@ export default function OnboardingPage() {
                 id="role"
                 className="input"
                 value={formData.role}
-                onChange={(event) => updateField("role", event.target.value)}
-                disabled={isSubmitting || isSuccess}
+                onChange={() => {}}
+                disabled
               >
                 <option value="student">Student</option>
                 <option value="ta">Teaching Assistant</option>
@@ -196,7 +241,7 @@ export default function OnboardingPage() {
             </div>
           ) : null}
 
-          {currentStep === 2 ? (
+          {authReady && currentStep === 2 ? (
             <div
               className={`panel panel-${transitionDirection}`}
               key={`step-2-${transitionDirection}`}
@@ -274,7 +319,7 @@ export default function OnboardingPage() {
             </div>
           ) : null}
 
-          {currentStep === 3 ? (
+          {authReady && currentStep === 3 ? (
             <div
               className={`panel panel-${transitionDirection}`}
               key={`step-3-${transitionDirection}`}
@@ -343,7 +388,9 @@ export default function OnboardingPage() {
               type="button"
               variant="secondary"
               onClick={handleBack}
-              disabled={currentStep === 1 || isSubmitting || isSuccess}
+              disabled={
+                !authReady || currentStep === 1 || isSubmitting || isSuccess
+              }
             >
               Back
             </Button>
@@ -352,14 +399,14 @@ export default function OnboardingPage() {
               <Button
                 type="button"
                 onClick={handleNext}
-                disabled={isSubmitting || isSuccess}
+                disabled={!authReady || isSubmitting || isSuccess}
               >
                 Continue
               </Button>
             ) : (
               <Button
                 type="submit"
-                disabled={isSubmitting || isSuccess}
+                disabled={!authReady || isSubmitting || isSuccess}
                 aria-busy={isSubmitting}
               >
                 {isSubmitting ? "Saving..." : "Finish setup"}

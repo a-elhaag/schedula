@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getDb } from "@/lib/db";
+import { hashPassword } from "@/lib/password";
 
 const MIN_PASSWORD_LENGTH = 8;
 const TOKEN_MIN_LENGTH = 16;
@@ -27,7 +29,7 @@ export async function POST(request) {
   } catch {
     return NextResponse.json(
       { message: "Invalid request payload." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -37,7 +39,7 @@ export async function POST(request) {
   if (token.length < TOKEN_MIN_LENGTH) {
     return NextResponse.json(
       { message: "This password reset link is invalid or has expired." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -49,8 +51,47 @@ export async function POST(request) {
   // Keep a consistent delay to reduce timing differences.
   await new Promise((resolve) => setTimeout(resolve, 350));
 
-  return NextResponse.json({
-    ok: true,
-    message: "Your password has been reset successfully. You can sign in now.",
-  });
+  try {
+    const db = await getDb();
+    const usersCollection = db.collection("users");
+
+    const user = await usersCollection.findOne({
+      password_reset_token: token,
+      password_reset_expires_at: { $gt: new Date() },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "This password reset link is invalid or has expired." },
+        { status: 400 },
+      );
+    }
+
+    const passwordHash = await hashPassword(password);
+
+    await usersCollection.updateOne(
+      { _id: user._id },
+      {
+        $set: {
+          password_hash: passwordHash,
+        },
+        $unset: {
+          password_reset_token: "",
+          password_reset_expires_at: "",
+        },
+      },
+    );
+
+    return NextResponse.json({
+      ok: true,
+      message:
+        "Your password has been reset successfully. You can sign in now.",
+    });
+  } catch (error) {
+    console.error("[reset-password] Error:", error);
+    return NextResponse.json(
+      { message: "Unable to reset password right now." },
+      { status: 500 },
+    );
+  }
 }

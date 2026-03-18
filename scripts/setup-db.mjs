@@ -129,6 +129,8 @@ const validators = {
         email_verified_at: { bsonType: ["date", "null"] },
         email_verify_token: { bsonType: ["string", "null"] },
         email_verify_expires_at: { bsonType: ["date", "null"] },
+        password_reset_token: { bsonType: ["string", "null"] },
+        password_reset_expires_at: { bsonType: ["date", "null"] },
         refresh_token_hash: { bsonType: ["string", "null"] },
         created_at: { bsonType: "date" },
         deleted_at: { bsonType: ["date", "null"] },

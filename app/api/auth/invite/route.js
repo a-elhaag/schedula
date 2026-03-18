@@ -113,6 +113,13 @@ export async function POST(request) {
       html: template.html,
     });
 
+    if (emailResult?.skipped && process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { message: "Unable to send invite email right now." },
+        { status: 503 },
+      );
+    }
+
     return NextResponse.json(
       {
         ok: true,
