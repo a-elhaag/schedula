@@ -5,13 +5,13 @@
 
 .error-state {
   text-align: center;
-  padding: 80px 24px;
+  padding: 5rem 1.5rem;
   background: var(--color-surface);
-  border-radius: 44px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-radius: 2.75rem;
+  box-shadow: 0 0.125rem 0.75rem rgba(0, 0, 0, 0.06);
   animation: esFadeIn 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(0.625rem);
 }
 
 @keyframes esFadeIn {
@@ -24,22 +24,22 @@
 .error-state__icon {
   display: flex;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
   color: var(--color-text-muted);
 }
 
 .error-state__title {
   font-family: "DM Serif Display", serif;
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 400;
   color: var(--color-text-primary);
-  margin: 0 0 8px;
+  margin: 0 0 0.5rem;
 }
 
 .error-state__message {
   font-family: "DM Sans", sans-serif;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--color-text-muted);
-  margin: 0 0 24px;
+  margin: 0 0 1.5rem;
   line-height: 1.6;
 }
