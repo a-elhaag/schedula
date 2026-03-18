@@ -3,16 +3,19 @@ import { getDb } from "@/lib/db";
 import { verifyToken } from "@/lib/jwt";
 import { generateToken } from "@/lib/auth";
 import { validateEmail, sendInviteEmail, INVITE_TTL_MS } from "@/lib/auth-helpers";
+import { logger } from "@/lib/logger";
 import { ObjectId } from "mongodb";
 
 const ROLE_OPTIONS = ["professor", "ta", "student"];
 
 export async function POST(request) {
+  const requestId = request.headers.get("x-request-id") || "unknown";
   let body;
 
   try {
     body = await request.json();
   } catch {
+    logger.warn({ requestId }, "Invalid request payload");
     return NextResponse.json(
       { message: "Invalid request payload." },
       { status: 400 },
@@ -42,6 +45,7 @@ export async function POST(request) {
   const payload = authToken ? verifyToken(authToken) : null;
 
   if (!payload || payload.role !== "coordinator") {
+    logger.warn({ requestId }, "Unauthorized invite attempt - coordinator access required");
     return NextResponse.json(
       { message: "Coordinator access required." },
       { status: 401 },
@@ -57,6 +61,7 @@ export async function POST(request) {
 
     const existingUser = await usersCollection.findOne({ email });
     if (existingUser) {
+      logger.info({ requestId, email }, "Invite attempted for existing user");
       return NextResponse.json(
         { message: "An account with this email already exists." },
         { status: 409 },
@@ -98,12 +103,17 @@ export async function POST(request) {
     );
 
     if (emailResult?.skipped && process.env.NODE_ENV === "production") {
+      logger.warn({ requestId, email }, "Invite email send skipped");
       return NextResponse.json(
         { message: "Unable to send invite email right now." },
         { status: 503 },
       );
     }
 
+    logger.info(
+      { requestId, email, role, invitedBy: payload.sub },
+      "Invite created successfully",
+    );
     return NextResponse.json(
       {
         ok: true,
@@ -116,7 +126,10 @@ export async function POST(request) {
       { status: 201 },
     );
   } catch (error) {
-    console.error("[invite] Error:", error);
+    logger.error(
+      { requestId, email, role, error: error.message, stack: error.stack },
+      "Invite creation error",
+    );
     return NextResponse.json(
       { message: "Unable to create invite right now." },
       { status: 500 },

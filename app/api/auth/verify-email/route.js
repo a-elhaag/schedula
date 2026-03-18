@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 const TOKEN_MIN_LENGTH = 16;
 
 export async function POST(request) {
+  const requestId = request.headers.get("x-request-id") || "unknown";
   let body;
 
   try {
     body = await request.json();
   } catch {
+    logger.warn({ requestId }, "Invalid request payload");
     return NextResponse.json(
       { message: "Invalid request payload." },
       { status: 400 },
@@ -55,12 +58,19 @@ export async function POST(request) {
       },
     );
 
+    logger.info(
+      { requestId, userId: user._id.toString() },
+      "Email verified successfully",
+    );
     return NextResponse.json({
       ok: true,
       message: "Email verified successfully. You can now sign in.",
     });
   } catch (error) {
-    console.error("[verify-email] Error:", error);
+    logger.error(
+      { requestId, error: error.message, stack: error.stack },
+      "Email verification error",
+    );
     return NextResponse.json(
       { message: "Unable to verify email right now." },
       { status: 500 },

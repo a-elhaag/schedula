@@ -2,16 +2,17 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { signToken } from "@/lib/jwt";
 import { comparePassword } from "@/lib/password";
-import { ObjectId } from "mongodb";
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { validateEmail } from "@/lib/auth-helpers";
+import { logger } from "@/lib/logger";
 
 export async function POST(request) {
+  const requestId = request.headers.get("x-request-id") || "unknown";
   let body;
 
   try {
     body = await request.json();
   } catch {
+    logger.warn({ requestId }, "Invalid request payload");
     return NextResponse.json(
       { message: "Invalid request payload." },
       { status: 400 },
@@ -22,7 +23,7 @@ export async function POST(request) {
     typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
   const password = typeof body?.password === "string" ? body.password : "";
 
-  if (!EMAIL_PATTERN.test(email)) {
+  if (!validateEmail(email)) {
     return NextResponse.json(
       { message: "Please provide a valid email address." },
       { status: 400 },
@@ -108,9 +109,13 @@ export async function POST(request) {
       path: "/",
     });
 
+    logger.info({ requestId, userId: user._id.toString() }, "Sign in successful");
     return response;
   } catch (error) {
-    console.error("[signin] Error:", error);
+    logger.error(
+      { requestId, error: error.message, stack: error.stack },
+      "Sign in error",
+    );
     return NextResponse.json(
       { message: "An error occurred during sign in." },
       { status: 500 },

@@ -9,6 +9,7 @@ import {
   sendEmailVerification,
   EMAIL_VERIFY_TTL_MS,
 } from "@/lib/auth-helpers";
+import { logger } from "@/lib/logger";
 import { ObjectId } from "mongodb";
 
 const DEFAULT_INSTITUTION_ID = "69b538e5aa373449d761b122"; // Software Engineering Department
@@ -30,11 +31,13 @@ function validatePassword(password) {
 }
 
 export async function POST(request) {
+  const requestId = request.headers.get("x-request-id") || "unknown";
   let body;
 
   try {
     body = await request.json();
   } catch {
+    logger.warn({ requestId }, "Invalid request payload");
     return NextResponse.json(
       { message: "Invalid request payload." },
       { status: 400 },
@@ -74,6 +77,7 @@ export async function POST(request) {
     // Check if user already exists
     const existingUser = await usersCollection.findOne({ email });
     if (existingUser) {
+      logger.info({ requestId, email }, "Sign up attempted with existing email");
       return NextResponse.json(
         { message: "An account with this email already exists." },
         { status: 409 },
@@ -131,9 +135,13 @@ export async function POST(request) {
       { status: 201 },
     );
 
+    logger.info({ requestId, userId, email }, "Sign up successful");
     return response;
   } catch (error) {
-    console.error("[signup] Error:", error);
+    logger.error(
+      { requestId, email, error: error.message, stack: error.stack },
+      "Sign up error",
+    );
     return NextResponse.json(
       { message: "An error occurred during sign up." },
       { status: 500 },
