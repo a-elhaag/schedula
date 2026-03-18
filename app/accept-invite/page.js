@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import Button from "@/components/Button";
@@ -39,7 +39,6 @@ export default function AcceptInvitePage() {
   );
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState(emailFromQuery);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState(token ? "idle" : "missing-token");
@@ -48,12 +47,6 @@ export default function AcceptInvitePage() {
   const isSubmitting = status === "submitting";
   const isSuccess = status === "success";
   const isError = status === "error" || status === "missing-token";
-
-  useEffect(() => {
-    if (emailFromQuery) {
-      setEmail(emailFromQuery);
-    }
-  }, [emailFromQuery]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -64,12 +57,11 @@ export default function AcceptInvitePage() {
       return;
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
     const normalizedName = name.trim();
 
-    if (normalizedEmail && !EMAIL_PATTERN.test(normalizedEmail)) {
+    if (emailFromQuery && !EMAIL_PATTERN.test(emailFromQuery)) {
       setStatus("error");
-      setMessage("Please enter a valid email address.");
+      setMessage("This invite link contains an invalid email address.");
       return;
     }
 
@@ -100,6 +92,7 @@ export default function AcceptInvitePage() {
           token,
           password,
           name: normalizedName,
+          email: emailFromQuery,
         }),
       });
 
@@ -122,8 +115,8 @@ export default function AcceptInvitePage() {
           : "";
 
       const verifyUrl = verificationToken
-        ? `/verify-email?token=${encodeURIComponent(verificationToken)}&email=${encodeURIComponent(normalizedEmail)}`
-        : `/verify-email?email=${encodeURIComponent(normalizedEmail)}`;
+        ? `/verify-email?token=${encodeURIComponent(verificationToken)}&email=${encodeURIComponent(emailFromQuery)}`
+        : `/verify-email?email=${encodeURIComponent(emailFromQuery)}`;
 
       setTimeout(() => {
         router.push(verifyUrl);
@@ -163,10 +156,10 @@ export default function AcceptInvitePage() {
             label="Email address"
             type="email"
             autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            value={emailFromQuery}
+            onChange={() => {}}
             placeholder="name@university.edu"
-            disabled={isSubmitting || isSuccess}
+            disabled
           />
 
           <Input

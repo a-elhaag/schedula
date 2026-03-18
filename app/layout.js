@@ -1,4 +1,5 @@
 import { DM_Sans, DM_Serif_Display } from "next/font/google";
+import AuthSignOutButton from "@/components/AuthSignOutButton";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -23,7 +24,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${dmSerif.variable}`}>
-      <body>{children}</body>
+      <body>
+        <AuthSignOutButton />
+        {children}
+      </body>
     </html>
   );
 }
