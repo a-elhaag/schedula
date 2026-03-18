@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { generateToken } from "@/lib/auth";
+import { getBaseUrl, sendEmail } from "@/lib/email";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -49,12 +50,26 @@ export async function POST(request) {
         },
       );
 
+      const baseUrl = getBaseUrl(request);
+      const verificationLink = `${baseUrl}/verify-email?token=${encodeURIComponent(
+        emailVerifyToken,
+      )}&email=${encodeURIComponent(email)}`;
+
+      const emailResult = await sendEmail({
+        to: email,
+        subject: "Verify your Schedula email",
+        text: `Verify your email to activate your Schedula account: ${verificationLink}`,
+        html: `<p>Verify your email to activate your Schedula account:</p><p><a href="${verificationLink}">Verify email</a></p>`,
+      });
+
       return NextResponse.json({
         ok: true,
         message:
           "If an account exists for this email, a new verification link has been sent.",
         verificationToken:
-          process.env.NODE_ENV === "production" ? undefined : emailVerifyToken,
+          emailResult?.skipped && process.env.NODE_ENV !== "production"
+            ? emailVerifyToken
+            : undefined,
       });
     }
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { generateToken } from "@/lib/auth";
+import { getBaseUrl, sendEmail } from "@/lib/email";
 import { ObjectId } from "mongodb";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -105,6 +106,18 @@ export async function POST(request) {
     const result = await usersCollection.insertOne(newUser);
     const userId = result.insertedId.toString();
 
+    const baseUrl = getBaseUrl(request);
+    const verificationLink = `${baseUrl}/verify-email?token=${encodeURIComponent(
+      emailVerifyToken,
+    )}&email=${encodeURIComponent(email)}`;
+
+    const emailResult = await sendEmail({
+      to: email,
+      subject: "Verify your Schedula account",
+      text: `Welcome to Schedula! Verify your email to activate your account: ${verificationLink}`,
+      html: `<p>Welcome to Schedula!</p><p>Verify your email to activate your account:</p><p><a href="${verificationLink}">Verify email</a></p>`,
+    });
+
     // Create response
     const response = NextResponse.json(
       {
@@ -112,7 +125,9 @@ export async function POST(request) {
         message: "Account created. Please verify your email to continue.",
         user: { id: userId, email, role: "coordinator" },
         verificationToken:
-          process.env.NODE_ENV === "production" ? undefined : emailVerifyToken,
+          emailResult?.skipped && process.env.NODE_ENV !== "production"
+            ? emailVerifyToken
+            : undefined,
       },
       { status: 201 },
     );

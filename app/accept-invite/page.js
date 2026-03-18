@@ -110,12 +110,23 @@ export default function AcceptInvitePage() {
       }
 
       setStatus("success");
-      setMessage(data?.message ?? "Invite accepted. Redirecting to sign in...");
+      setMessage(
+        data?.message ?? "Invite accepted. Redirecting to verify email...",
+      );
       setPassword("");
       setConfirmPassword("");
 
+      const verificationToken =
+        typeof data?.verificationToken === "string"
+          ? data.verificationToken
+          : "";
+
+      const verifyUrl = verificationToken
+        ? `/verify-email?token=${encodeURIComponent(verificationToken)}&email=${encodeURIComponent(normalizedEmail)}`
+        : `/verify-email?email=${encodeURIComponent(normalizedEmail)}`;
+
       setTimeout(() => {
-        router.push("/signin");
+        router.push(verifyUrl);
       }, 800);
     } catch (error) {
       setStatus("error");
