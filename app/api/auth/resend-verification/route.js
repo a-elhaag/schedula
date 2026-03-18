@@ -5,17 +5,20 @@ import {
   generateEmailVerificationToken,
   sendEmailVerification,
 } from "@/lib/auth-helpers";
+import { logger } from "@/lib/logger";
 
 const ANTI_ENUMERATION_DELAY_MS = 300;
 const DEFAULT_MESSAGE =
   "If an account exists for this email, a new verification link has been sent.";
 
 export async function POST(request) {
+  const requestId = request.headers.get("x-request-id") || "unknown";
   let body;
 
   try {
     body = await request.json();
   } catch {
+    logger.warn({ requestId }, "Invalid request payload");
     return NextResponse.json(
       { message: "Invalid request payload." },
       { status: 400 },
@@ -45,12 +48,17 @@ export async function POST(request) {
       const emailResult = await sendEmailVerification(email, token, request);
 
       if (emailResult?.skipped && process.env.NODE_ENV === "production") {
+        logger.warn({ requestId, email }, "Verification email send skipped");
         return NextResponse.json(
           { message: "Unable to resend verification email right now." },
           { status: 503 },
         );
       }
 
+      logger.info(
+        { requestId, userId: user._id.toString() },
+        "Verification email resent",
+      );
       return NextResponse.json({
         ok: true,
         message: DEFAULT_MESSAGE,
@@ -67,7 +75,10 @@ export async function POST(request) {
       message: DEFAULT_MESSAGE,
     });
   } catch (error) {
-    console.error("[resend-verification] Error:", error);
+    logger.error(
+      { requestId, email, error: error.message, stack: error.stack },
+      "Resend verification error",
+    );
     return NextResponse.json(
       { message: "Unable to resend verification email right now." },
       { status: 500 },

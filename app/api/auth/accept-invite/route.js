@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { generateToken } from "@/lib/auth";
 import { buildEmailTemplate, getBaseUrl, sendEmail } from "@/lib/email";
+import { logger } from "@/lib/logger";
 
 const TOKEN_MIN_LENGTH = 16;
 
@@ -23,11 +24,13 @@ function validatePassword(password) {
 }
 
 export async function POST(request) {
+  const requestId = request.headers.get("x-request-id") || "unknown";
   let body;
 
   try {
     body = await request.json();
   } catch {
+    logger.warn({ requestId }, "Invalid request payload");
     return NextResponse.json(
       { message: "Invalid request payload." },
       { status: 400 },
@@ -72,6 +75,10 @@ export async function POST(request) {
     }
 
     if (email && email !== user.email.toLowerCase()) {
+      logger.warn(
+        { requestId, userId: user._id.toString(), email },
+        "Accept invite email mismatch",
+      );
       return NextResponse.json(
         { message: "This invite link does not match the provided email." },
         { status: 400 },
@@ -116,12 +123,17 @@ export async function POST(request) {
     });
 
     if (emailResult?.skipped && process.env.NODE_ENV === "production") {
+      logger.warn({ requestId, userId: user._id.toString() }, "Verification email send skipped");
       return NextResponse.json(
         { message: "Unable to send verification email right now." },
         { status: 503 },
       );
     }
 
+    logger.info(
+      { requestId, userId: user._id.toString(), email: user.email },
+      "Invite accepted successfully",
+    );
     return NextResponse.json({
       ok: true,
       message: "Invite accepted. Please verify your email to continue.",
@@ -131,7 +143,10 @@ export async function POST(request) {
           : undefined,
     });
   } catch (error) {
-    console.error("[accept-invite] Error:", error);
+    logger.error(
+      { requestId, email, error: error.message, stack: error.stack },
+      "Accept invite error",
+    );
     return NextResponse.json(
       { message: "Unable to accept invite right now." },
       { status: 500 },

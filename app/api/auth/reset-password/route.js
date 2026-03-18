@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
+import { logger } from "@/lib/logger";
 
 const MIN_PASSWORD_LENGTH = 8;
 const TOKEN_MIN_LENGTH = 16;
@@ -22,11 +23,13 @@ function validatePassword(password) {
 }
 
 export async function POST(request) {
+  const requestId = request.headers.get("x-request-id") || "unknown";
   let body;
 
   try {
     body = await request.json();
   } catch {
+    logger.warn({ requestId }, "Invalid request payload");
     return NextResponse.json(
       { message: "Invalid request payload." },
       { status: 400 },
@@ -82,13 +85,20 @@ export async function POST(request) {
       },
     );
 
+    logger.info(
+      { requestId, userId: user._id.toString() },
+      "Password reset successfully",
+    );
     return NextResponse.json({
       ok: true,
       message:
         "Your password has been reset successfully. You can sign in now.",
     });
   } catch (error) {
-    console.error("[reset-password] Error:", error);
+    logger.error(
+      { requestId, error: error.message, stack: error.stack },
+      "Password reset error",
+    );
     return NextResponse.json(
       { message: "Unable to reset password right now." },
       { status: 500 },

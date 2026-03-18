@@ -1,23 +1,27 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { verifyToken } from "@/lib/jwt";
+import { logger } from "@/lib/logger";
 import { ObjectId } from "mongodb";
 
 const ROLE_OPTIONS = ["coordinator", "professor", "ta", "student"];
 
 export async function POST(request) {
+  const requestId = request.headers.get("x-request-id") || "unknown";
   let body;
 
   const authToken = request.cookies.get("auth_token")?.value;
   const payload = authToken ? verifyToken(authToken) : null;
 
   if (!payload || !ROLE_OPTIONS.includes(payload.role)) {
+    logger.warn({ requestId }, "Unauthorized onboarding attempt");
     return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
   }
 
   try {
     body = await request.json();
   } catch {
+    logger.warn({ requestId }, "Invalid request payload");
     return NextResponse.json(
       { message: "Invalid request payload." },
       { status: 400 },
@@ -82,8 +86,16 @@ export async function POST(request) {
         },
       },
     );
+
+    logger.info(
+      { requestId, userId: payload.sub, role, institution },
+      "Onboarding completed",
+    );
   } catch (error) {
-    console.error("[onboarding] Error:", error);
+    logger.error(
+      { requestId, userId: payload.sub, error: error.message, stack: error.stack },
+      "Onboarding error",
+    );
     return NextResponse.json(
       { message: "Unable to save onboarding right now." },
       { status: 500 },
