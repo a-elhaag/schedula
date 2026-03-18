@@ -2,12 +2,10 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { verifyToken } from "@/lib/jwt";
 import { generateToken } from "@/lib/auth";
-import { buildEmailTemplate, getBaseUrl, sendEmail } from "@/lib/email";
+import { validateEmail, sendInviteEmail, INVITE_TTL_MS } from "@/lib/auth-helpers";
 import { ObjectId } from "mongodb";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ROLE_OPTIONS = ["professor", "ta", "student"];
-const INVITE_TTL_DAYS = 7;
 
 export async function POST(request) {
   let body;
@@ -21,13 +19,12 @@ export async function POST(request) {
     );
   }
 
-  const email =
-    typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+  const email = body?.email ? String(body.email).trim().toLowerCase() : "";
   const role =
     typeof body?.role === "string" ? body.role.trim().toLowerCase() : "";
   const name = typeof body?.name === "string" ? body.name.trim() : "";
 
-  if (!EMAIL_PATTERN.test(email)) {
+  if (!validateEmail(email)) {
     return NextResponse.json(
       { message: "Please provide a valid email address." },
       { status: 400 },
@@ -67,9 +64,7 @@ export async function POST(request) {
     }
 
     const inviteToken = generateToken();
-    const inviteExpiresAt = new Date(
-      Date.now() + INVITE_TTL_DAYS * 24 * 60 * 60 * 1000,
-    );
+    const inviteExpiresAt = new Date(Date.now() + INVITE_TTL_MS);
 
     const newUser = {
       institution_id: new ObjectId(payload.institution),
@@ -89,29 +84,18 @@ export async function POST(request) {
 
     await usersCollection.insertOne(newUser);
 
-    const baseUrl = getBaseUrl(request);
-    const inviteLink = `${baseUrl}/accept-invite?token=${encodeURIComponent(
-      inviteToken,
-    )}&email=${encodeURIComponent(email)}`;
-
     const roleLabel = {
       professor: "Professor",
       ta: "Teaching Assistant",
       student: "Student",
     }[role];
 
-    const template = buildEmailTemplate({
-      type: "invite",
-      actionUrl: inviteLink,
+    const emailResult = await sendInviteEmail(
+      email,
+      inviteToken,
+      request,
       roleLabel,
-    });
-
-    const emailResult = await sendEmail({
-      to: email,
-      subject: template.subject,
-      text: template.text,
-      html: template.html,
-    });
+    );
 
     if (emailResult?.skipped && process.env.NODE_ENV === "production") {
       return NextResponse.json(

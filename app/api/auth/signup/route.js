@@ -3,11 +3,15 @@ import { getDb } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { generateToken } from "@/lib/auth";
 import { buildEmailTemplate, getBaseUrl, sendEmail } from "@/lib/email";
+import {
+  validateEmail,
+  generateEmailVerificationToken,
+  sendEmailVerification,
+  EMAIL_VERIFY_TTL_MS,
+} from "@/lib/auth-helpers";
 import { ObjectId } from "mongodb";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DEFAULT_INSTITUTION_ID = "69b538e5aa373449d761b122"; // Software Engineering Department
-const EMAIL_VERIFY_TTL_HOURS = 24;
 
 function validatePassword(password) {
   const hasUpper = /[A-Z]/.test(password);
@@ -38,8 +42,7 @@ export async function POST(request) {
   }
 
   const name = typeof body?.name === "string" ? body.name.trim() : "";
-  const email =
-    typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+  const email = body?.email ? String(body.email).trim().toLowerCase() : "";
   const password = typeof body?.password === "string" ? body.password : "";
 
   if (name.length < 2) {
@@ -49,7 +52,7 @@ export async function POST(request) {
     );
   }
 
-  if (!EMAIL_PATTERN.test(email)) {
+  if (!validateEmail(email)) {
     return NextResponse.json(
       { message: "Please provide a valid email address." },
       { status: 400 },
@@ -80,10 +83,9 @@ export async function POST(request) {
     // Hash the password
     const passwordHash = await hashPassword(password);
 
+    // Generate initial verification token
     const emailVerifyToken = generateToken();
-    const emailVerifyExpiresAt = new Date(
-      Date.now() + EMAIL_VERIFY_TTL_HOURS * 60 * 60 * 1000,
-    );
+    const emailVerifyExpiresAt = new Date(Date.now() + EMAIL_VERIFY_TTL_MS);
 
     // Create user document
     const newUser = {
@@ -106,22 +108,7 @@ export async function POST(request) {
     const result = await usersCollection.insertOne(newUser);
     const userId = result.insertedId.toString();
 
-    const baseUrl = getBaseUrl(request);
-    const verificationLink = `${baseUrl}/verify-email?token=${encodeURIComponent(
-      emailVerifyToken,
-    )}&email=${encodeURIComponent(email)}`;
-
-    const template = buildEmailTemplate({
-      type: "verify",
-      actionUrl: verificationLink,
-    });
-
-    const emailResult = await sendEmail({
-      to: email,
-      subject: template.subject,
-      text: template.text,
-      html: template.html,
-    });
+    const emailResult = await sendEmailVerification(email, emailVerifyToken, request);
 
     if (emailResult?.skipped && process.env.NODE_ENV === "production") {
       return NextResponse.json(
