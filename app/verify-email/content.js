@@ -43,6 +43,7 @@ export default function VerifyEmailPage() {
     try {
       const response = await fetch("/api/auth/verify-email", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -92,6 +93,7 @@ export default function VerifyEmailPage() {
     try {
       const response = await fetch("/api/auth/resend-verification", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

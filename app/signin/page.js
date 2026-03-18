@@ -42,6 +42,7 @@ export default function SignInPage() {
     try {
       const response = await fetch("/api/auth/signin", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

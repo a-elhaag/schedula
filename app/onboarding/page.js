@@ -112,6 +112,7 @@ export default function OnboardingPage() {
     try {
       const response = await fetch("/api/auth/onboarding", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
