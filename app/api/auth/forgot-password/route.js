@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { generateToken } from "@/lib/auth";
-import { buildEmailTemplate, getBaseUrl, sendEmail } from "@/lib/email";
+import {
+  validateEmail,
+  generatePasswordResetToken,
+  sendPasswordResetEmail,
+} from "@/lib/auth-helpers";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ANTI_ENUMERATION_DELAY_MS = 300;
+const DEFAULT_MESSAGE =
+  "If an account exists for this email, a password reset link has been sent.";
 
 export async function POST(request) {
   let body;
@@ -17,10 +22,9 @@ export async function POST(request) {
     );
   }
 
-  const email =
-    typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+  const email = body?.email ? String(body.email).trim().toLowerCase() : "";
 
-  if (!EMAIL_PATTERN.test(email)) {
+  if (!validateEmail(email)) {
     return NextResponse.json(
       { message: "Please provide a valid email address." },
       { status: 400 },
@@ -28,7 +32,7 @@ export async function POST(request) {
   }
 
   // Keep a consistent delay to avoid account-enumeration timing signals.
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  await new Promise((resolve) => setTimeout(resolve, ANTI_ENUMERATION_DELAY_MS));
 
   try {
     const db = await getDb();
@@ -36,35 +40,8 @@ export async function POST(request) {
     const user = await usersCollection.findOne({ email });
 
     if (user) {
-      const passwordResetToken = generateToken();
-      const passwordResetExpiresAt = new Date(Date.now() + 60 * 60 * 1000);
-
-      await usersCollection.updateOne(
-        { _id: user._id },
-        {
-          $set: {
-            password_reset_token: passwordResetToken,
-            password_reset_expires_at: passwordResetExpiresAt,
-          },
-        },
-      );
-
-      const baseUrl = getBaseUrl(request);
-      const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(
-        passwordResetToken,
-      )}`;
-
-      const template = buildEmailTemplate({
-        type: "reset",
-        actionUrl: resetLink,
-      });
-
-      const emailResult = await sendEmail({
-        to: email,
-        subject: template.subject,
-        text: template.text,
-        html: template.html,
-      });
+      const token = await generatePasswordResetToken(user._id);
+      const emailResult = await sendPasswordResetEmail(email, token, request);
 
       if (emailResult?.skipped && process.env.NODE_ENV === "production") {
         return NextResponse.json(
@@ -75,19 +52,18 @@ export async function POST(request) {
 
       return NextResponse.json({
         ok: true,
-        message:
-          "If an account exists for this email, a password reset link has been sent.",
+        message: DEFAULT_MESSAGE,
         resetToken:
           emailResult?.skipped && process.env.NODE_ENV !== "production"
-            ? passwordResetToken
+            ? token
             : undefined,
       });
     }
 
+    // Return same message whether user exists or not (security: prevent account enumeration)
     return NextResponse.json({
       ok: true,
-      message:
-        "If an account exists for this email, a password reset link has been sent.",
+      message: DEFAULT_MESSAGE,
     });
   } catch (error) {
     console.error("[forgot-password] Error:", error);

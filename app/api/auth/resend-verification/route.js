@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { generateToken } from "@/lib/auth";
-import { buildEmailTemplate, getBaseUrl, sendEmail } from "@/lib/email";
+import {
+  validateEmail,
+  generateEmailVerificationToken,
+  sendEmailVerification,
+} from "@/lib/auth-helpers";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ANTI_ENUMERATION_DELAY_MS = 300;
+const DEFAULT_MESSAGE =
+  "If an account exists for this email, a new verification link has been sent.";
 
 export async function POST(request) {
   let body;
@@ -17,10 +22,9 @@ export async function POST(request) {
     );
   }
 
-  const email =
-    typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+  const email = body?.email ? String(body.email).trim().toLowerCase() : "";
 
-  if (!EMAIL_PATTERN.test(email)) {
+  if (!validateEmail(email)) {
     return NextResponse.json(
       { message: "Please provide a valid email address." },
       { status: 400 },
@@ -28,44 +32,17 @@ export async function POST(request) {
   }
 
   // Keep a consistent delay to avoid account-enumeration timing signals.
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  await new Promise((resolve) => setTimeout(resolve, ANTI_ENUMERATION_DELAY_MS));
 
   try {
     const db = await getDb();
     const usersCollection = db.collection("users");
-
     const user = await usersCollection.findOne({ email });
 
+    // Send verification email only if user exists and email is not verified
     if (user && !user.email_verified_at) {
-      const emailVerifyToken = generateToken();
-      const emailVerifyExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-      await usersCollection.updateOne(
-        { _id: user._id },
-        {
-          $set: {
-            email_verify_token: emailVerifyToken,
-            email_verify_expires_at: emailVerifyExpiresAt,
-          },
-        },
-      );
-
-      const baseUrl = getBaseUrl(request);
-      const verificationLink = `${baseUrl}/verify-email?token=${encodeURIComponent(
-        emailVerifyToken,
-      )}&email=${encodeURIComponent(email)}`;
-
-      const template = buildEmailTemplate({
-        type: "verify",
-        actionUrl: verificationLink,
-      });
-
-      const emailResult = await sendEmail({
-        to: email,
-        subject: template.subject,
-        text: template.text,
-        html: template.html,
-      });
+      const token = await generateEmailVerificationToken(user._id);
+      const emailResult = await sendEmailVerification(email, token, request);
 
       if (emailResult?.skipped && process.env.NODE_ENV === "production") {
         return NextResponse.json(
@@ -76,19 +53,18 @@ export async function POST(request) {
 
       return NextResponse.json({
         ok: true,
-        message:
-          "If an account exists for this email, a new verification link has been sent.",
+        message: DEFAULT_MESSAGE,
         verificationToken:
           emailResult?.skipped && process.env.NODE_ENV !== "production"
-            ? emailVerifyToken
+            ? token
             : undefined,
       });
     }
 
+    // Return same message whether user exists or not (security: prevent account enumeration)
     return NextResponse.json({
       ok: true,
-      message:
-        "If an account exists for this email, a new verification link has been sent.",
+      message: DEFAULT_MESSAGE,
     });
   } catch (error) {
     console.error("[resend-verification] Error:", error);
