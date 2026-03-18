@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { verifyToken } from "@/lib/jwt";
 import { generateToken } from "@/lib/auth";
-import { getBaseUrl, sendEmail } from "@/lib/email";
+import { buildEmailTemplate, getBaseUrl, sendEmail } from "@/lib/email";
 import { ObjectId } from "mongodb";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -94,11 +94,23 @@ export async function POST(request) {
       inviteToken,
     )}&email=${encodeURIComponent(email)}`;
 
+    const roleLabel = {
+      professor: "Professor",
+      ta: "Teaching Assistant",
+      student: "Student",
+    }[role];
+
+    const template = buildEmailTemplate({
+      type: "invite",
+      actionUrl: inviteLink,
+      roleLabel,
+    });
+
     const emailResult = await sendEmail({
       to: email,
-      subject: "Your Schedula invite",
-      text: `You have been invited to Schedula. Set your password to activate your account: ${inviteLink}`,
-      html: `<p>You have been invited to Schedula.</p><p>Set your password to activate your account:</p><p><a href="${inviteLink}">Accept invite</a></p>`,
+      subject: template.subject,
+      text: template.text,
+      html: template.html,
     });
 
     return NextResponse.json(
