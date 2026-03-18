@@ -1,9 +1,19 @@
 .checkbox-root {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   cursor: pointer;
   user-select: none;
+  transition: transform 200ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.checkbox-root:not(.is-disabled):hover {
+  transform: translateY(-0.0625rem);
+}
+
+.checkbox-root:not(.is-disabled):active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
 }
 
 .checkbox-input {
@@ -13,31 +23,43 @@
 }
 
 .checkbox-control {
-  width: 18px;
-  height: 18px;
-  border-radius: 6px;
-  border: 2px solid #64748b;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 0.375rem;
+  border: 0.125rem solid #64748b;
   background: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 180ms ease;
+  flex-shrink: 0;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 200ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
+  will-change: transform;
+}
+
+.checkbox-root:not(.is-disabled):hover .checkbox-control {
+  border-color: var(--color-accent, #0071e3);
+  box-shadow: 0 0 0 0.1875rem rgba(0, 113, 227, 0.12);
 }
 
 .checkbox-control::after {
   content: "";
-  width: 4px;
-  height: 9px;
-  border-right: 2px solid #ffffff;
-  border-bottom: 2px solid #ffffff;
+  width: 0.25rem;
+  height: 0.5625rem;
+  border-right: 0.125rem solid #ffffff;
+  border-bottom: 0.125rem solid #ffffff;
   transform: rotate(45deg) scale(0);
   transform-origin: center;
-  transition: transform 140ms ease;
+  transition: transform 160ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
 }
 
 .checkbox-input:checked + .checkbox-control {
   background: var(--color-accent, #0071e3);
   border-color: var(--color-accent, #0071e3);
+  transform: scale(1.1);
 }
 
 .checkbox-input:checked + .checkbox-control::after {
@@ -45,16 +67,31 @@
 }
 
 .checkbox-input:focus-visible + .checkbox-control {
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.24);
+  box-shadow: 0 0 0 0.1875rem rgba(0, 113, 227, 0.24);
 }
 
 .checkbox-label {
   font-family: "DM Sans", sans-serif;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--color-text-primary, #0f172a);
+  transition: color 180ms ease;
+}
+
+.checkbox-input:checked ~ .checkbox-label {
+  color: var(--color-accent, #0071e3);
 }
 
 .checkbox-root.is-disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkbox-root,
+  .checkbox-control,
+  .checkbox-control::after,
+  .checkbox-label {
+    transition: none;
+    transform: none !important;
+  }
 }

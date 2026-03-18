@@ -33,6 +33,7 @@ export default function ForgotPasswordPage() {
     try {
       const response = await fetch("/api/auth/forgot-password", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -42,13 +43,15 @@ export default function ForgotPasswordPage() {
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(data?.message ?? "Unable to send reset instructions right now.");
+        throw new Error(
+          data?.message ?? "Unable to send reset instructions right now.",
+        );
       }
 
       setStatus("success");
       setMessage(
         data?.message ??
-          "If an account exists for this email, a password reset link has been sent."
+          "If an account exists for this email, a password reset link has been sent.",
       );
       setEmail("");
     } catch (error) {
@@ -56,7 +59,7 @@ export default function ForgotPasswordPage() {
       setMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong. Please try again in a moment."
+          : "Something went wrong. Please try again in a moment.",
       );
     }
   }
