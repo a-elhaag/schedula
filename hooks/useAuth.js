@@ -28,7 +28,12 @@ export function useAuth() {
 
         if (!response.ok) {
           if (!cancelled) {
-            setAuth({ userId: null, email: null, role: null, isLoading: false });
+            setAuth({
+              userId: null,
+              email: null,
+              role: null,
+              isLoading: false,
+            });
           }
           return;
         }
