@@ -2,7 +2,7 @@
 
 .btn {
   font-family: "DM Sans", sans-serif;
-  font-weight: 700;
+  font-weight: 600;
   transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
@@ -38,13 +38,13 @@
 .btn-primary {
   background-color: var(--color-accent);
   color: var(--color-surface);
-  box-shadow: 0 4px 20px rgba(0, 113, 227, 0.267);
+  box-shadow: 0 6px 18px rgba(0, 113, 227, 0.22);
 }
 
 .btn-primary:hover:not(:disabled) {
   background-color: #0063c7;
-  transform: scale(1.05);
-  box-shadow: 0 8px 28px rgba(0, 113, 227, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0, 113, 227, 0.28);
 }
 
 .btn-primary:active:not(:disabled) {
@@ -86,13 +86,13 @@
 .btn-destructive {
   background-color: #d53830;
   color: var(--color-surface);
-  box-shadow: 0 4px 20px rgba(255, 59, 48, 0.267);
+  box-shadow: 0 6px 18px rgba(213, 56, 48, 0.22);
 }
 
 .btn-destructive:hover:not(:disabled) {
   background-color: #9e1c15;
-  transform: scale(1.05);
-  box-shadow: 0 8px 28px rgba(255, 59, 48, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(213, 56, 48, 0.28);
 }
 
 .btn-destructive:active:not(:disabled) {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { verifyTokenEdge } from "@/lib/edge-auth";
 
 /**
  * middleware.js
@@ -42,7 +42,7 @@ function getRequiredRoles(pathname) {
   return null;
 }
 
-export function middleware(request) {
+export async function middleware(request) {
   const pathname = request.nextUrl.pathname;
 
   // Skip API routes (they handle their own auth)
@@ -70,7 +70,7 @@ export function middleware(request) {
     return NextResponse.redirect(new URL("/signin", request.url));
   }
 
-  const payload = verifyToken(authToken);
+  const payload = await verifyTokenEdge(authToken);
 
   if (!payload) {
     // Invalid or expired token — redirect to signin

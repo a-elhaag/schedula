@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
+import { Input } from "@/components/Input";
 import "./styles.css";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -121,66 +122,54 @@ export default function SignUpPage() {
 
         <form className="signup-form" onSubmit={handleSubmit} noValidate>
           <div className="field-group">
-            <label htmlFor="name" className="field-label">
-              Full name
-            </label>
-            <input
+            <Input
               id="name"
+              label="Full name"
               type="text"
               autoComplete="name"
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder="Your full name"
               disabled={isSubmitting || isSuccess}
-              className="auth-input"
             />
           </div>
 
           <div className="field-group">
-            <label htmlFor="email" className="field-label">
-              Email address
-            </label>
-            <input
+            <Input
               id="email"
+              label="Email address"
               type="email"
               autoComplete="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="name@university.edu"
               disabled={isSubmitting || isSuccess}
-              className="auth-input"
             />
           </div>
 
           <div className="field-group">
-            <label htmlFor="password" className="field-label">
-              Password
-            </label>
-            <input
+            <Input
               id="password"
+              label="Password"
               type="password"
               autoComplete="new-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               placeholder="At least 8 characters"
               disabled={isSubmitting || isSuccess}
-              className="auth-input"
             />
           </div>
 
           <div className="field-group">
-            <label htmlFor="confirm-password" className="field-label">
-              Confirm password
-            </label>
-            <input
+            <Input
               id="confirm-password"
+              label="Confirm password"
               type="password"
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
               placeholder="Re-enter your password"
               disabled={isSubmitting || isSuccess}
-              className="auth-input"
             />
           </div>
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { signToken, comparePassword } from "@/lib/auth";
+import { signToken } from "@/lib/jwt";
+import { comparePassword } from "@/lib/password";
 import { ObjectId } from "mongodb";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
