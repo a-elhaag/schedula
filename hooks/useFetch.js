@@ -9,7 +9,7 @@
  *   const { data, error, isLoading } = useFetch('/api/endpoint', { method: 'POST', body: {...} });
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 
 export function useFetch(url, options = {}) {
   const [data, setData] = useState(null);
@@ -59,12 +59,15 @@ export function useFetch(url, options = {}) {
     [url, options],
   );
 
-  // Auto-execute if no method specified (GET by default)
-  const [hasExecuted, setHasExecuted] = useState(false);
-  if (!options.method && !hasExecuted) {
-    setHasExecuted(true);
-    execute();
-  }
+  // Auto-execute GET requests exactly once after mount
+  const hasExecutedRef = useRef(false);
+  useEffect(() => {
+    if (!options.method && !hasExecutedRef.current) {
+      hasExecutedRef.current = true;
+      execute();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return { data, error, isLoading, execute };
 }

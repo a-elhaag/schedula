@@ -2,6 +2,8 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { useAuth } from "../../../hooks/useAuth";
+import { useDataCache } from "../../../hooks/useDataCache";
+import { clearCached, setCached } from "../../../lib/clientCache";
 import "./styles.css";
 
 // ── Components from components/ folder ───────────────────────────────────────
@@ -69,47 +71,39 @@ export default function ProfessorAvailabilityPage() {
   const [step, setStep] = useState("select"); // select | confirm | done
   const [selected, setSelected] = useState(new Set());
   const [submitting, setSubmitting] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [staff, setStaff] = useState(null);
+  const [authError, setAuthError] = useState(null);
 
-  // ── Load existing availability on mount ───────────────────────────────────
+  // Only start fetching once auth has resolved and userId is available
+  const fetchUrl = auth.userId
+    ? `/api/staff/availability?userId=${auth.userId}`
+    : null;
+
+  const {
+    data,
+    isLoading,
+    error: fetchError,
+  } = useDataCache(
+    "staff_availability",
+    "availability",
+    fetchUrl,
+  );
+
+  const loading = auth.isLoading || (!!fetchUrl && isLoading && !data);
+  const error = authError ?? fetchError;
+  const staff = data?.staff ?? null;
+
+  // Restore previously saved slots into the grid when data first loads
   useEffect(() => {
-    async function loadAvailability() {
-      // Wait for auth to load
-      if (auth.isLoading) return;
-
-      if (!auth.userId) {
-        setError("Not authenticated");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const res = await fetch(
-          `/api/staff/availability?userId=${auth.userId}`,
-          { credentials: "include" },
-        );
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error ?? "Failed to load");
-
-        setStaff(data.staff);
-
-        // Restore previously saved slots into the grid
-        if (data.slots?.length) {
-          const restored = new Set(
-            data.slots.map(({ day, slot }) => slotKey(day, slot)),
-          );
-          setSelected(restored);
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+    if (!auth.userId && !auth.isLoading) {
+      setAuthError("Not authenticated");
+      return;
     }
-    loadAvailability();
-  }, [auth.userId, auth.isLoading]);
+    if (data?.slots?.length) {
+      setSelected(
+        new Set(data.slots.map(({ day, slot }) => slotKey(day, slot)))
+      );
+    }
+  }, [data, auth.userId, auth.isLoading]);
 
   // ── Submit to MongoDB via API route ───────────────────────────────────────
   async function handleSubmit() {
@@ -127,12 +121,21 @@ export default function ProfessorAvailabilityPage() {
         body: JSON.stringify({ userId: auth.userId, slots }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Submission failed");
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Submission failed");
+
+      // Update the cache with fresh data + new version hash so next visit
+      // doesn't need to re-fetch unnecessarily
+      if (json.versionHash) {
+        const freshData = { ...data, slots, versionHash: json.versionHash };
+        setCached("staff_availability", freshData, json.versionHash);
+      } else {
+        clearCached("staff_availability");
+      }
 
       setStep("done");
     } catch (err) {
-      setError(err.message);
+      setAuthError(err.message);
     } finally {
       setSubmitting(false);
     }

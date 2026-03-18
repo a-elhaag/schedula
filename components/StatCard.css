@@ -1,46 +1,60 @@
 /* StatCard Component CSS */
 .stat-card {
   background: var(--color-surface);
-  border-radius: 44px;
-  padding: 32px;
-  width: 250px;
-  height: 180px;
+  border-radius: 2.75rem;
+  padding: 2rem;
+  width: 100%;
+  min-height: 11.25rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0.125rem 0.75rem rgba(0, 0, 0, 0.06);
+  transition:
+    transform 360ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow 360ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
   cursor: pointer;
   box-sizing: border-box;
+  will-change: transform;
 }
 
 .stat-card:hover {
-  transform: scale(1.04);
+  transform: translateY(-0.25rem) scale(1.03);
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    0 2px 8px rgba(0, 0, 0, 0.06);
+    0 0.75rem 2.5rem rgba(0, 0, 0, 0.13),
+    0 0.25rem 0.75rem rgba(0, 0, 0, 0.06);
+}
+
+.stat-card:active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
 }
 
 .stat-card-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .stat-card-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 28px;
-  background-color: rgba(0, 113, 227, 0.08); /* accent/8 */
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1.75rem;
+  background-color: rgba(0, 113, 227, 0.08);
   color: var(--color-accent);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 300ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
+  flex-shrink: 0;
+}
+
+.stat-card:hover .stat-card-icon {
+  transform: scale(1.12) rotate(-5deg);
 }
 
 .stat-card-label {
   font-family: inherit;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -51,22 +65,22 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .stat-card-value {
   font-family: inherit;
-  font-size: 40px;
-  font-weight: 800; /* font-black */
+  font-size: 2.5rem;
+  font-weight: 800;
   color: var(--color-accent);
   line-height: 1;
 }
 
 .stat-card-trend {
   font-family: inherit;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
-  padding-bottom: 4px;
+  padding-bottom: 0.25rem;
 }
 
 .stat-card-trend.trend-up {
