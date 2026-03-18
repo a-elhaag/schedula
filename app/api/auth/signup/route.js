@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { signToken } from "@/lib/jwt";
 import { hashPassword } from "@/lib/password";
+import { generateToken } from "@/lib/auth";
 import { ObjectId } from "mongodb";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DEFAULT_INSTITUTION_ID = "69b538e5aa373449d761b122"; // Software Engineering Department
+const EMAIL_VERIFY_TTL_HOURS = 24;
 
 function validatePassword(password) {
   const hasUpper = /[A-Z]/.test(password);
@@ -78,14 +79,25 @@ export async function POST(request) {
     // Hash the password
     const passwordHash = await hashPassword(password);
 
+    const emailVerifyToken = generateToken();
+    const emailVerifyExpiresAt = new Date(
+      Date.now() + EMAIL_VERIFY_TTL_HOURS * 60 * 60 * 1000,
+    );
+
     // Create user document
     const newUser = {
       institution_id: new ObjectId(DEFAULT_INSTITUTION_ID),
       email,
       password_hash: passwordHash,
-      role: "student", // Default role on signup
+      role: "coordinator", // Coordinator-only signup
       name,
       invite_status: "pending", // User must verify email
+      email_verify_token: emailVerifyToken,
+      email_verify_expires_at: emailVerifyExpiresAt,
+      email_verified_at: null,
+      invited_by: null,
+      invite_token: null,
+      invite_expires_at: null,
       created_at: new Date(),
     };
 
@@ -93,32 +105,17 @@ export async function POST(request) {
     const result = await usersCollection.insertOne(newUser);
     const userId = result.insertedId.toString();
 
-    // Generate JWT token (will be used after email verification)
-    const token = signToken({
-      sub: userId,
-      email,
-      role: "student",
-      institution: DEFAULT_INSTITUTION_ID,
-    });
-
     // Create response
     const response = NextResponse.json(
       {
         ok: true,
         message: "Account created. Please verify your email to continue.",
-        user: { id: userId, email, role: "student" },
+        user: { id: userId, email, role: "coordinator" },
+        verificationToken:
+          process.env.NODE_ENV === "production" ? undefined : emailVerifyToken,
       },
       { status: 201 },
     );
-
-    // Set JWT cookie (will be valid after email verification)
-    response.cookies.set("auth_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 30 * 60, // 30 minutes
-      path: "/",
-    });
 
     return response;
   } catch (error) {
