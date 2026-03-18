@@ -4,7 +4,12 @@ import { useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import "./AuthSignOutButton.css";
 
-const PROTECTED_PREFIXES = ["/coordinator", "/staff", "/student", "/onboarding"];
+const PROTECTED_PREFIXES = [
+  "/coordinator",
+  "/staff",
+  "/student",
+  "/onboarding",
+];
 
 export default function AuthSignOutButton() {
   const pathname = usePathname();
