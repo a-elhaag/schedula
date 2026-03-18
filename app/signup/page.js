@@ -101,8 +101,17 @@ export default function SignUpPage() {
       setPassword("");
       setConfirmPassword("");
 
+      const verificationToken =
+        typeof data?.verificationToken === "string"
+          ? data.verificationToken
+          : "";
+
+      const verifyUrl = verificationToken
+        ? `/verify-email?token=${encodeURIComponent(verificationToken)}&email=${encodeURIComponent(normalizedEmail)}`
+        : `/verify-email?email=${encodeURIComponent(normalizedEmail)}`;
+
       setTimeout(() => {
-        router.push("/verify-email");
+        router.push(verifyUrl);
       }, 500);
     } catch (error) {
       setStatus("error");
@@ -117,8 +126,10 @@ export default function SignUpPage() {
   return (
     <div className="page-container">
       <div className="signup-card">
-        <h1>Sign Up</h1>
-        <p className="subtitle">Create your Schedula account.</p>
+        <h1>Coordinator Sign Up</h1>
+        <p className="subtitle">
+          Create the coordinator account for your department.
+        </p>
 
         <form className="signup-form" onSubmit={handleSubmit} noValidate>
           <div className="field-group">

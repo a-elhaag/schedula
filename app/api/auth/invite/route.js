@@ -1,0 +1,107 @@
+import { NextResponse } from "next/server";
+import { getDb } from "@/lib/db";
+import { verifyToken } from "@/lib/jwt";
+import { generateToken } from "@/lib/auth";
+import { ObjectId } from "mongodb";
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ROLE_OPTIONS = ["professor", "ta", "student"];
+const INVITE_TTL_DAYS = 7;
+
+export async function POST(request) {
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { message: "Invalid request payload." },
+      { status: 400 },
+    );
+  }
+
+  const email =
+    typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+  const role =
+    typeof body?.role === "string" ? body.role.trim().toLowerCase() : "";
+  const name = typeof body?.name === "string" ? body.name.trim() : "";
+
+  if (!EMAIL_PATTERN.test(email)) {
+    return NextResponse.json(
+      { message: "Please provide a valid email address." },
+      { status: 400 },
+    );
+  }
+
+  if (!ROLE_OPTIONS.includes(role)) {
+    return NextResponse.json(
+      { message: "Please choose a valid staff or student role." },
+      { status: 400 },
+    );
+  }
+
+  const authToken = request.cookies.get("auth_token")?.value;
+  const payload = authToken ? verifyToken(authToken) : null;
+
+  if (!payload || payload.role !== "coordinator") {
+    return NextResponse.json(
+      { message: "Coordinator access required." },
+      { status: 401 },
+    );
+  }
+
+  // Keep a consistent delay to reduce timing differences.
+  await new Promise((resolve) => setTimeout(resolve, 320));
+
+  try {
+    const db = await getDb();
+    const usersCollection = db.collection("users");
+
+    const existingUser = await usersCollection.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json(
+        { message: "An account with this email already exists." },
+        { status: 409 },
+      );
+    }
+
+    const inviteToken = generateToken();
+    const inviteExpiresAt = new Date(
+      Date.now() + INVITE_TTL_DAYS * 24 * 60 * 60 * 1000,
+    );
+
+    const newUser = {
+      institution_id: new ObjectId(payload.institution),
+      email,
+      password_hash: null,
+      role,
+      name: name || email.split("@")[0],
+      invite_status: "pending",
+      invited_by: new ObjectId(payload.sub),
+      invite_token: inviteToken,
+      invite_expires_at: inviteExpiresAt,
+      email_verified_at: null,
+      email_verify_token: null,
+      email_verify_expires_at: null,
+      created_at: new Date(),
+    };
+
+    await usersCollection.insertOne(newUser);
+
+    return NextResponse.json(
+      {
+        ok: true,
+        message: "Invite created successfully.",
+        inviteToken:
+          process.env.NODE_ENV === "production" ? undefined : inviteToken,
+      },
+      { status: 201 },
+    );
+  } catch (error) {
+    console.error("[invite] Error:", error);
+    return NextResponse.json(
+      { message: "Unable to create invite right now." },
+      { status: 500 },
+    );
+  }
+}

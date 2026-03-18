@@ -54,8 +54,8 @@ export async function POST(request) {
       );
     }
 
-    // Check if user has joined (invite_status === 'joined')
-    if (user.invite_status !== "joined") {
+    // Check if user has joined and verified email
+    if (user.invite_status !== "joined" || !user.email_verified_at) {
       return NextResponse.json(
         {
           message:
@@ -83,11 +83,19 @@ export async function POST(request) {
       institution: user.institution_id.toString(),
     });
 
+    const redirectByRole = {
+      coordinator: "/coordinator/setup",
+      professor: "/staff/schedule",
+      ta: "/staff/schedule",
+      student: "/student/schedule",
+    };
+
     // Create response with httpOnly cookie
     const response = NextResponse.json(
       {
         ok: true,
         user: { id: user._id.toString(), email: user.email, role: user.role },
+        redirectTo: redirectByRole[user.role] ?? "/signin",
       },
       { status: 200 },
     );
