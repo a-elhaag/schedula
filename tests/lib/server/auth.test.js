@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/lib/server/auth";
 import { getDb } from "@/lib/db";
-import { mockDb, mockCollection, createMockId, resetMocks } from "../__mocks__/db";
+import { mockDb, mockCollection, resetMocks } from "../../__mocks__/db";
 
 jest.mock("@/lib/db");
 
