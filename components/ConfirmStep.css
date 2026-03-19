@@ -1,0 +1,108 @@
+/* =============================================================================
+   ConfirmStep.css
+   Styles for the availability confirmation/review step component.
+   Uses CSS variables from globals.css - no hardcoded colors.
+   All dimensions in rem.
+============================================================================= */
+
+.confirm-step {
+  background: var(--color-surface);
+  border-radius: 1.75rem;
+  padding: 2rem;
+  box-shadow: 0 0.125rem 0.75rem rgba(0, 0, 0, 0.06);
+}
+
+.confirm-step__title {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  margin: 0 0 0.375rem;
+}
+
+.confirm-step__subtitle {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0 0 1.5rem;
+  line-height: 1.6;
+}
+
+.confirm-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-bottom: 1.25rem;
+}
+
+.confirm-empty {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.confirm-summary__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-background);
+  border-radius: 0.875rem;
+  transition: background 200ms ease;
+}
+
+.confirm-summary__row:hover {
+  background: var(--color-surface-hover);
+}
+
+.confirm-summary__day {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  min-width: 5.625rem;
+  flex-shrink: 0;
+  padding-top: 0.125rem;
+}
+
+.confirm-summary__slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.confirm-summary__slot {
+  background: rgba(0, 113, 227, 0.1);
+  color: var(--color-accent);
+  border: 1px solid rgba(0, 113, 227, 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.confirm-warning {
+  background: #FFFBEB;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.8125rem;
+  color: #92400E;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+@media (max-width: 43.75rem) {
+  .confirm-summary__row { flex-direction: column; gap: 0.5rem; }
+  .confirm-step         { padding: 1.5rem 1.25rem; }
+}

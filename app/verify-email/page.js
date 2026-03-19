@@ -1,12 +1,10 @@
-import "./styles.css";
+import { Suspense } from 'react';
+import VerifyEmailContent from './content';
 
 export default function VerifyEmailPage() {
   return (
-    <div className="page-container">
-      <div className="content-center">
-        <h1>Verify Email</h1>
-        <p>Check your email to verify your account</p>
-      </div>
-    </div>
+    <Suspense fallback={<div className="page-container"><div style={{ textAlign: 'center' }}>Loading...</div></div>}>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }
