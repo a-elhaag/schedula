@@ -1,22 +1,244 @@
 .page-container {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(170deg, #f7f7ef 0%, #eef4f6 100%);
+  padding: 24px;
+}
+
+.schedule-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 44px rgba(15, 42, 61, 0.08);
+}
+
+.schedule-header {
+  padding: 28px 28px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.schedule-header h1 {
+  margin: 0;
+  color: #0f2a3d;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.1;
+}
+
+.schedule-header p {
+  margin: 8px 0 0;
+  color: #517083;
+  font-size: 14px;
+}
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  padding: 16px 28px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  flex-wrap: wrap;
+  align-items: flex-end;
+  background-color: #f7fbfd;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #264a62;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.filter-group select,
+.filter-group input {
+  padding: 8px 12px;
+  border: 1px solid #d0dce3;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #0f2a3d;
+  background-color: #ffffff;
+  transition: border-color 0.2s;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+  outline: none;
+  border-color: #0f2a3d;
+  box-shadow: 0 0 0 3px rgba(15, 42, 61, 0.1);
+}
+
+.btn-clear {
+  padding: 8px 16px;
+  background-color: #e8f0f4;
+  color: #517083;
+  border: 1px solid #d0dce3;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-clear:hover {
+  background-color: #dce5eb;
+  color: #0f2a3d;
+}
+
+.state-card {
+  margin: 24px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 42, 61, 0.14);
+  padding: 24px;
+  background-color: #f7fbfd;
+}
+
+.state-card h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  color: #0f2a3d;
+}
+
+.state-card p {
+  margin: 0;
+  color: #496679;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: #f3f8fa;
+}
+
+th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  color: #264a62;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+td {
+  padding: 14px 16px;
+  border-top: 1px solid #e7eff3;
+  color: #123043;
+  vertical-align: top;
+  font-size: 14px;
+}
+
+td strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+td span {
+  color: #4e6a7c;
+  font-size: 13px;
+}
+
+/* Pagination */
+.pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  width: 100%;
-  background-color: var(--color-background);
+  gap: 12px;
+  padding: 20px 28px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.content-center {
-  text-align: center;
+.pagination button {
+  padding: 8px 16px;
+  background-color: #f3f8fa;
+  border: 1px solid #d0dce3;
+  border-radius: 6px;
+  color: #264a62;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s;
 }
 
-.content-center h1 {
-  color: var(--color-text-primary);
-  margin-bottom: 16px;
+.pagination button:hover:not(:disabled) {
+  background-color: #dce5eb;
+  color: #0f2a3d;
 }
 
-.content-center p {
-  color: var(--color-text-muted);
-  font-size: 16px;
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 13px;
+  color: #517083;
+  font-weight: 600;
+}
+
+.results-info {
+  padding: 0 28px 16px;
+  font-size: 12px;
+  color: #4e6a7c;
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 12px;
+  }
+
+  .schedule-header {
+    padding: 20px 18px 14px;
+  }
+
+  .filter-bar {
+    padding: 12px 18px;
+    gap: 8px;
+  }
+
+  .filter-group {
+    min-width: 120px;
+    flex: 0 1 auto;
+  }
+
+  .filter-group input,
+  .filter-group select {
+    font-size: 12px;
+  }
+
+  th,
+  td {
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  .state-card {
+    margin: 14px;
+    padding: 18px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    padding: 16px 18px;
+  }
+
+  .results-info {
+    padding: 0 18px 12px;
+  }
 }
