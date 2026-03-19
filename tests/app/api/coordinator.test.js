@@ -125,7 +125,7 @@ describe("Coordinator API Routes", () => {
         "http://localhost/api/coordinator/rooms?limit=100",
       );
 
-      const response = await getCoursesRoute(request);
+      const response = await getRoomsRoute(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);

@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 /**
  * Mock MongoDB collection
  */

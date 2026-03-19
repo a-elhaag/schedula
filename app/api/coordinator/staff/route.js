@@ -10,8 +10,12 @@ export const GET = withApiErrorHandling(async function getCoordinatorStaffRoute(
     const { searchParams } = new URL(request.url);
 
     const role = searchParams.get("role") ?? undefined;
-    const limit = Math.min(parseInt(searchParams.get("limit") || "100"), 500);
-    const skip = Math.max(parseInt(searchParams.get("skip") || "0"), 0);
+    const parsedLimit = parseInt(searchParams.get("limit") || "", 10);
+    const limit = Number.isNaN(parsedLimit)
+      ? 100
+      : Math.min(Math.max(parsedLimit, 0), 500);
+    const parsedSkip = parseInt(searchParams.get("skip") || "", 10);
+    const skip = Number.isNaN(parsedSkip) ? 0 : Math.max(parsedSkip, 0);
 
     const result = await getCoordinatorStaff(user.institutionId, {
       role,

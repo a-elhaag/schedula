@@ -10,8 +10,13 @@ export const GET = withApiErrorHandling(async function getCoordinatorRoomsRoute(
     const { searchParams } = new URL(request.url);
 
     const building = searchParams.get("building") ?? undefined;
-    const limit = Math.min(parseInt(searchParams.get("limit") || "100"), 500);
-    const skip = Math.max(parseInt(searchParams.get("skip") || "0"), 0);
+    const parsedLimit = Number.parseInt(searchParams.get("limit") ?? "", 10);
+    const limit = Math.min(
+      Math.max(Number.isNaN(parsedLimit) ? 100 : parsedLimit, 0),
+      500,
+    );
+    const parsedSkip = Number.parseInt(searchParams.get("skip") ?? "", 10);
+    const skip = Math.max(Number.isNaN(parsedSkip) ? 0 : parsedSkip, 0);
 
     const result = await getCoordinatorRooms(user.institutionId, {
       building,
