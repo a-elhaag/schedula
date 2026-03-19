@@ -10,8 +10,13 @@ export const GET = withApiErrorHandling(async function getCoordinatorCoursesRout
     const { searchParams } = new URL(request.url);
 
     const departmentId = searchParams.get("departmentId") ?? undefined;
-    const limit = Math.min(parseInt(searchParams.get("limit") || "100"), 500);
-    const skip = Math.max(parseInt(searchParams.get("skip") || "0"), 0);
+    const rawLimit = parseInt(searchParams.get("limit") ?? "100", 10);
+    const limit = Math.min(
+      Math.max(Number.isNaN(rawLimit) ? 100 : rawLimit, 0),
+      500,
+    );
+    const rawSkip = parseInt(searchParams.get("skip") ?? "0", 10);
+    const skip = Math.max(Number.isNaN(rawSkip) ? 0 : rawSkip, 0);
 
     const result = await getCoordinatorCourses(user.institutionId, {
       departmentId,
