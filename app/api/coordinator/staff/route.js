@@ -1,6 +1,7 @@
 import { jsonError, jsonOk, withApiErrorHandling } from "@/lib/server/api";
 import { getCoordinatorStaff } from "@/lib/server/coordinatorService";
 import { getCurrentUser } from "@/lib/server/auth";
+import { parseSearchParams } from "@/lib/server/utils";
 
 export const GET = withApiErrorHandling(async function getCoordinatorStaffRoute(
   request,
@@ -9,13 +10,13 @@ export const GET = withApiErrorHandling(async function getCoordinatorStaffRoute(
     const user = await getCurrentUser(request);
     const { searchParams } = new URL(request.url);
 
+    // OPTIMIZATION: Centralized parameter parsing
+    const { limit, skip } = parseSearchParams(searchParams, {
+      limit: { default: 100, max: 500 },
+      skip: { default: 0 },
+    });
+
     const role = searchParams.get("role") ?? undefined;
-    const parsedLimit = parseInt(searchParams.get("limit") || "", 10);
-    const limit = Number.isNaN(parsedLimit)
-      ? 100
-      : Math.min(Math.max(parsedLimit, 0), 500);
-    const parsedSkip = parseInt(searchParams.get("skip") || "", 10);
-    const skip = Number.isNaN(parsedSkip) ? 0 : Math.max(parsedSkip, 0);
 
     const result = await getCoordinatorStaff(user.institutionId, {
       role,
