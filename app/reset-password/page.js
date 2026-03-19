@@ -1,12 +1,18 @@
-import "./styles.css";
+import { Suspense } from "react";
+import ResetPasswordContent from "./content";
 
 export default function ResetPasswordPage() {
   return (
-    <div className="page-container">
-      <div className="content-center">
-        <h1>Reset Password</h1>
-        <p>Enter your new password</p>
-      </div>
-    </div>
+    <Suspense
+      fallback={
+        <div className="page-container">
+          <div className="reset-card" style={{ textAlign: "center" }}>
+            Loading...
+          </div>
+        </div>
+      }
+    >
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

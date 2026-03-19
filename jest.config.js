@@ -1,15 +1,14 @@
 module.exports = {
-  testEnvironment: "node",
-  testMatch: ["**/tests/**/*.test.js"],
+  testEnvironment: 'node',
+  testMatch: ['**/__tests__/**/*.test.js', '**/*.test.js'],
   collectCoverageFrom: [
-    "lib/server/**/*.js",
-    "app/api/**/*.js",
-    "!**/*.test.js",
-    "!**/node_modules/**",
+    'lib/**/*.js',
+    'app/api/**/*.js',
+    '!**/*.config.js',
+    '!**/node_modules/**',
   ],
-  coveragePathIgnorePatterns: ["/node_modules/", "/.next/"],
-  setupFilesAfterEnv: ["<rootDir>/tests/setup.js"],
-  moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/$1",
-  },
+  coveragePathIgnorePatterns: ['/node_modules/', '/.next/'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  testTimeout: 30000,
+  verbose: true,
 };
