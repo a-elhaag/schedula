@@ -21,7 +21,7 @@ describe('POST /api/auth/invite', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(201);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.ok).toBe(true);
     expect(data.message).toContain('successfully');
 
@@ -48,7 +48,7 @@ describe('POST /api/auth/invite', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(401);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('Coordinator access required');
   });
 
@@ -65,7 +65,7 @@ describe('POST /api/auth/invite', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('valid email');
   });
 
@@ -82,7 +82,7 @@ describe('POST /api/auth/invite', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('valid');
   });
 
@@ -103,7 +103,7 @@ describe('POST /api/auth/invite', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(409);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('already exists');
   });
 });

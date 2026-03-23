@@ -27,7 +27,7 @@ describe('POST /api/auth/accept-invite', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(200);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.ok).toBe(true);
     expect(data.message).toContain('verify your email');
 
@@ -49,7 +49,7 @@ describe('POST /api/auth/accept-invite', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('invalid or has expired');
   });
 
@@ -72,7 +72,7 @@ describe('POST /api/auth/accept-invite', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('invalid or has expired');
   });
 
@@ -93,7 +93,7 @@ describe('POST /api/auth/accept-invite', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('does not match');
   });
 
@@ -114,7 +114,7 @@ describe('POST /api/auth/accept-invite', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('Password must');
   });
 });
