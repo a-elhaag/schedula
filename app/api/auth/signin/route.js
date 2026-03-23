@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { signToken } from "@/lib/jwt";
-import { comparePassword } from "@/lib/password";
+import { comparePassword, hashPassword } from "@/lib/password";
+import { generateToken } from "@/lib/auth";
 import { validateEmail } from "@/lib/auth-helpers";
 import { logger } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limiter";
@@ -108,6 +109,16 @@ export async function POST(request) {
       institution: user.institution_id.toString(),
     });
 
+    // Generate Refresh token (7 days TTL)
+    const rawRefreshToken = generateToken(64);
+    const refreshTokenHash = await hashPassword(rawRefreshToken);
+    const refreshTokenCookieVal = `${user._id.toString()}.${rawRefreshToken}`;
+
+    await usersCollection.updateOne(
+      { _id: user._id },
+      { $set: { refresh_token_hash: refreshTokenHash } }
+    );
+
     const redirectByRole = {
       coordinator: "/coordinator/setup",
       professor: "/staff/schedule",
@@ -115,7 +126,7 @@ export async function POST(request) {
       student: "/student/schedule",
     };
 
-    // Create response with httpOnly cookie
+    // Create response with httpOnly cookies
     const response = NextResponse.json(
       {
         ok: true,
@@ -125,11 +136,21 @@ export async function POST(request) {
       { status: 200 },
     );
 
+    const isSecure = process.env.NODE_ENV === "production";
+
     response.cookies.set("auth_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isSecure,
       sameSite: "lax",
       maxAge: 30 * 60, // 30 minutes
+      path: "/",
+    });
+
+    response.cookies.set("refresh_token", refreshTokenCookieVal, {
+      httpOnly: true,
+      secure: isSecure,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60, // 7 days
       path: "/",
     });
 

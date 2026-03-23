@@ -11,6 +11,38 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+function onRefreshed(success) {
+  refreshSubscribers.forEach((callback) => callback(success));
+  refreshSubscribers = [];
+}
+
+function doRefresh() {
+  if (isRefreshing) {
+    return new Promise((resolve) => {
+      refreshSubscribers.push(resolve);
+    });
+  }
+
+  isRefreshing = true;
+  return new Promise((resolve) => {
+    fetch("/api/auth/refresh", { method: "POST" })
+      .then((res) => {
+        const success = res.ok;
+        isRefreshing = false;
+        onRefreshed(success);
+        resolve(success);
+      })
+      .catch(() => {
+        isRefreshing = false;
+        onRefreshed(false);
+        resolve(false);
+      });
+  });
+}
+
 export function useFetch(url, options = {}) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -22,15 +54,15 @@ export function useFetch(url, options = {}) {
       setError(null);
       setData(null);
 
-      try {
+      const makeRequest = async () => {
         const mergedOptions = {
           ...options,
           ...customOptions,
-          credentials: "include", // Always send auth_token cookie
+          credentials: "include", // Always send auth_token/refresh_token cookies
           headers: {
             "Content-Type": "application/json",
             ...options.headers,
-            ...customOptions.headers,
+            ...(customOptions.headers || {}),
           },
         };
 
@@ -40,10 +72,44 @@ export function useFetch(url, options = {}) {
         }
 
         const response = await fetch(url, mergedOptions);
+        
+        // Return 401s up to handle refresh
+        if (response.status === 401 && url !== "/api/auth/refresh" && url !== "/api/auth/signin") {
+          return { status: 401, response };
+        }
+
         const result = await response.json().catch(() => null);
 
         if (!response.ok) {
           throw new Error(result?.message ?? `HTTP ${response.status}`);
+        }
+
+        return { status: response.status, result };
+      };
+
+      try {
+        let { status, result, response } = await makeRequest();
+
+        // Handle Token Expiry
+        if (status === 401) {
+          const refreshed = await doRefresh();
+          if (refreshed) {
+            // Retry request
+            const retryRes = await makeRequest();
+            status = retryRes.status;
+            result = retryRes.result;
+            response = retryRes.response;
+
+            if (status === 401) {
+              // Still 401 after refresh -> log out
+              window.location.href = "/signin";
+              throw new Error("Session expired. Please sign in again.");
+            }
+          } else {
+            // Refresh failed
+            window.location.href = "/signin";
+            throw new Error("Session expired. Please sign in again.");
+          }
         }
 
         setData(result);

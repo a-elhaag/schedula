@@ -1,5 +1,6 @@
 import { getDb } from "../../../../lib/db";
 import { ObjectId } from "mongodb";
+import { getCurrentUser } from "@/lib/server/auth";
 
 /**
  * GET /api/student/schedule?userId=xxx
@@ -8,11 +9,16 @@ import { ObjectId } from "mongodb";
  */
 export async function GET(request) {
   try {
+    const authUser = getCurrentUser(request, { requiredRole: ["student", "coordinator"] });
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
 
     if (!userId) {
       return Response.json({ error: "userId is required" }, { status: 400 });
+    }
+
+    if (authUser.role !== "coordinator" && authUser.userId !== userId) {
+      return Response.json({ error: "Forbidden. Can only view your own schedule." }, { status: 403 });
     }
 
     const db = await getDb();

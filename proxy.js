@@ -101,6 +101,7 @@ export async function proxy(request) {
   requestHeaders.set("x-user-id", payload.sub);
   requestHeaders.set("x-user-email", payload.email);
   requestHeaders.set("x-user-role", payload.role);
+  requestHeaders.set("x-user-institution", payload.institution ?? "");
 
   return withRequestId(
     NextResponse.next({

@@ -1,6 +1,7 @@
 import { getDb } from "../../../../lib/db";
 import { ObjectId } from "mongodb";
 import { createHash } from "crypto";
+import { getCurrentUser } from "@/lib/server/auth";
 
 function computeAvailabilityHash(slots) {
   const sorted = [...slots].sort((a, b) =>
@@ -24,11 +25,16 @@ function computeAvailabilityHash(slots) {
 // ── GET ───────────────────────────────────────────────────────────────────────
 export async function GET(request) {
   try {
+    const authUser = getCurrentUser(request, { requiredRole: ["professor", "ta", "coordinator"] });
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
 
     if (!userId) {
       return Response.json({ error: "userId is required" }, { status: 400 });
+    }
+
+    if (authUser.role !== "coordinator" && authUser.userId !== userId) {
+      return Response.json({ error: "Forbidden. Can only view your own availability." }, { status: 403 });
     }
 
     const db = await getDb();
@@ -76,11 +82,16 @@ export async function GET(request) {
 // ── POST ──────────────────────────────────────────────────────────────────────
 export async function POST(request) {
   try {
+    const authUser = getCurrentUser(request, { requiredRole: ["professor", "ta", "coordinator"] });
     const body   = await request.json();
     const { userId, slots } = body;
 
     if (!userId) {
       return Response.json({ error: "userId is required" }, { status: 400 });
+    }
+
+    if (authUser.role !== "coordinator" && authUser.userId !== userId) {
+      return Response.json({ error: "Forbidden. Can only update your own availability." }, { status: 403 });
     }
 
     if (!Array.isArray(slots)) {

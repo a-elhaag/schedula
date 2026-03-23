@@ -11,48 +11,41 @@ describe("Auth Utility", () => {
   });
 
   describe("getCurrentUser", () => {
-    it("should return current user from database", async () => {
+    it("should return user from proxy headers", () => {
       const coordinatorId = "507f1f77bcf86cd799439011";
       const institutionId = "507f1f77bcf86cd799439012";
 
-      const mockDbInstance = mockDb();
-      const usersCollection = mockCollection("users");
-      usersCollection.findOne.mockResolvedValue({
-        _id: { toString: () => coordinatorId },
-        institution_id: { toString: () => institutionId },
-        role: "coordinator",
-      });
+      const headers = new Headers();
+      headers.set("x-user-id", coordinatorId);
+      headers.set("x-user-role", "coordinator");
+      headers.set("x-user-email", "test@example.com");
+      headers.set("x-user-institution", institutionId);
 
-      mockDbInstance.collection.mockReturnValue(usersCollection);
-      getDb.mockResolvedValue(mockDbInstance);
-
-      const request = new Request("http://localhost/api/test");
-      const user = await getCurrentUser(request);
+      const request = new Request("http://localhost/api/test", { headers });
+      const user = getCurrentUser(request);
 
       expect(user).toEqual({
         userId: coordinatorId,
         role: "coordinator",
+        email: "test@example.com",
         institutionId,
       });
-      expect(usersCollection.findOne).toHaveBeenCalledWith(
-        { role: "coordinator" },
-        { projection: { _id: 1, institution_id: 1 } },
-      );
     });
 
-    it("should throw error when no coordinator found", async () => {
-      const mockDbInstance = mockDb();
-      const usersCollection = mockCollection("users");
-      usersCollection.findOne.mockResolvedValue(null);
-
-      mockDbInstance.collection.mockReturnValue(usersCollection);
-      getDb.mockResolvedValue(mockDbInstance);
-
+    it("should throw a 401 error when no auth context is found", () => {
       const request = new Request("http://localhost/api/test");
 
-      await expect(getCurrentUser(request)).rejects.toThrow(
-        "No coordinator user found",
-      );
+      expect(() => getCurrentUser(request)).toThrow("Unauthorized.");
+    });
+    
+    it("should enforce requiredRole", () => {
+      const headers = new Headers();
+      headers.set("x-user-id", "test-id");
+      headers.set("x-user-role", "student");
+
+      const request = new Request("http://localhost/api/test", { headers });
+
+      expect(() => getCurrentUser(request, { requiredRole: "coordinator" })).toThrow("Forbidden. Insufficient permissions.");
     });
   });
 });

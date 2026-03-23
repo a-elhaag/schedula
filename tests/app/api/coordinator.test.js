@@ -37,7 +37,7 @@ describe("Coordinator API Routes", () => {
         limit: 100,
       };
 
-      getCurrentUser.mockResolvedValue(mockUser);
+      getCurrentUser.mockReturnValue(mockUser);
       getCoordinatorCourses.mockResolvedValue(mockCoursesData);
 
       const request = new Request(
@@ -58,7 +58,7 @@ describe("Coordinator API Routes", () => {
     });
 
     it("should apply department filter", async () => {
-      getCurrentUser.mockResolvedValue(mockUser);
+      getCurrentUser.mockReturnValue(mockUser);
       getCoordinatorCourses.mockResolvedValue({
         items: [],
         total: 0,
@@ -80,7 +80,7 @@ describe("Coordinator API Routes", () => {
     });
 
     it("should cap limit at 500", async () => {
-      getCurrentUser.mockResolvedValue(mockUser);
+      getCurrentUser.mockReturnValue(mockUser);
       getCoordinatorCourses.mockResolvedValue({
         items: [],
         total: 0,
@@ -118,7 +118,7 @@ describe("Coordinator API Routes", () => {
         limit: 100,
       };
 
-      getCurrentUser.mockResolvedValue(mockUser);
+      getCurrentUser.mockReturnValue(mockUser);
       getCoordinatorRooms.mockResolvedValue(mockRoomsData);
 
       const request = new Request(
@@ -133,7 +133,7 @@ describe("Coordinator API Routes", () => {
     });
 
     it("should apply building filter", async () => {
-      getCurrentUser.mockResolvedValue(mockUser);
+      getCurrentUser.mockReturnValue(mockUser);
       getCoordinatorRooms.mockResolvedValue({
         items: [],
         total: 0,
@@ -171,7 +171,7 @@ describe("Coordinator API Routes", () => {
         limit: 100,
       };
 
-      getCurrentUser.mockResolvedValue(mockUser);
+      getCurrentUser.mockReturnValue(mockUser);
       getCoordinatorStaff.mockResolvedValue(mockStaffData);
 
       const request = new Request(
@@ -187,7 +187,7 @@ describe("Coordinator API Routes", () => {
     });
 
     it("should filter staff by role", async () => {
-      getCurrentUser.mockResolvedValue(mockUser);
+      getCurrentUser.mockReturnValue(mockUser);
       getCoordinatorStaff.mockResolvedValue({
         items: [],
         total: 0,
@@ -214,7 +214,7 @@ describe("Coordinator API Routes", () => {
       const error = new Error("Invalid department ID");
       error.status = 400;
 
-      getCurrentUser.mockResolvedValue(mockUser);
+      getCurrentUser.mockReturnValue(mockUser);
       getCoordinatorCourses.mockRejectedValue(error);
 
       const request = new Request(
@@ -229,7 +229,7 @@ describe("Coordinator API Routes", () => {
     });
 
     it("should handle auth errors", async () => {
-      getCurrentUser.mockRejectedValue(new Error("No user found"));
+      getCurrentUser.mockImplementation(() => { throw new Error("No user found") });
 
       const request = new Request(
         "http://localhost/api/coordinator/courses",
