@@ -6,7 +6,7 @@ export const GET = withApiErrorHandling(async function getCoordinatorRoomsRoute(
   request,
 ) {
   try {
-    const user = await getCurrentUser(request);
+    const user = getCurrentUser(request, { requiredRole: "coordinator" });
     const { searchParams } = new URL(request.url);
 
     const building = searchParams.get("building") ?? undefined;

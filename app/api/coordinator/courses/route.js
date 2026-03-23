@@ -6,7 +6,7 @@ export const GET = withApiErrorHandling(async function getCoordinatorCoursesRout
   request,
 ) {
   try {
-    const user = await getCurrentUser(request);
+    const user = getCurrentUser(request, { requiredRole: "coordinator" });
     const { searchParams } = new URL(request.url);
 
     const departmentId = searchParams.get("departmentId") ?? undefined;
