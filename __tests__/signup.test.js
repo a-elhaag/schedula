@@ -16,7 +16,7 @@ describe('POST /api/auth/signup', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(201);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.ok).toBe(true);
     expect(data.user.email).toBe('newuser@example.com');
     expect(data.message).toContain('verify your email');
@@ -32,7 +32,7 @@ describe('POST /api/auth/signup', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('valid email');
   });
 
@@ -46,7 +46,7 @@ describe('POST /api/auth/signup', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('full name');
   });
 
@@ -60,7 +60,7 @@ describe('POST /api/auth/signup', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('Password must');
   });
 
@@ -83,7 +83,7 @@ describe('POST /api/auth/signup', () => {
     const response = await POST(req2);
 
     expect(response.status).toBe(409);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('already exists');
   });
 

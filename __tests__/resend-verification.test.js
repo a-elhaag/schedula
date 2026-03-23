@@ -21,7 +21,7 @@ describe('POST /api/auth/resend-verification', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(200);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.ok).toBe(true);
     expect(data.message).toContain('verification link');
 
@@ -45,7 +45,7 @@ describe('POST /api/auth/resend-verification', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(200);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('verification link');
   });
 
@@ -57,7 +57,7 @@ describe('POST /api/auth/resend-verification', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('valid email');
   });
 
@@ -80,6 +80,6 @@ describe('POST /api/auth/resend-verification', () => {
     // Both should return same message
     expect(res1.status).toBe(200);
     expect(res2.status).toBe(200);
-    expect(getJsonResponse(res1).message).toBe(getJsonResponse(res2).message);
+    expect((await getJsonResponse(res1)).message).toBe((await getJsonResponse(res2)).message);
   });
 });

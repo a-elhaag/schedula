@@ -3,7 +3,7 @@
  * Helper functions for API route testing
  */
 
-import { createRequest, createResponse } from 'node-mocks-http';
+import { createResponse } from 'node-mocks-http';
 import { ObjectId } from 'mongodb';
 import { getDb } from '@/lib/db';
 import { hashPassword } from '@/lib/password';
@@ -17,7 +17,7 @@ export async function createTestUser(userData = {}) {
   const usersCollection = db.collection('users');
 
   const defaultUser = {
-    institution_id: new ObjectId('669b538e5aa373449d761b122'),
+    institution_id: new ObjectId('669b538e5aa373449d761b12'),
     email: 'test@example.com',
     password_hash: await hashPassword('TestPassword123'),
     role: 'student',
@@ -47,42 +47,32 @@ export function createAuthRequest(method, url, user, body = null) {
     institution: user.institution_id.toString(),
   });
 
-  const req = createRequest({
-    method,
-    url,
-    headers: {
-      'x-request-id': 'test-request-id',
-    },
-    cookies: {
-      auth_token: token,
-    },
+  const headers = new Headers({
+    'x-request-id': 'test-request-id',
+    'Cookie': `auth_token=${token}`,
   });
 
-  if (body) {
-    req._setBody(JSON.stringify(body));
-  }
-
-  return req;
+  return new Request(`http://localhost${url}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : null,
+  });
 }
 
 /**
  * Create a basic HTTP request
  */
 export function createTestRequest(method, url, body = null, headers = {}) {
-  const req = createRequest({
-    method,
-    url,
-    headers: {
-      'x-request-id': 'test-request-id',
-      ...headers,
-    },
+  const requestHeaders = new Headers({
+    'x-request-id': 'test-request-id',
+    ...headers,
   });
 
-  if (body) {
-    req._setBody(JSON.stringify(body));
-  }
-
-  return req;
+  return new Request(`http://localhost${url}`, {
+    method,
+    headers: requestHeaders,
+    body: body ? JSON.stringify(body) : null,
+  });
 }
 
 /**
@@ -97,8 +87,11 @@ export function createTestResponse() {
 /**
  * Extract JSON response from response object
  */
-export function getJsonResponse(res) {
+export async function getJsonResponse(res) {
   try {
+    if (res instanceof Response) {
+      return await res.json();
+    }
     return JSON.parse(res._getData());
   } catch {
     return null;
