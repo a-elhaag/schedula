@@ -72,38 +72,63 @@ export default function ProfessorAvailabilityPage() {
   const [selected, setSelected] = useState(new Set());
   const [submitting, setSubmitting] = useState(false);
   const [authError, setAuthError] = useState(null);
+  const [bypassAuthUser, setBypassAuthUser] = useState(null);
+
+  // Get bypass auth user if enabled
+  useEffect(() => {
+    async function getBypassAuthUser() {
+      try {
+        const response = await fetch("/api/auth/bypass-status", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json().catch(() => null);
+          if (data?.bypassAuthEnabled && data?.user?.id) {
+            setBypassAuthUser(data.user);
+          }
+        }
+      } catch {
+        // Continue with normal auth flow
+      }
+    }
+
+    getBypassAuthUser();
+  }, []);
+
+  // Use bypass auth user ID if available, otherwise use auth user ID
+  const currentUserId = bypassAuthUser?.id || auth.userId;
 
   // Only start fetching once auth has resolved and userId is available
-  const fetchUrl = auth.userId
-    ? `/api/staff/availability?userId=${auth.userId}`
+  const fetchUrl = currentUserId
+    ? `/api/staff/availability?userId=${currentUserId}`
     : null;
 
   const {
     data,
     isLoading,
     error: fetchError,
-  } = useDataCache(
-    "staff_availability",
-    "availability",
-    fetchUrl,
-  );
+  } = useDataCache("staff_availability", "availability", fetchUrl);
 
-  const loading = auth.isLoading || (!!fetchUrl && isLoading && !data);
+  const loading =
+    (bypassAuthUser ? false : auth.isLoading) ||
+    (!!fetchUrl && isLoading && !data);
   const error = authError ?? fetchError;
   const staff = data?.staff ?? null;
 
   // Restore previously saved slots into the grid when data first loads
   useEffect(() => {
-    if (!auth.userId && !auth.isLoading) {
+    if (!currentUserId && !bypassAuthUser && !auth.isLoading) {
       setAuthError("Not authenticated");
       return;
     }
     if (data?.slots?.length) {
       setSelected(
-        new Set(data.slots.map(({ day, slot }) => slotKey(day, slot)))
+        new Set(data.slots.map(({ day, slot }) => slotKey(day, slot))),
       );
     }
-  }, [data, auth.userId, auth.isLoading]);
+  }, [data, currentUserId, auth.isLoading, bypassAuthUser]);
 
   // ── Submit to MongoDB via API route ───────────────────────────────────────
   async function handleSubmit() {
@@ -118,7 +143,7 @@ export default function ProfessorAvailabilityPage() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: auth.userId, slots }),
+        body: JSON.stringify({ userId: currentUserId, slots }),
       });
 
       const json = await res.json();
