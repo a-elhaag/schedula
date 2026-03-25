@@ -19,8 +19,8 @@ import {
 } from "../../../components/icons/index";
 import { useDataCache } from "../../../hooks/useDataCache";
 
-// Uses logged-in user from auth
-import { useAuth } from "@/hooks/useAuth";
+// ── Replace with real logged-in user ID once auth is wired ───────────────────
+const CURRENT_USER_ID = "69b6f7d2b3f8bb28379d5e68";
 
 const DEFAULT_DAYS = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday"];
 
@@ -28,6 +28,30 @@ const DEFAULT_DAYS = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday"];
 export default function StudentSchedulePage() {
   const [activeDay, setActiveDay] = useState("Sunday");
   const [downloading, setDownloading] = useState(false);
+  const [userId, setUserId] = useState(CURRENT_USER_ID);
+
+  // Get user ID from bypass auth if enabled
+  useEffect(() => {
+    async function getBypassAuthUser() {
+      try {
+        const response = await fetch("/api/auth/bypass-status", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json().catch(() => null);
+          if (data?.bypassAuthEnabled && data?.user?.id) {
+            setUserId(data.user.id);
+          }
+        }
+      } catch {
+        // Use default user ID if bypass auth check fails
+      }
+    }
+
+    getBypassAuthUser();
+  }, []);
 
   const auth = useAuth();
   const {
@@ -38,7 +62,7 @@ export default function StudentSchedulePage() {
   } = useDataCache(
     "student_schedule",
     "schedule",
-    `/api/student/schedule?userId=${auth.userId}`
+    `/api/student/schedule?userId=${CURRENT_USER_ID}`
   );
 
   const student = data?.student ?? null;
@@ -50,7 +74,7 @@ export default function StudentSchedulePage() {
   useEffect(() => {
     if (data?.workingDays?.length && data?.sessions) {
       const first = data.workingDays.find(
-        (d) => (data.sessions[d] ?? []).length > 0
+        (d) => (data.sessions[d] ?? []).length > 0,
       );
       if (first) setActiveDay(first);
     }
@@ -61,7 +85,9 @@ export default function StudentSchedulePage() {
     const all = Object.values(sessions).flat();
     return {
       allSessions: all,
-      totalCredits: all.filter((s) => s.credits > 0).reduce((a, s) => a + s.credits, 0),
+      totalCredits: all
+        .filter((s) => s.credits > 0)
+        .reduce((a, s) => a + s.credits, 0),
       totalCourses: new Set(all.map((s) => s.code)).size,
     };
   }, [sessions]);
