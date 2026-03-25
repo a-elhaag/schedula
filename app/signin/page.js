@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
@@ -15,6 +15,40 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
+
+  // Check if bypass auth is enabled and redirect
+  useEffect(() => {
+    async function checkBypassAuth() {
+      try {
+        const response = await fetch("/api/auth/bypass-status", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json().catch(() => null);
+
+        if (data?.bypassAuthEnabled && data?.user) {
+          // Redirect based on user role when bypass auth is enabled
+          const roleRedirects = {
+            coordinator: "/coordinator/setup",
+            professor: "/staff/schedule",
+            ta: "/staff/schedule",
+            student: "/student/schedule",
+          };
+
+          const redirectPath =
+            roleRedirects[data.user.role] || "/coordinator/setup";
+          router.push(redirectPath);
+        }
+      } catch {
+        // If the check fails, continue with normal sign-in flow
+      }
+    }
+
+    checkBypassAuth();
+  }, [router]);
 
   const isSubmitting = status === "submitting";
   const isSuccess = status === "success";
