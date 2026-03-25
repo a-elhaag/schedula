@@ -19,8 +19,8 @@ import {
 } from "../../../components/icons/index";
 import { useDataCache } from "../../../hooks/useDataCache";
 
-// ── Replace with real logged-in user ID once auth is wired ───────────────────
-const CURRENT_USER_ID = "69b6f7d2b3f8bb28379d5e68";
+// Uses logged-in user from auth
+import { useAuth } from "@/hooks/useAuth";
 
 const DEFAULT_DAYS = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday"];
 
@@ -29,6 +29,7 @@ export default function StudentSchedulePage() {
   const [activeDay, setActiveDay] = useState("Sunday");
   const [downloading, setDownloading] = useState(false);
 
+  const auth = useAuth();
   const {
     data,
     isLoading: loading,
@@ -37,7 +38,7 @@ export default function StudentSchedulePage() {
   } = useDataCache(
     "student_schedule",
     "schedule",
-    `/api/student/schedule?userId=${CURRENT_USER_ID}`
+    `/api/student/schedule?userId=${auth.userId}`
   );
 
   const student = data?.student ?? null;
