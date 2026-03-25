@@ -24,6 +24,37 @@ export default function CoordinatorImportPage() {
       id: Date.now(),
     });
   };
+
+  const handleImport = async () => {
+    if (!csvFile) return;
+
+    const formData = new FormData();
+    formData.append('csvFile', csvFile);
+    formData.append('datasetType', 'courses'); // Default to courses; can add selector
+
+    try {
+      showToast("info", "Importing", `Uploading ${csvFile.name}...`);
+      
+      const response = await fetch('/api/coordinator/import', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        showToast("success", "Import Successful", 
+          `Imported ${result.stats.inserted || 0} rows. ${result.stats.warnings || 0} warnings, ${result.stats.errors?.length || 0} errors.`
+        );
+        setCsvFile(null);
+      } else {
+        showToast("error", "Import Failed", result.message || "Validation errors occurred");
+      }
+    } catch (error) {
+      showToast("error", "Upload Error", error.message || "Network error");
+    }
+  };
+
   const importStats = [
     { label: "Datasets Ready", value: "6", note: "2 need mapping" },
     { label: "Rows Validated", value: "4,382", note: "97% clean" },
@@ -119,15 +150,9 @@ export default function CoordinatorImportPage() {
               <button
                 type="button"
                 className="primary-btn"
-                onClick={() => {
-                  showToast(
-                    "success",
-                    "Validating",
-                    `Processing ${csvFile.name}. Please wait...`
-                  );
-                }}
+                onClick={handleImport}
               >
-                Validate & Next
+                Validate & Import
               </button>
             </div>
           )}
