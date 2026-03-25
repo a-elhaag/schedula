@@ -11,7 +11,9 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "db:setup": "node --env-file=.env scripts/setup-db.mjs",
+    "db:seed": "node --env-file=.env scripts/seed-data.mjs",
     "db:export": "node --env-file=.env scripts/export-data.mjs",
+    "db:truncate": "node --env-file=.env scripts/truncate-db.mjs",
     "send-test-email": "node --env-file=.env scripts/send-test-email.mjs",
     "indexes": "node --env-file=.env scripts/create-indexes.mjs"
   },

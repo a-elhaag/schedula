@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyTokenEdge } from "@/lib/edge-auth";
+import { DEMO_USERS, getDemoUserById } from "@/lib/demo-users";
 
 /**
  * proxy.js
@@ -59,6 +60,47 @@ export async function proxy(request) {
   // Allow public routes
   if (isPublicRoute(pathname)) {
     return withRequestId(NextResponse.next());
+  }
+
+  // Check if bypass auth is enabled for development
+  if (process.env.BYPASS_AUTH === "true") {
+    // Skip token verification and use demo user info
+    const requestHeaders = new Headers(request.headers);
+
+    // Check for x-user-id header to switch between demo users
+    const headerUserId = request.headers.get("x-user-id");
+    let bypassUser = null;
+
+    if (headerUserId) {
+      // Try to find demo user by ID
+      bypassUser = getDemoUserById(headerUserId);
+    }
+
+    // Fall back to default demo user from env
+    if (!bypassUser) {
+      const defaultUserId =
+        process.env.BYPASS_AUTH_USER_ID || "666666666666666666666601";
+      const defaultRole = process.env.BYPASS_AUTH_USER_ROLE || "coordinator";
+      const defaultEmail =
+        process.env.BYPASS_AUTH_USER_EMAIL || "coordinator@demo.local";
+
+      bypassUser = {
+        id: defaultUserId,
+        email: defaultEmail,
+        role: defaultRole,
+      };
+    }
+
+    requestHeaders.set("x-user-id", bypassUser.id);
+    requestHeaders.set("x-user-email", bypassUser.email);
+    requestHeaders.set("x-user-role", bypassUser.role);
+    return withRequestId(
+      NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      }),
+    );
   }
 
   // Get required roles for protected route
