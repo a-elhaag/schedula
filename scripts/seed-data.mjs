@@ -443,6 +443,117 @@ async function seedDatabase() {
     const staffIds = Object.values(staffRes.insertedIds);
     console.log(`✅  ${staffIds.length} instructors created\n`);
 
+    // 5a. Create Demo Users (for BYPASS_AUTH testing)
+    console.log("🧪  Creating demo users for testing…");
+    const demoDocs = [
+      {
+        _id: new ObjectId("666666666666666666666601"),
+        institution_id: institutionId,
+        faculty_id: facultyId,
+        department_id: departmentId,
+        email: "coordinator@demo.local",
+        password_hash: "demo_password_123",
+        role: "coordinator",
+        name: "Demo Coordinator",
+        invite_status: "joined",
+        created_at: new Date(),
+      },
+      {
+        _id: new ObjectId("666666666666666666666602"),
+        institution_id: institutionId,
+        faculty_id: facultyId,
+        department_id: departmentId,
+        email: "professor@demo.local",
+        password_hash: "demo_password_123",
+        role: "professor",
+        name: "Demo Professor",
+        invite_status: "joined",
+        created_at: new Date(),
+      },
+      {
+        _id: new ObjectId("666666666666666666666603"),
+        institution_id: institutionId,
+        faculty_id: facultyId,
+        department_id: departmentId,
+        email: "ta@demo.local",
+        password_hash: "demo_password_123",
+        role: "ta",
+        name: "Demo Teaching Assistant",
+        invite_status: "joined",
+        created_at: new Date(),
+      },
+      {
+        _id: new ObjectId("666666666666666666666604"),
+        institution_id: institutionId,
+        faculty_id: facultyId,
+        department_id: departmentId,
+        email: "student.level1@demo.local",
+        password_hash: "demo_password_123",
+        role: "student",
+        name: "Demo Student (Level 1)",
+        year_level: "1",
+        invite_status: "joined",
+        created_at: new Date(),
+      },
+      {
+        _id: new ObjectId("666666666666666666666605"),
+        institution_id: institutionId,
+        faculty_id: facultyId,
+        department_id: departmentId,
+        email: "student.level2@demo.local",
+        password_hash: "demo_password_123",
+        role: "student",
+        name: "Demo Student (Level 2)",
+        year_level: "2",
+        invite_status: "joined",
+        created_at: new Date(),
+      },
+      {
+        _id: new ObjectId("666666666666666666666606"),
+        institution_id: institutionId,
+        faculty_id: facultyId,
+        department_id: departmentId,
+        email: "student.level3@demo.local",
+        password_hash: "demo_password_123",
+        role: "student",
+        name: "Demo Student (Level 3)",
+        year_level: "3",
+        invite_status: "joined",
+        created_at: new Date(),
+      },
+      {
+        _id: new ObjectId("666666666666666666666607"),
+        institution_id: institutionId,
+        faculty_id: facultyId,
+        department_id: departmentId,
+        email: "student.level4@demo.local",
+        password_hash: "demo_password_123",
+        role: "student",
+        name: "Demo Student (Level 4)",
+        year_level: "4",
+        invite_status: "joined",
+        created_at: new Date(),
+      },
+    ];
+
+    try {
+      await db.collection("users").insertMany(demoDocs);
+      console.log(`✅  ${demoDocs.length} demo users created\n`);
+      console.log("   📧  Demo Accounts (when BYPASS_AUTH=true):");
+      console.log("       • Coordinator: coordinator@demo.local");
+      console.log("       • Professor: professor@demo.local");
+      console.log("       • TA: ta@demo.local");
+      console.log("       • Student L1: student.level1@demo.local");
+      console.log("       • Student L2: student.level2@demo.local");
+      console.log("       • Student L3: student.level3@demo.local");
+      console.log("       • Student L4: student.level4@demo.local\n");
+    } catch (err) {
+      // Demo users may already exist, that's OK
+      if (!err.message.includes("E11000")) {
+        console.warn("⚠️   Could not insert demo users:", err.message);
+      }
+    }
+
     // 6. Create Courses with Sections
     console.log("📖  Creating courses…");
     const courseMap = new Map(); // code -> { _id, staffIds }
@@ -552,6 +663,19 @@ async function seedDatabase() {
     console.log(`   • Instructors: ${staffIds.length}`);
     console.log(`   • Courses: ${courseIds.length}`);
     console.log(`   • Schedule Entries: ${scheduleEntries.length}\n`);
+
+    console.log("─────────────────────────────────────────");
+    console.log("🔑  Additional Notes:");
+    console.log("   • Demo users have IDs starting with 666666...");
+    console.log("   • Set BYPASS_AUTH=true in .env to test without JWT tokens");
+    console.log("   • Use x-user-id header to switch between demo accounts:");
+    console.log("     - 666666666666666666666601 (Coordinator)");
+    console.log("     - 666666666666666666666602 (Professor)");
+    console.log("     - 666666666666666666666603 (TA)");
+    console.log("     - 666666666666666666666604 (Student L1)");
+    console.log("     - 666666666666666666666605 (Student L2)");
+    console.log("     - 666666666666666666666606 (Student L3)");
+    console.log("     - 666666666666666666666607 (Student L4)\n");
   } catch (err) {
     console.error("\n❌  Seed failed:", err.message);
     console.error(err);
