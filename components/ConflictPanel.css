@@ -1,0 +1,56 @@
+/* =============================================================================
+   ConflictPanel.css
+   Conflict list panel for schedule review page.
+   Uses CSS variables from globals.css - no hardcoded colors.
+============================================================================= */
+
+.conflict-panel {
+  background: rgba(255, 59, 48, 0.05);
+  border: 1px solid rgba(255, 59, 48, 0.2);
+  border-radius: 20px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.conflict-panel__title {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #FF3B30;
+  margin: 0 0 12px;
+}
+
+.conflict-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.conflict-item:last-child { margin-bottom: 0; }
+
+.conflict-item__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #FF3B30;
+}
+
+.conflict-item__label {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 2px;
+}
+
+.conflict-item__slot {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0;
+}

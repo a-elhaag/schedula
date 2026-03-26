@@ -1,0 +1,71 @@
+/* =============================================================================
+   CoordinatorSessionRow.css
+   Horizontal session row for coordinator review and published pages.
+   Uses CSS variables from globals.css - no hardcoded colors.
+============================================================================= */
+
+.coord-session-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 20px;
+  background: var(--color-background);
+  border-radius: 20px;
+  border-left: 4px solid var(--color-border);
+  transition: all 200ms ease;
+}
+
+.coord-session-row:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.coord-session-row--conflict {
+  border-left-color: #FF3B30;
+  background: rgba(255, 59, 48, 0.04);
+}
+
+.coord-session-row__time {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  flex-shrink: 0;
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  gap: 2px;
+}
+
+.coord-session-row__info { flex: 1; min-width: 0; }
+
+.coord-session-row__title {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coord-session-row__code { color: var(--color-accent); }
+
+.coord-session-row__meta {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.coord-session-row__badges {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  .coord-session-row       { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .coord-session-row__time { min-width: auto; flex-direction: row; gap: 8px; }
+}
