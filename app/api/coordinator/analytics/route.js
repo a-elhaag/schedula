@@ -1,66 +1,121 @@
-import { jsonError, jsonOk, withApiErrorHandling } from "@/lib/server/api";
+import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/server/auth";
 import { getDb } from "@/lib/db";
 import { ObjectId } from "mongodb";
+import { resolveInstitutionId } from "@/app/api/coordinator/_helpers/resolve-institution";
 
-export const GET = withApiErrorHandling(async function getRoomOccupancy(request) {
+const DAYS  = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
+const SLOTS = ["07:30","08:30","09:30","10:30","11:30","12:30","1:30","2:30","3:30","4:30"];
+
+// ── GET /api/coordinator/analytics ───────────────────────────────────────────
+export async function GET(request) {
   try {
-    const user = getCurrentUser(request, { requiredRole: "coordinator" });
-    const { searchParams } = new URL(request.url);
-    const scheduleId = searchParams.get("scheduleId") || null;
-    const termLabel = searchParams.get("term") || null;
+    const { institutionId } = getCurrentUser(request, { requiredRole: "coordinator" });
 
-    const db = await getDb();
-    const query = { 
-      institution_id: new ObjectId(user.institutionId),
-      ...(scheduleId && { _id: new ObjectId(scheduleId) }),
-      ...(termLabel && { term_label: termLabel })
-    };
+    const db   = await getDb();
+    const iOid = await resolveInstitutionId(institutionId);
 
-    const schedule = await db.collection("schedules").findOne(query);
-    if (!schedule?.entries) {
-      return jsonOk({ occupancy: {}, days: [], slots: [], summary: {} });
-    }
+    // Get latest published (or any) schedule
+    const schedule = await db.collection("schedules").findOne(
+      { institution_id: iOid },
+      { sort: { created_at: -1 } }
+    );
 
-    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"];
-    const slots = ["08:00", "09:30", "11:00", "12:30", "14:00", "15:30"];
-    const occupancy = {};
-
-    days.forEach(day => {
-      occupancy[day] = slots.map(() => 0);
+    const totalRooms = await db.collection("rooms").countDocuments({
+      institution_id: iOid, deleted_at: null,
     });
 
-    let totalSessions = 0;
-    let totalCapacity = 0;
+    if (!schedule?.entries?.length) {
+      return NextResponse.json({
+        heatmap:      {},
+        stats:        { totalSessions: 0, peakOccupancy: 0, peakSlot: "--", roomsUsed: 0, totalRooms },
+        topRooms:     [],
+        activeDays:   [],
+      });
+    }
 
-    for (const entry of schedule.entries) {
-      const dayIdx = days.indexOf(entry.day);
-      if (dayIdx === -1) continue;
+    const entries = schedule.entries;
 
-      const slotIdx = slots.findIndex(slot => 
-        slot <= entry.start && slot >= entry.start // Simplified slot matching
-      );
-      if (slotIdx !== -1) {
-        occupancy[days[dayIdx]][slotIdx]++;
-        totalSessions++;
+    // Build heatmap: for each day+slot, count how many sessions overlap
+    const slotCounts = {};
+    DAYS.forEach(d => {
+      slotCounts[d] = {};
+      SLOTS.forEach(s => { slotCounts[d][s] = 0; });
+    });
+
+    for (const entry of entries) {
+      const day = entry.day;
+      if (!slotCounts[day]) continue;
+      for (const slot of SLOTS) {
+        if (entry.start <= slot && slot < entry.end) {
+          slotCounts[day][slot]++;
+        }
       }
     }
 
-    // Normalize to % (assume avg room capacity 30)
-    Object.keys(occupancy).forEach(day => {
-      occupancy[day] = occupancy[day].map(usage => 
-        Math.round((usage / 3) * 100) // Normalize 0-3 sessions -> 0-100%
-      );
+    // Convert counts to occupancy percentages
+    const heatmap = {};
+    let peakOccupancy = 0;
+    let peakSlot = "";
+    DAYS.forEach(d => {
+      heatmap[d] = {};
+      SLOTS.forEach(s => {
+        const pct = totalRooms > 0 ? Math.round((slotCounts[d][s] / totalRooms) * 100) : 0;
+        heatmap[d][s] = Math.min(pct, 100);
+        if (pct > peakOccupancy) {
+          peakOccupancy = pct;
+          peakSlot = `${d} ${s}`;
+        }
+      });
     });
 
-    return jsonOk({ 
-      occupancy,
-      days,
-      slots,
-      summary: { avgOccupancy: Math.round(totalSessions / (days.length * slots.length) * 100) }
+    // Rooms usage frequency
+    const roomCounts = {};
+    for (const entry of entries) {
+      const rid = entry.room_id?.toString();
+      if (rid) roomCounts[rid] = (roomCounts[rid] ?? 0) + 1;
+    }
+
+    const roomIds  = Object.keys(roomCounts);
+    const rooms    = await db.collection("rooms").find({ _id: { $in: roomIds.map(id => new ObjectId(id)) } }).toArray();
+    const roomMap  = Object.fromEntries(rooms.map(r => [r._id.toString(), r]));
+    const maxCount = Math.max(...Object.values(roomCounts), 1);
+
+    const topRooms = roomIds
+      .sort((a, b) => roomCounts[b] - roomCounts[a])
+      .slice(0, 6)
+      .map(id => ({
+        name:      roomMap[id]?.name ?? id,
+        count:     roomCounts[id],
+        occupancy: Math.round((roomCounts[id] / maxCount) * 100),
+      }));
+
+    // Sessions per day
+    const dayCounts = {};
+    for (const entry of entries) {
+      dayCounts[entry.day] = (dayCounts[entry.day] ?? 0) + 1;
+    }
+    const maxDay = Math.max(...Object.values(dayCounts), 1);
+    const activeDays = DAYS.filter(d => dayCounts[d] > 0).map(d => ({
+      day:   d,
+      count: dayCounts[d],
+      pct:   Math.round((dayCounts[d] / maxDay) * 100),
+    }));
+
+    return NextResponse.json({
+      heatmap,
+      stats: {
+        totalSessions: entries.length,
+        peakOccupancy,
+        peakSlot,
+        roomsUsed: roomIds.length,
+        totalRooms,
+      },
+      topRooms,
+      activeDays,
     });
-  } catch (error) {
-    throw error;
+
+  } catch (err) {
+    return NextResponse.json({ message: err.message ?? "Server error" }, { status: err.status ?? 500 });
   }
-});
-
+}

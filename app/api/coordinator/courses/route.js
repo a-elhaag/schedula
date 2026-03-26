@@ -1,43 +1,60 @@
-import { jsonError, jsonOk, withApiErrorHandling } from "@/lib/server/api";
-import { getCoordinatorCourses, createCourse } from "@/lib/server/coordinatorService";
+import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/server/auth";
+import { getCoordinatorCourses, createCourse } from "@/lib/server/coordinatorService";
+import { resolveInstitutionId } from "@/app/api/coordinator/_helpers/resolve-institution";
 
-export const GET = withApiErrorHandling(async function getCoordinatorCoursesRoute(request) {
+// ── GET /api/coordinator/courses ─────────────────────────────────────────────
+export async function GET(request) {
   try {
-    const user = getCurrentUser(request, { requiredRole: "coordinator" });
+    const { institutionId } = getCurrentUser(request, { requiredRole: "coordinator" });
+
     const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get("limit") ?? "100");
+    const skip  = parseInt(searchParams.get("skip")  ?? "0");
 
-    const departmentId = searchParams.get("departmentId") ?? undefined;
-    const rawLimit = parseInt(searchParams.get("limit") ?? "100", 10);
-    const limit = Math.min(Math.max(Number.isNaN(rawLimit) ? 100 : rawLimit, 0), 500);
-    const rawSkip = parseInt(searchParams.get("skip") ?? "0", 10);
-    const skip = Math.max(Number.isNaN(rawSkip) ? 0 : rawSkip, 0);
+    const iOid      = await resolveInstitutionId(institutionId);
+    const resolvedId = iOid.toString();
+    const result     = await getCoordinatorCourses(resolvedId, { limit, skip });
 
-    const result = await getCoordinatorCourses(user.institutionId, {
-      departmentId,
-      limit,
-      skip,
+    // Add mock fill rate for now (real data needs enrollment tracking)
+    const items = result.items.map(c => ({
+      ...c,
+      fillRate: Math.floor(60 + Math.random() * 35), // replace with real enrollment data
+    }));
+
+    return NextResponse.json({ ...result, items });
+
+  } catch (err) {
+    const status = err.status ?? 500;
+    return NextResponse.json({ message: err.message ?? "Server error" }, { status });
+  }
+}
+
+// ── POST /api/coordinator/courses ─────────────────────────────────────────────
+export async function POST(request) {
+  try {
+    const { institutionId } = getCurrentUser(request, { requiredRole: "coordinator" });
+
+    const body = await request.json();
+    const { code, name, credit_hours, sections } = body;
+
+    if (!code?.trim() || !name?.trim()) {
+      return NextResponse.json({ message: "Course code and name are required." }, { status: 400 });
+    }
+
+    const iOid       = await resolveInstitutionId(institutionId);
+    const resolvedId  = iOid.toString();
+    const course      = await createCourse(resolvedId, {
+      code:         code.trim().toUpperCase(),
+      name:         name.trim(),
+      credit_hours: parseInt(credit_hours) || 3,
+      sections:     parseInt(sections)     || 1,
     });
 
-    return jsonOk(result);
-  } catch (error) {
-    if (error?.status === 400) {
-      return jsonError(error.message, 400);
-    }
-    throw error;
+    return NextResponse.json({ ok: true, course }, { status: 201 });
+
+  } catch (err) {
+    const status = err.status ?? 500;
+    return NextResponse.json({ message: err.message ?? "Server error" }, { status });
   }
-});
-
-export const POST = withApiErrorHandling(async function createCourseRoute(request) {
-  try {
-    const user = getCurrentUser(request, { requiredRole: "coordinator" });
-    const courseData = await request.json();
-
-    const course = await createCourse(user.institutionId, courseData);
-    return jsonOk(course, 201);
-  } catch (error) {
-    if (error?.status === 400) return jsonError(error.message, 400);
-    throw error;
-  }
-});
-
+}

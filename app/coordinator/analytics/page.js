@@ -1,138 +1,165 @@
 "use client";
 
-import { useEffect, useState, Fragment } from "react";
-import { useFetch } from "@/hooks/useFetch";
+import { useState, useEffect, useCallback, Fragment } from "react";
 import "./styles.css";
 
+import { StatCard }  from "@/components/StatCard";
+import Spinner       from "@/components/Spinner";
+import ErrorState    from "@/components/ErrorState";
+import Button        from "@/components/Button";
+import { BoltIcon, CalendarIcon, WarningIcon } from "@/components/icons/index";
+
+const DAYS  = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
+const SLOTS = ["07:30","08:30","09:30","10:30","11:30","12:30","1:30","2:30","3:30","4:30"];
+
+function usageClass(value) {
+  if (value >= 85) return "heat-level-5";
+  if (value >= 70) return "heat-level-4";
+  if (value >= 55) return "heat-level-3";
+  if (value >= 40) return "heat-level-2";
+  return "heat-level-1";
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function CoordinatorAnalyticsPage() {
-  const [termLabel, setTermLabel] = useState("");
-  const [occupancyData, setOccupancyData] = useState(null);
+  const [data,    setData]    = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState(null);
 
-  const { data, error, loading: fetchLoading } = useFetch(
-    `/api/coordinator/analytics?term=${encodeURIComponent(termLabel)}`,
-    { method: "GET" }
-  );
-
-  useEffect(() => {
-    if (data) {
-      setOccupancyData(data);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res  = await fetch("/api/coordinator/analytics");
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message ?? "Failed to load");
+      setData(json);
+    } catch (e) {
+      setError(e.message);
+    } finally {
       setLoading(false);
     }
-  }, [data]);
+  }, []);
 
-  useEffect(() => {
-    setLoading(fetchLoading);
-  }, [fetchLoading]);
+  useEffect(() => { load(); }, [load]);
 
-  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"];
-  const slots = ["08:00", "09:30", "11:00", "12:30", "14:00", "15:30"];
+  if (loading) return <div className="page-container"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (error)   return <div className="page-container"><ErrorState message={error} onRetry={load} /></div>;
 
-  const usageClass = (value) => {
-    if (value >= 85) return "heat-level-5";
-    if (value >= 70) return "heat-level-4";
-    if (value >= 55) return "heat-level-3";
-    if (value >= 40) return "heat-level-2";
-    return "heat-level-1";
-  };
-
-  if (error) {
-    return (
-      <div className="page-container">
-        <main className="analytics-shell">
-          <section className="analytics-hero">
-            <h1>Analytics</h1>
-          </section>
-          <div className="error-state">
-            <h2>Error loading analytics data</h2>
-            <p>{error.message || "Unknown error"}</p>
-          </div>
-        </main>
-      </div>
-    );
-  }
+  const heatmap     = data?.heatmap     ?? {};
+  const stats       = data?.stats       ?? {};
+  const topRooms    = data?.topRooms    ?? [];
+  const activeDays  = data?.activeDays  ?? [];
 
   return (
     <div className="page-container">
       <main className="analytics-shell">
-        <section className="analytics-hero">
+
+        {/* Hero */}
+        <section className="analytics-hero reveal reveal-1">
           <p className="hero-eyebrow">Coordinator Analytics</p>
           <h1>Room Occupancy Heatmap</h1>
           <p>
             Visualize room usage by day and timeslot to spot overload periods
             and improve schedule balance.
           </p>
-          <div className="filter-row">
-            <input
-              type="text"
-              placeholder="Term label (e.g., Spring 2026)"
-              value={termLabel}
-              onChange={(e) => setTermLabel(e.target.value)}
-              className="input"
-            />
-            <button type="button" className="primary-btn" onClick={() => {}}>
-              Refresh
-            </button>
+        </section>
+
+        {/* Stats */}
+        <section className="stats-grid reveal reveal-2">
+          <StatCard label="Total Sessions"  value={String(stats.totalSessions ?? 0)}  trend="This term"          Icon={CalendarIcon} />
+          <StatCard label="Peak Occupancy"  value={`${stats.peakOccupancy ?? 0}%`}    trend={stats.peakSlot ?? "--"} Icon={BoltIcon} />
+          <StatCard label="Rooms Used"      value={String(stats.roomsUsed ?? 0)}      trend={`of ${stats.totalRooms ?? 0} available`} Icon={WarningIcon} />
+        </section>
+
+        {/* Heatmap */}
+        <section className="heatmap-card reveal reveal-3" aria-label="Room occupancy heatmap">
+          <div className="heatmap-header">
+            <div>
+              <h2>Occupancy by Day and Slot</h2>
+              <p>Percentage of rooms occupied at each time slot.</p>
+            </div>
+            <Button variant="ghost" onClick={load}>Refresh</Button>
+          </div>
+
+          <div className="legend-row" aria-hidden="true">
+            <span>Low</span>
+            <div className="legend-scale">
+              <span className="legend-dot heat-level-1" />
+              <span className="legend-dot heat-level-2" />
+              <span className="legend-dot heat-level-3" />
+              <span className="legend-dot heat-level-4" />
+              <span className="legend-dot heat-level-5" />
+            </div>
+            <span>High</span>
+          </div>
+
+          <div className="heatmap-grid" role="table">
+            <div className="corner-cell" aria-hidden="true">Day / Slot</div>
+            {SLOTS.map(slot => (
+              <div key={slot} className="slot-header" role="columnheader">{slot}</div>
+            ))}
+
+            {DAYS.map((day, dayIndex) => (
+              <Fragment key={day}>
+                <div className="day-label" role="rowheader">{day}</div>
+                {SLOTS.map((slot, slotIndex) => {
+                  const value = heatmap[day]?.[slot] ?? 0;
+                  return (
+                    <button
+                      key={`${day}-${slot}`}
+                      type="button"
+                      className={`heat-cell ${usageClass(value)}`}
+                      title={`${day} ${slot}: ${value}% occupied`}
+                      style={{ animationDelay: `${dayIndex * 80 + slotIndex * 45}ms` }}
+                    >
+                      <span>{value > 0 ? `${value}%` : ""}</span>
+                    </button>
+                  );
+                })}
+              </Fragment>
+            ))}
           </div>
         </section>
 
-        {loading ? (
-          <div className="skeleton-grid">
-            {days.map((_, i) => (
-              <div key={i} className="skeleton" />
-            ))}
-          </div>
-        ) : occupancyData ? (
-          <section className="heatmap-card" aria-label="Room occupancy by day and time">
-            <div className="legend-row">
-              <span>Low</span>
-              <div className="legend-scale">
-                <span className="legend-dot heat-level-1" />
-                <span className="legend-dot heat-level-2" />
-                <span className="legend-dot heat-level-3" />
-                <span className="legend-dot heat-level-4" />
-                <span className="legend-dot heat-level-5" />
+        {/* Top rooms + active days */}
+        <div className="analytics-bottom reveal reveal-4">
+          {topRooms.length > 0 && (
+            <section className="panel">
+              <h2>Most Used Rooms</h2>
+              <div className="top-rooms-list">
+                {topRooms.map((r, i) => (
+                  <div key={i} className="top-room-row">
+                    <span className="top-room-name">{r.name}</span>
+                    <div className="fill-track" style={{ flex: 1 }}>
+                      <div className="fill-bar" style={{ "--fill-width": `${r.occupancy}%` }} />
+                    </div>
+                    <span className="top-room-pct">{r.occupancy}%</span>
+                  </div>
+                ))}
               </div>
-              <span>High</span>
-            </div>
-            <div className="stats-row">
-              <p>Avg Occupancy: <strong>{occupancyData.summary?.avgOccupancy || 0}%</strong></p>
-              <button type="button" className="ghost-btn">Export CSV</button>
-            </div>
+            </section>
+          )}
 
-            <div className="heatmap-grid">
-              <div className="corner-cell">Day / Slot</div>
-              {slots.map((slot) => (
-                <div key={slot} className="slot-header">{slot}</div>
-              ))}
+          {activeDays.length > 0 && (
+            <section className="panel">
+              <h2>Sessions per Day</h2>
+              <div className="day-bars">
+                {activeDays.map((d, i) => (
+                  <div key={i} className="day-bar-row">
+                    <span className="day-bar-label">{d.day.slice(0,3)}</span>
+                    <div className="fill-track" style={{ flex: 1 }}>
+                      <div className="fill-bar" style={{ "--fill-width": `${d.pct}%` }} />
+                    </div>
+                    <span className="day-bar-count">{d.count}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
 
-              {days.map((day, dayIndex) => (
-                <Fragment key={day}>
-                  <div className="day-label">{day}</div>
-                  {occupancyData.occupancy[day]?.map((value, slotIndex) => (
-                    <button
-                      key={`${day}-${slots[slotIndex]}`}
-                      type="button"
-                      className={`heat-cell ${usageClass(value)}`}
-                      title={`${day} ${slots[slotIndex]}: ${value}% occupied`}
-                      style={{ animationDelay: `${dayIndex * 80 + slotIndex * 45}ms` }}
-                    >
-                      <span>{value}%</span>
-                    </button>
-                  )) || slots.map((_, i) => (
-                    <div key={i} className="heat-cell heat-level-0" />
-                  ))}
-                </Fragment>
-              ))}
-            </div>
-          </section>
-        ) : (
-          <div className="empty-state">
-            <p>No analytics data available. Generate a schedule first.</p>
-          </div>
-        )}
       </main>
     </div>
   );
 }
-

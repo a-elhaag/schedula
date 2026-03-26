@@ -1,100 +1,193 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import CSVImportDropzone from "@/components/CSVImportDropzone";
-import Toast from "@/components/Toast";
+import Toast             from "@/components/Toast";
+import { StatCard }      from "@/components/StatCard";
+import Button            from "@/components/Button";
+import Spinner           from "@/components/Spinner";
+import ErrorState        from "@/components/ErrorState";
+import Badge             from "@/components/Badge";
+import { DownloadIcon, BoltIcon, WarningIcon } from "@/components/icons/index";
 import "./styles.css";
 
+// ── DatasetCard ───────────────────────────────────────────────────────────────
+function DatasetCard({ dataset }) {
+  const statusVariant = {
+    Ready:   "success",
+    Mapping: "warning",
+    Review:  "info",
+    Error:   "danger",
+  }[dataset.status] ?? "default";
+
+  return (
+    <article className="dataset-card">
+      <div className="dataset-head">
+        <p className="dataset-name">{dataset.name}</p>
+        <Badge variant={statusVariant} size="sm">{dataset.status}</Badge>
+      </div>
+      <p className="dataset-file">{dataset.file}</p>
+      <div className="dataset-meta">
+        <p>{dataset.rows} rows</p>
+        <p>{dataset.progress}% complete</p>
+      </div>
+      <div className="progress-track">
+        <div className="progress-fill" style={{ "--import-progress": `${dataset.progress}%` }} />
+      </div>
+    </article>
+  );
+}
+
+// ── ValidationCard ────────────────────────────────────────────────────────────
+function ValidationCard({ result }) {
+  if (!result) return null;
+  const hasErrors   = result.errors?.length   > 0;
+  const hasWarnings = result.warnings?.length > 0;
+
+  return (
+    <article className={`validation-card ${hasErrors ? "validation-card--error" : ""}`}>
+      <h3>Validation Result</h3>
+      <p className="validation-summary">
+        {result.valid} valid rows &nbsp;|&nbsp;
+        {result.errors?.length ?? 0} errors &nbsp;|&nbsp;
+        {result.warnings?.length ?? 0} warnings
+      </p>
+      {hasErrors && (
+        <ul className="validation-list validation-list--error">
+          {result.errors.slice(0, 5).map((e, i) => <li key={i}>{e}</li>)}
+          {result.errors.length > 5 && <li>...and {result.errors.length - 5} more</li>}
+        </ul>
+      )}
+      {hasWarnings && !hasErrors && (
+        <ul className="validation-list validation-list--warning">
+          {result.warnings.slice(0, 5).map((w, i) => <li key={i}>{w}</li>)}
+        </ul>
+      )}
+    </article>
+  );
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function CoordinatorImportPage() {
-  const [csvFile, setCsvFile] = useState(null);
-  const [toast, setToast] = useState({
-    open: false,
-    variant: "info",
-    title: "",
-    message: "",
-    id: 0,
-  });
+  const [csvFile,      setCsvFile]      = useState(null);
+  const [datasetType,  setDatasetType]  = useState("courses");
+  const [validating,   setValidating]   = useState(false);
+  const [importing,    setImporting]    = useState(false);
+  const [validation,   setValidation]   = useState(null);
+  const [stats,        setStats]        = useState(null);
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState(null);
+  const [toast,        setToast]        = useState({ open: false, variant: "info", title: "", message: "", id: 0 });
 
-  const showToast = (variant, title, message) => {
-    setToast({
-      open: true,
-      variant,
-      title,
-      message,
-      id: Date.now(),
-    });
-  };
+  const showToast = (variant, title, message) =>
+    setToast({ open: true, variant, title, message, id: Date.now() });
 
-  const handleImport = async () => {
-    if (!csvFile) return;
-
-    const formData = new FormData();
-    formData.append('csvFile', csvFile);
-    formData.append('datasetType', 'courses'); // Default to courses; can add selector
-
+  // Load import stats on mount
+  const loadStats = useCallback(async () => {
+    setLoading(true);
     try {
-      showToast("info", "Importing", `Uploading ${csvFile.name}...`);
-      
-      const response = await fetch('/api/coordinator/import', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        showToast("success", "Import Successful", 
-          `Imported ${result.stats.inserted || 0} rows. ${result.stats.warnings || 0} warnings, ${result.stats.errors?.length || 0} errors.`
-        );
-        setCsvFile(null);
-      } else {
-        showToast("error", "Import Failed", result.message || "Validation errors occurred");
-      }
-    } catch (error) {
-      showToast("error", "Upload Error", error.message || "Network error");
+      const res  = await fetch("/api/coordinator/import");
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message);
+      setStats(json);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  const importStats = [
-    { label: "Datasets Ready", value: "6", note: "2 need mapping" },
-    { label: "Rows Validated", value: "4,382", note: "97% clean" },
-    { label: "Last Sync", value: "14:25", note: "Today" },
-  ];
+  useEffect(() => { loadStats(); }, [loadStats]);
 
-  const datasets = [
-    {
-      name: "Courses Catalog",
-      file: "courses_spring_2026.csv",
-      rows: 214,
-      status: "Ready",
-      progress: 100,
-    },
-    {
-      name: "Staff Assignments",
-      file: "staff_assignments.xlsx",
-      rows: 96,
-      status: "Mapping",
-      progress: 72,
-    },
-    {
-      name: "Room Inventory",
-      file: "rooms_capacity.csv",
-      rows: 138,
-      status: "Ready",
-      progress: 100,
-    },
-    {
-      name: "Student Groups",
-      file: "student_groups.csv",
-      rows: 512,
-      status: "Review",
-      progress: 58,
-    },
-  ];
+  // Validate CSV client-side (basic) then send to server
+  async function handleValidate() {
+    if (!csvFile) return;
+    setValidating(true);
+    setValidation(null);
+    try {
+      const text = await csvFile.text();
+      const lines = text.trim().split("\n");
+      const headers = lines[0]?.split(",").map(h => h.trim().toLowerCase()) ?? [];
+
+      // Basic client-side header check
+      const requiredHeaders = {
+        courses: ["code", "name", "credit_hours"],
+        staff:   ["name", "email", "role"],
+        rooms:   ["name", "label", "building"],
+      }[datasetType] ?? [];
+
+      const missing = requiredHeaders.filter(h => !headers.includes(h));
+      if (missing.length > 0) {
+        setValidation({
+          valid:    0,
+          errors:   [`Missing required columns: ${missing.join(", ")}`],
+          warnings: [],
+        });
+        showToast("warning", "Validation Failed", "Fix missing columns and re-upload.");
+        return;
+      }
+
+      // Send to server for deep validation
+      const formData = new FormData();
+      formData.append("file", csvFile);
+      formData.append("type", datasetType);
+
+      const res  = await fetch("/api/coordinator/import/validate", {
+        method: "POST",
+        body:   formData,
+      });
+      const json = await res.json();
+      setValidation(json);
+
+      if (json.errors?.length > 0) {
+        showToast("warning", "Validation Issues", `${json.errors.length} errors found.`);
+      } else {
+        showToast("success", "Validation Passed", `${json.valid} rows ready to import.`);
+      }
+    } catch (e) {
+      showToast("danger", "Error", e.message);
+    } finally {
+      setValidating(false);
+    }
+  }
+
+  // Import to DB
+  async function handleImport() {
+    if (!csvFile || !validation || validation.errors?.length > 0) return;
+    setImporting(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", csvFile);
+      formData.append("type", datasetType);
+
+      const res  = await fetch("/api/coordinator/import", {
+        method: "POST",
+        body:   formData,
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message ?? "Import failed");
+
+      showToast("success", "Import Complete", `${json.imported} records imported successfully.`);
+      setCsvFile(null);
+      setValidation(null);
+      loadStats();
+    } catch (e) {
+      showToast("danger", "Import Failed", e.message);
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  const datasets = stats?.recentImports ?? [];
+
+  if (loading) return <div className="import-page"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (error)   return <div className="import-page"><ErrorState message={error} onRetry={loadStats} /></div>;
 
   return (
     <div className="import-page">
       <main className="import-shell">
+
+        {/* Hero */}
         <section className="hero reveal reveal-1">
           <p className="hero-eyebrow">Coordinator Workspace</p>
           <h1>Import Data</h1>
@@ -104,132 +197,85 @@ export default function CoordinatorImportPage() {
           </p>
         </section>
 
+        {/* Stats */}
         <section className="stats-grid reveal reveal-2">
-          {importStats.map((stat) => (
-            <article className="stat-card" key={stat.label}>
-              <p className="stat-label">{stat.label}</p>
-              <p className="stat-value">{stat.value}</p>
-              <p className="stat-note">{stat.note}</p>
-            </article>
-          ))}
+          <StatCard label="Total Courses" value={String(stats?.coursesCount ?? 0)} trend="In database"      Icon={BoltIcon}    />
+          <StatCard label="Staff Members" value={String(stats?.staffCount   ?? 0)} trend="Professors + TAs" Icon={DownloadIcon} />
+          <StatCard label="Rooms"         value={String(stats?.roomsCount   ?? 0)} trend="Available"        Icon={WarningIcon}  />
         </section>
 
+        {/* Upload panel */}
         <section className="panel reveal reveal-3">
           <div className="panel-head">
             <div>
               <h2>{csvFile ? "File Loaded" : "Import New CSV"}</h2>
-              <p>{csvFile ? "Ready to proceed with validation." : "Select a CSV file to begin."}</p>
+              <p>{csvFile ? `${csvFile.name} ready for validation.` : "Select a CSV file to begin."}</p>
             </div>
+          </div>
+
+          {/* Dataset type selector */}
+          <div className="dataset-type-tabs">
+            {["courses","staff","rooms"].map(t => (
+              <button
+                key={t}
+                className={`filter-tab ${datasetType === t ? "filter-tab--active" : ""}`}
+                onClick={() => { setDatasetType(t); setValidation(null); }}
+              >
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
           </div>
 
           <div className="dropzone-container">
             <CSVImportDropzone
-              onFileSelect={(file) => {
+              onFileSelect={file => {
                 setCsvFile(file);
-                showToast(
-                  "success",
-                  "CSV Loaded",
-                  `${file.name} is ready for validation.`
-                );
+                setValidation(null);
+                showToast("success", "CSV Loaded", `${file.name} is ready for validation.`);
               }}
             />
           </div>
 
           {csvFile && (
             <div className="upload-queue-actions">
-              <button
-                type="button"
-                className="ghost-btn"
-                onClick={() => {
-                  setCsvFile(null);
-                  showToast("info", "Cleared", "CSV selection has been cleared.");
-                }}
-              >
+              <Button variant="ghost" onClick={() => { setCsvFile(null); setValidation(null); }}>
                 Clear File
-              </button>
-              <button
-                type="button"
-                className="primary-btn"
+              </Button>
+              <Button variant="ghost" onClick={handleValidate} disabled={validating}>
+                {validating ? "Validating..." : "Validate CSV"}
+              </Button>
+              <Button
+                variant="primary"
                 onClick={handleImport}
+                disabled={importing || !validation || validation.errors?.length > 0}
               >
-                Validate & Import
-              </button>
+                {importing ? "Importing..." : "Import to Database"}
+              </Button>
             </div>
           )}
+
+          {/* Validation result */}
+          {validation && <ValidationCard result={validation} />}
         </section>
 
-        <section className="panel reveal reveal-3">
-          <div className="panel-head">
-            <div>
-              <h2>Import Queue</h2>
-              <p>Track each file from upload to mapping and validation.</p>
+        {/* Recent imports */}
+        {datasets.length > 0 && (
+          <section className="panel reveal reveal-3">
+            <div className="panel-head">
+              <div>
+                <h2>Recent Imports</h2>
+                <p>Track each file from upload to completion.</p>
+              </div>
             </div>
-          </div>
+            <div className="dataset-grid">
+              {datasets.map((d, i) => <DatasetCard key={i} dataset={d} />)}
+            </div>
+          </section>
+        )}
 
-          <div className="dataset-grid">
-            {datasets.map((dataset) => (
-              <article className="dataset-card" key={dataset.name}>
-                <div className="dataset-head">
-                  <p className="dataset-name">{dataset.name}</p>
-                  <span className={`status-badge status-${dataset.status.toLowerCase()}`}>
-                    {dataset.status}
-                  </span>
-                </div>
-
-                <p className="dataset-file">{dataset.file}</p>
-
-                <div className="dataset-meta">
-                  <p>{dataset.rows} rows</p>
-                  <p>{dataset.progress}% complete</p>
-                </div>
-
-                <div className="progress-track">
-                  <div
-                    className="progress-fill"
-                    style={{ "--import-progress": `${dataset.progress}%` }}
-                  />
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="validation reveal reveal-4">
-          <article className="validation-card">
-            <h3>Validation Summary</h3>
-            <p>17 warnings detected in Staff Assignments dataset.</p>
-            <ul>
-              <li>9 missing instructor IDs</li>
-              <li>5 invalid room codes</li>
-              <li>3 duplicate section keys</li>
-            </ul>
-            <button type="button" className="ghost-btn">
-              Resolve Warnings
-            </button>
-          </article>
-
-          <article className="validation-card">
-            <h3>Next Step</h3>
-            <p>
-              After resolving warnings, publish the clean dataset as the source
-              for schedule generation.
-            </p>
-            <button type="button" className="ghost-btn">
-              Publish Dataset Snapshot
-            </button>
-          </article>
-        </section>
-
-        <Toast
-          key={toast.id}
-          open={toast.open}
-          variant={toast.variant}
-          title={toast.title}
-          message={toast.message}
-          onClose={() => setToast((prev) => ({ ...prev, open: false }))}
-          duration={3200}
-        />
       </main>
+
+      <Toast key={toast.id} open={toast.open} variant={toast.variant} title={toast.title} message={toast.message} onClose={() => setToast(p => ({ ...p, open: false }))} duration={3200} />
     </div>
   );
 }
