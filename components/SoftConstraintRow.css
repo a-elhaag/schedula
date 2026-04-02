@@ -1,0 +1,73 @@
+/* =============================================================================
+   HardConstraintRow.css + SoftConstraintRow.css (shared)
+   Constraint rows for the coordinator constraints page.
+   Uses CSS variables from globals.css - no hardcoded colors.
+============================================================================= */
+
+/* ── Hard constraint row ── */
+.hard-constraint-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border);
+  gap: 16px;
+}
+
+.hard-constraint-row:last-child { border-bottom: none; }
+
+.hard-constraint-row__info  { flex: 1; min-width: 0; }
+.hard-constraint-row__label { font-family: "DM Sans", sans-serif; font-size: 14px; font-weight: 700; color: var(--color-text-primary); margin: 0 0 3px; }
+.hard-constraint-row__desc  { font-family: "DM Sans", sans-serif; font-size: 12px; color: var(--color-text-muted); margin: 0; line-height: 1.5; }
+
+.hard-constraint-row__control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ── Soft constraint row ── */
+.soft-constraint-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border);
+  gap: 16px;
+}
+
+.soft-constraint-row:last-child { border-bottom: none; }
+
+.soft-constraint-row__info  { flex: 1; min-width: 0; }
+.soft-constraint-row__label { font-family: "DM Sans", sans-serif; font-size: 14px; font-weight: 700; color: var(--color-text-primary); margin: 0 0 3px; }
+.soft-constraint-row__desc  { font-family: "DM Sans", sans-serif; font-size: 12px; color: var(--color-text-muted); margin: 0; line-height: 1.5; }
+
+.soft-constraint-row__slider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  min-width: 200px;
+}
+
+/* ── Shared badge ── */
+.constraint-badge {
+  font-family: "DM Sans", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.constraint-badge--hard { background: rgba(255, 59, 48, 0.1); color: #FF3B30; }
+.constraint-badge--soft { background: rgba(0, 113, 227, 0.1); color: var(--color-accent); }
+
+@media (max-width: 700px) {
+  .hard-constraint-row,
+  .soft-constraint-row { flex-direction: column; align-items: flex-start; }
+  .soft-constraint-row__slider { min-width: auto; width: 100%; }
+}

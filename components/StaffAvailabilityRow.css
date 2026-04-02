@@ -1,0 +1,101 @@
+/* =============================================================================
+   StaffAvailabilityRow.css
+   Expandable row for staff availability status display.
+   Uses CSS variables from globals.css - no hardcoded colors.
+============================================================================= */
+
+.avail-row {
+  background: var(--color-background);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: box-shadow 200ms ease;
+}
+
+.avail-row:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); }
+
+.avail-row__main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: background 200ms ease;
+}
+
+.avail-row__main:hover { background: rgba(0, 113, 227, 0.04); }
+
+.avail-row__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: rgba(0, 113, 227, 0.1);
+  color: var(--color-accent);
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avail-row__info       { flex: 1; min-width: 0; }
+.avail-row__name       { font-family: "DM Sans", sans-serif; font-size: 14px; font-weight: 700; color: var(--color-text-primary); margin: 0 0 2px; }
+.avail-row__role       { font-family: "DM Sans", sans-serif; font-size: 12px; color: var(--color-text-muted); margin: 0; }
+.avail-row__slots      { flex-shrink: 0; }
+
+.avail-row__slot-count {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.avail-row__slot-count--none { color: var(--color-text-muted); }
+
+.avail-row__toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--color-text-muted);
+  padding: 0 4px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.avail-row__details {
+  padding: 12px 18px 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.avail-row__day {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.avail-row__day:last-child { margin-bottom: 0; }
+
+.avail-row__day-label {
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-accent);
+  min-width: 36px;
+  flex-shrink: 0;
+}
+
+.avail-row__day-slots { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.avail-slot-badge {
+  background: rgba(0, 113, 227, 0.1);
+  color: var(--color-accent);
+  border: 1px solid rgba(0, 113, 227, 0.2);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
