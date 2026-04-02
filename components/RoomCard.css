@@ -1,0 +1,53 @@
+/* =============================================================================
+   RoomCard.css
+   Room card with label, building badge, and capacity.
+   Uses CSS variables from globals.css - no hardcoded colors.
+============================================================================= */
+
+.room-card {
+  background: var(--color-background);
+  border-radius: 24px;
+  padding: 20px;
+  transition: transform 250ms ease, box-shadow 250ms ease;
+}
+
+.room-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.room-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.room-card__label {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: 0.04em;
+}
+
+.room-card h3 {
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 10px;
+}
+
+.room-card__meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.room-card__meta strong {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
