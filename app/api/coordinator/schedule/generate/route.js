@@ -88,11 +88,11 @@ export async function POST(request) {
     const fastApiUrl = process.env.FASTAPI_URL;
     if (fastApiUrl) {
       try {
-        const solverRes = await fetch(`${fastApiUrl}/solve`, {
+        const solverRes = await fetch(`${fastApiUrl}/schedule/generate`, {
           method:  "POST",
           headers: { "Content-Type":"application/json" },
           body:    JSON.stringify({ institution_id: iOid.toString(), term_label: termLabel }),
-          signal:  AbortSignal.timeout(30000),
+          signal:  AbortSignal.timeout(65000),
         });
         const solved = await solverRes.json();
         if (solverRes.ok && solved.entries) {
