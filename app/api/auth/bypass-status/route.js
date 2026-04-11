@@ -1,30 +1,19 @@
 import { NextResponse } from "next/server";
-import { DEMO_USERS } from "@/lib/demo-users";
+import { DEV_USER } from "@/lib/demo-users";
 
-export async function GET(request) {
-  const bypassAuth = process.env.BYPASS_AUTH === "true";
+export async function GET() {
+  const devMode = process.env.DEV_MODE === "true";
 
-  if (!bypassAuth) {
-    return NextResponse.json({
-      bypassAuthEnabled: false,
-      user: null,
-    });
+  if (!devMode) {
+    return NextResponse.json({ devMode: false, user: null });
   }
 
-  // Get default demo user
-  const defaultUserId =
-    process.env.BYPASS_AUTH_USER_ID || "666666666666666666666601";
-  const defaultRole = process.env.BYPASS_AUTH_USER_ROLE || "coordinator";
-  const defaultEmail =
-    process.env.BYPASS_AUTH_USER_EMAIL || "coordinator@demo.local";
-
   return NextResponse.json({
-    bypassAuthEnabled: true,
+    devMode: true,
     user: {
-      id: defaultUserId,
-      email: defaultEmail,
-      role: defaultRole,
+      id: DEV_USER.id,
+      email: DEV_USER.email,
+      role: DEV_USER.role,
     },
-    demoUsers: DEMO_USERS, // Return all available demo users for reference
   });
 }

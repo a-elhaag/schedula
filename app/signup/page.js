@@ -126,10 +126,18 @@ export default function SignUpPage() {
   return (
     <div className="page-container">
       <div className="signup-card">
-        <h1>Coordinator Sign Up</h1>
+        <h1>Create Account</h1>
         <p className="subtitle">
-          Create the coordinator account for your department.
+          Set up the coordinator account for your department.
         </p>
+
+        <div className="admin-notice" role="note">
+          <span className="admin-notice-icon" aria-hidden="true">ⓘ</span>
+          <span>
+            This page is for <strong>department coordinators (admins) only</strong>.
+            If you&apos;re a professor, TA, or student, ask your coordinator to invite you &mdash; you&apos;ll receive an email with a link to join.
+          </span>
+        </div>
 
         <form className="signup-form" onSubmit={handleSubmit} noValidate>
           <div className="field-group">

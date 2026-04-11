@@ -39,6 +39,29 @@
   animation-delay: 180ms;
 }
 
+.admin-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background-color: #f0f6ff;
+  border: 1px solid #bdd7ff;
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  font-size: 0.9rem;
+  color: #1a3a6b;
+  line-height: 1.45;
+  margin-bottom: 1.25rem;
+  animation: contentFadeUp 480ms ease both;
+  animation-delay: 200ms;
+}
+
+.admin-notice-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+  margin-top: 0.05rem;
+  opacity: 0.75;
+}
+
 .signup-form {
   display: flex;
   flex-direction: column;

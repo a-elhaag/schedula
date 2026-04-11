@@ -9,6 +9,13 @@ import "./styles.css";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const ROLE_REDIRECTS = {
+  coordinator: "/coordinator/setup",
+  professor: "/staff/schedule",
+  ta: "/staff/schedule",
+  student: "/student/schedule",
+};
+
 export default function SignInPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -16,9 +23,11 @@ export default function SignInPage() {
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
 
-  // Check if bypass auth is enabled and redirect
+  // If DEV_MODE is active, skip sign-in and redirect automatically
   useEffect(() => {
-    async function checkBypassAuth() {
+    let cancelled = false;
+
+    async function checkDevMode() {
       try {
         const response = await fetch("/api/auth/bypass-status", {
           method: "GET",
@@ -29,25 +38,20 @@ export default function SignInPage() {
 
         const data = await response.json().catch(() => null);
 
-        if (data?.bypassAuthEnabled && data?.user) {
-          // Redirect based on user role when bypass auth is enabled
-          const roleRedirects = {
-            coordinator: "/coordinator/setup",
-            professor: "/staff/schedule",
-            ta: "/staff/schedule",
-            student: "/student/schedule",
-          };
-
-          const redirectPath =
-            roleRedirects[data.user.role] || "/coordinator/setup";
-          router.push(redirectPath);
+        if (data?.devMode && data?.user) {
+          const redirect = ROLE_REDIRECTS[data.user.role] ?? "/coordinator/setup";
+          if (!cancelled) router.push(redirect);
         }
       } catch {
-        // If the check fails, continue with normal sign-in flow
+        // Silently fall through to normal sign-in
       }
     }
 
-    checkBypassAuth();
+    checkDevMode();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   const isSubmitting = status === "submitting";
@@ -167,7 +171,7 @@ export default function SignInPage() {
         ) : null}
 
         <p className="back-link">
-          New here? <Link href="/signup">Create an account</Link>
+          New coordinator? <Link href="/signup">Create an account</Link>
         </p>
       </div>
     </div>
