@@ -8,6 +8,7 @@ import { StatCard }          from "@/components/StatCard";
 import Modal                 from "@/components/Modal";
 import Toast                 from "@/components/Toast";
 import Spinner               from "@/components/Spinner";
+import SkeletonPage          from "@/components/SkeletonPage";
 import ErrorState            from "@/components/ErrorState";
 import ConflictPanel         from "@/components/ConflictPanel";
 import CoordinatorSessionRow from "@/components/CoordinatorSessionRow";
@@ -63,7 +64,7 @@ export default function CoordinatorScheduleReviewPage() {
 
   const conflictSlots = new Set(conflicts.map(c => c.slot));
 
-  if (loading) return <div className="review-page"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (loading) return <SkeletonPage stats={3} rows={6} />;
   if (error)   return <div className="review-page"><ErrorState message={error} onRetry={load} /></div>;
 
   const sessions  = data?.sessions  ?? [];

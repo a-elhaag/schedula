@@ -7,6 +7,7 @@ import Button        from "@/components/Button";
 import { StatCard }  from "@/components/StatCard";
 import Toast         from "@/components/Toast";
 import Spinner       from "@/components/Spinner";
+import SkeletonPage  from "@/components/SkeletonPage";
 import ErrorState    from "@/components/ErrorState";
 import Badge         from "@/components/Badge";
 import ProgressBar   from "@/components/ProgressBar";
@@ -19,9 +20,11 @@ export default function CoordinatorScheduleGeneratePage() {
   const [generating, setGenerating] = useState(false);
   const [progress,   setProgress]   = useState(0);
   const [statusMsg,  setStatusMsg]  = useState("");
+  const [elapsed,    setElapsed]    = useState(0);
   const [error,      setError]      = useState(null);
   const [toast,      setToast]      = useState({ open:false, variant:"info", title:"", message:"", id:0 });
-  const pollRef = useRef(null);
+  const pollRef    = useRef(null);
+  const timerRef   = useRef(null);
 
   const showToast = (variant, title, message) =>
     setToast({ open:true, variant, title, message, id:Date.now() });
@@ -39,6 +42,30 @@ export default function CoordinatorScheduleGeneratePage() {
 
   useEffect(() => { load(); }, [load]);
 
+  function startElapsedTimer() {
+    setElapsed(0);
+    timerRef.current = setInterval(() => setElapsed(s => s + 1), 1000);
+  }
+
+  function stopElapsedTimer() {
+    clearInterval(timerRef.current);
+  }
+
+  function formatElapsed(s) {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
+  }
+
+  const STATUS_STEPS = [
+    "Initializing solver...",
+    "Loading courses and rooms...",
+    "Building constraint model...",
+    "Running CP-SAT solver...",
+    "Optimizing soft constraints...",
+    "Finalizing timetable...",
+  ];
+
   function startPolling(jobId) {
     let tick = 0;
     pollRef.current = setInterval(async () => {
@@ -46,10 +73,12 @@ export default function CoordinatorScheduleGeneratePage() {
       try {
         const res  = await fetch(`/api/coordinator/schedule/generate?jobId=${jobId}`);
         const json = await res.json();
+        const stepMsg = STATUS_STEPS[Math.min(Math.floor(tick / 2), STATUS_STEPS.length - 1)];
         setProgress(Math.min(tick * 8, 95));
-        setStatusMsg(json.statusMessage ?? "Solver is running...");
+        setStatusMsg(json.statusMessage ?? stepMsg);
         if (json.status === "completed") {
           clearInterval(pollRef.current);
+          stopElapsedTimer();
           setProgress(100);
           setStatusMsg("Schedule generated successfully.");
           setGenerating(false);
@@ -57,23 +86,26 @@ export default function CoordinatorScheduleGeneratePage() {
           load();
         } else if (json.status === "failed") {
           clearInterval(pollRef.current);
+          stopElapsedTimer();
           setGenerating(false);
           showToast("danger", "Failed", json.error ?? "Solver encountered an error.");
           load();
         }
       } catch (e) {
         clearInterval(pollRef.current);
+        stopElapsedTimer();
         setGenerating(false);
       }
     }, 2000);
   }
 
-  useEffect(() => () => clearInterval(pollRef.current), []);
+  useEffect(() => () => { clearInterval(pollRef.current); clearInterval(timerRef.current); }, []);
 
   async function handleGenerate() {
     setGenerating(true);
     setProgress(5);
     setStatusMsg("Initializing solver...");
+    startElapsedTimer();
     try {
       const res  = await fetch("/api/coordinator/schedule/generate", {
         method:  "POST",
@@ -101,7 +133,7 @@ export default function CoordinatorScheduleGeneratePage() {
   const stats     = data?.stats       ?? {};
   const readiness = data?.readiness   ?? {};
 
-  if (loading) return <div className="courses-page"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (loading) return <SkeletonPage stats={3} rows={5} />;
   if (error)   return <div className="courses-page"><ErrorState message={error} onRetry={load} /></div>;
 
   return (
@@ -170,10 +202,17 @@ export default function CoordinatorScheduleGeneratePage() {
 
           {generating && (
             <div className="gen-status">
-              {/* ProgressBar from components/ */}
+              <div className="gen-status__header">
+                <span className="gen-status__label">
+                  <span className="gen-status__dot" />
+                  Solver running
+                </span>
+                <span className="gen-status__timer">{formatElapsed(elapsed)}</span>
+              </div>
               <ProgressBar value={progress} label={statusMsg} />
               <p className="gen-status__hint">
-                This may take a few minutes depending on the number of courses and constraints.
+                Please wait — this can take up to 2 minutes depending on the
+                number of courses, staff, and constraints.
               </p>
             </div>
           )}

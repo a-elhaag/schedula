@@ -7,6 +7,7 @@ import Button                from "@/components/Button";
 import { StatCard }          from "@/components/StatCard";
 import Toast                 from "@/components/Toast";
 import Spinner               from "@/components/Spinner";
+import SkeletonPage          from "@/components/SkeletonPage";
 import ErrorState            from "@/components/ErrorState";
 import CoordinatorSessionRow from "@/components/CoordinatorSessionRow";
 import { DownloadIcon, CalendarIcon, BoltIcon, UserIcon } from "@/components/icons/index";
@@ -61,7 +62,7 @@ export default function CoordinatorSchedulePublishedPage() {
   const daySessions = sessions[activeDay] ?? [];
   const allSessions = Object.values(sessions).flat();
 
-  if (loading) return <div className="courses-page"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (loading) return <SkeletonPage stats={3} rows={6} />;
   if (error)   return <div className="courses-page"><ErrorState message={error} onRetry={load} /></div>;
 
   if (!data?.scheduleId) return (

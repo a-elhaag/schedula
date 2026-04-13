@@ -5,6 +5,7 @@ import "./styles.css";
 
 import { StatCard }  from "@/components/StatCard";
 import Spinner       from "@/components/Spinner";
+import SkeletonPage  from "@/components/SkeletonPage";
 import ErrorState    from "@/components/ErrorState";
 import Button        from "@/components/Button";
 import { BoltIcon, CalendarIcon, WarningIcon } from "@/components/icons/index";
@@ -43,7 +44,7 @@ export default function CoordinatorAnalyticsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  if (loading) return <div className="page-container"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (loading) return <SkeletonPage stats={3} rows={5} />;
   if (error)   return <div className="page-container"><ErrorState message={error} onRetry={load} /></div>;
 
   const heatmap     = data?.heatmap     ?? {};

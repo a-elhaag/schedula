@@ -8,6 +8,7 @@ import { StatCard }  from "@/components/StatCard";
 import Modal         from "@/components/Modal";
 import Toast         from "@/components/Toast";
 import Spinner       from "@/components/Spinner";
+import SkeletonPage  from "@/components/SkeletonPage";
 import ErrorState    from "@/components/ErrorState";
 import { Input }     from "@/components/Input";
 import CourseCard    from "@/components/CourseCard";
@@ -70,7 +71,7 @@ export default function CoordinatorCoursesPage() {
     ? Math.round(courses.reduce((a, c) => a + (c.fillRate ?? 0), 0) / courses.length)
     : 0;
 
-  if (loading) return <div className="courses-page"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (loading) return <SkeletonPage stats={3} rows={5} />;
   if (error)   return <div className="courses-page"><ErrorState message={error} onRetry={load} /></div>;
 
   return (

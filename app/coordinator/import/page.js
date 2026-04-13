@@ -6,6 +6,7 @@ import Toast             from "@/components/Toast";
 import { StatCard }      from "@/components/StatCard";
 import Button            from "@/components/Button";
 import Spinner           from "@/components/Spinner";
+import SkeletonPage      from "@/components/SkeletonPage";
 import ErrorState        from "@/components/ErrorState";
 import Badge             from "@/components/Badge";
 import { DownloadIcon, BoltIcon, WarningIcon } from "@/components/icons/index";
@@ -180,7 +181,7 @@ export default function CoordinatorImportPage() {
 
   const datasets = stats?.recentImports ?? [];
 
-  if (loading) return <div className="import-page"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (loading) return <SkeletonPage stats={3} rows={4} />;
   if (error)   return <div className="import-page"><ErrorState message={error} onRetry={loadStats} /></div>;
 
   return (
