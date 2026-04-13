@@ -1,0 +1,60 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   SkeletonPage.css
+   Generic coordinator-page loading skeleton.
+───────────────────────────────────────────────────────────────────────────── */
+
+.skp-wrap {
+  padding: 3rem 2rem 4rem;
+  max-width: 80rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Hero */
+.skp-hero { display: flex; flex-direction: column; gap: 0.625rem; }
+.skp-eyebrow  { height: 0.75rem; width: 9rem;  border-radius: 9999px; }
+.skp-title    { height: 2.75rem; width: 18rem; border-radius: 1.25rem; }
+.skp-subtitle { height: 1rem;   width: 26rem; border-radius: 9999px; }
+
+/* Stat grid */
+.skp-stats {
+  display: grid;
+  grid-template-columns: repeat(var(--skp-cols, 3), 1fr);
+  gap: 1rem;
+}
+.skp-stat {
+  height: 6.5rem;
+  border-radius: 2.75rem;
+}
+
+/* Panel */
+.skp-panel {
+  background: var(--color-surface);
+  border-radius: 2.75rem;
+  padding: 1.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.skp-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.skp-panel-title { height: 1.375rem; width: 10rem; border-radius: 0.75rem; }
+.skp-panel-btn   { height: 2.25rem;  width: 7.5rem; border-radius: 9999px;  }
+
+/* Rows */
+.skp-rows { display: flex; flex-direction: column; gap: 0.625rem; }
+.skp-row  { height: 3.5rem; border-radius: 1.75rem; }
+
+@media (max-width: 43.75rem) {
+  .skp-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .skp-title    { width: 12rem; }
+  .skp-subtitle { width: 16rem; }
+}

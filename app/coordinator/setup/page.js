@@ -6,6 +6,7 @@ import "./styles.css";
 import Button     from "@/components/Button";
 import Toast      from "@/components/Toast";
 import Spinner    from "@/components/Spinner";
+import SkeletonPage from "@/components/SkeletonPage";
 import ErrorState from "@/components/ErrorState";
 import { Input }  from "@/components/Input";
 import { BoltIcon, CalendarIcon, HomeIcon, UserIcon } from "@/components/icons/index";
@@ -126,7 +127,7 @@ export default function CoordinatorSetupPage() {
     finally { setSaving(false); }
   }
 
-  if (loading) return <div className="courses-page"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (loading) return <SkeletonPage stats={0} rows={4} />;
   if (error)   return <div className="courses-page"><ErrorState message={error} onRetry={load} /></div>;
 
   if (done) return (

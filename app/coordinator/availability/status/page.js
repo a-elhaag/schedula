@@ -5,6 +5,7 @@ import "./styles.css";
 
 import { StatCard }          from "@/components/StatCard";
 import Spinner               from "@/components/Spinner";
+import SkeletonPage          from "@/components/SkeletonPage";
 import ErrorState            from "@/components/ErrorState";
 import Button                from "@/components/Button";
 import StaffAvailabilityRow  from "@/components/StaffAvailabilityRow";
@@ -41,7 +42,7 @@ export default function CoordinatorAvailabilityStatusPage() {
   const missing   = staff.filter(m => m.status !== "submitted").length;
   const coverage  = staff.length ? Math.round((submitted / staff.length) * 100) : 0;
 
-  if (loading) return <div className="courses-page"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (loading) return <SkeletonPage stats={3} rows={6} />;
   if (error)   return <div className="courses-page"><ErrorState message={error} onRetry={load} /></div>;
 
   return (

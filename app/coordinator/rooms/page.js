@@ -8,6 +8,7 @@ import { StatCard } from "@/components/StatCard";
 import Modal       from "@/components/Modal";
 import Toast       from "@/components/Toast";
 import Spinner     from "@/components/Spinner";
+import SkeletonPage from "@/components/SkeletonPage";
 import ErrorState  from "@/components/ErrorState";
 import { Input }   from "@/components/Input";
 import RoomCard    from "@/components/RoomCard";
@@ -71,7 +72,7 @@ export default function CoordinatorRoomsPage() {
     r.label.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) return <div className="courses-page"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (loading) return <SkeletonPage stats={3} rows={5} />;
   if (error)   return <div className="courses-page"><ErrorState message={error} onRetry={load} /></div>;
 
   return (

@@ -7,6 +7,7 @@ import Button             from "@/components/Button";
 import { StatCard }       from "@/components/StatCard";
 import Toast              from "@/components/Toast";
 import Spinner            from "@/components/Spinner";
+import SkeletonPage       from "@/components/SkeletonPage";
 import ErrorState         from "@/components/ErrorState";
 import HardConstraintRow  from "@/components/HardConstraintRow";
 import SoftConstraintRow  from "@/components/SoftConstraintRow";
@@ -79,7 +80,7 @@ export default function CoordinatorConstraintsPage() {
     showToast("info", "Reset", "Constraints reset to defaults.");
   }
 
-  if (loading) return <div className="courses-page"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (loading) return <SkeletonPage stats={2} rows={6} />;
   if (error)   return <div className="courses-page"><ErrorState message={error} onRetry={load} /></div>;
 
   const hardEnabled = Object.values(hard).filter(Boolean).length;

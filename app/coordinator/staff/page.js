@@ -8,6 +8,7 @@ import { StatCard } from "@/components/StatCard";
 import Modal       from "@/components/Modal";
 import Toast       from "@/components/Toast";
 import Spinner     from "@/components/Spinner";
+import SkeletonPage from "@/components/SkeletonPage";
 import ErrorState  from "@/components/ErrorState";
 import { Input }   from "@/components/Input";
 import MemberCard  from "@/components/MemberCard";
@@ -73,7 +74,7 @@ export default function CoordinatorStaffPage() {
   const tas        = staff.filter(s => s.role === "ta").length;
   const highLoad   = staff.filter(s => (s.workload ?? 0) >= 85).length;
 
-  if (loading) return <div className="staff-page"><div className="review-loading"><Spinner size="lg" /></div></div>;
+  if (loading) return <SkeletonPage stats={3} rows={5} />;
   if (error)   return <div className="staff-page"><ErrorState message={error} onRetry={load} /></div>;
 
   return (
