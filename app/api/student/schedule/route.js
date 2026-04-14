@@ -128,8 +128,11 @@ export async function GET(request) {
     });
 
   } catch (err) {
-    console.error("[student/schedule] error:", err);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+    const status = err.status ?? 500;
+    return Response.json(
+      { error: status === 500 ? "Internal server error" : err.message },
+      { status },
+    );
   }
 }
 

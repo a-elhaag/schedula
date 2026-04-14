@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/jwt";
-import { getDemoUserById } from "@/lib/demo-users";
 import { logger } from "@/lib/logger";
 
 export async function GET(request) {
@@ -8,25 +7,17 @@ export async function GET(request) {
 
   // Check if bypass auth is enabled
   if (process.env.BYPASS_AUTH === "true") {
-    // Try to get user ID from header (set by proxy.js)
-    const headerUserId = request.headers.get("x-user-id");
-    const headerRole = request.headers.get("x-user-role");
-    const headerEmail = request.headers.get("x-user-email");
-
-    const demoUser = headerUserId ? getDemoUserById(headerUserId) : null;
-
+    // Use headers injected by proxy.js, then fall back to env defaults
     const userId =
-      demoUser?.id ||
+      request.headers.get("x-user-id") ||
       process.env.BYPASS_AUTH_USER_ID ||
       "666666666666666666666601";
     const role =
-      demoUser?.role ||
-      headerRole ||
+      request.headers.get("x-user-role") ||
       process.env.BYPASS_AUTH_USER_ROLE ||
       "coordinator";
     const email =
-      demoUser?.email ||
-      headerEmail ||
+      request.headers.get("x-user-email") ||
       process.env.BYPASS_AUTH_USER_EMAIL ||
       "coordinator@demo.local";
     const institution = "demo-institution";

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { verifyTokenEdge } from "@/lib/edge-auth";
-import { DEMO_USERS, getDemoUserById } from "@/lib/demo-users";
 
 /**
  * proxy.js
@@ -64,43 +63,11 @@ export async function proxy(request) {
 
   // Check if bypass auth is enabled for development
   if (process.env.BYPASS_AUTH === "true") {
-    // Skip token verification and use demo user info
     const requestHeaders = new Headers(request.headers);
-
-    // Check for x-user-id header to switch between demo users
-    const headerUserId = request.headers.get("x-user-id");
-    let bypassUser = null;
-
-    if (headerUserId) {
-      // Try to find demo user by ID
-      bypassUser = getDemoUserById(headerUserId);
-    }
-
-    // Fall back to default demo user from env
-    if (!bypassUser) {
-      const defaultUserId =
-        process.env.BYPASS_AUTH_USER_ID || "666666666666666666666601";
-      const defaultRole = process.env.BYPASS_AUTH_USER_ROLE || "coordinator";
-      const defaultEmail =
-        process.env.BYPASS_AUTH_USER_EMAIL || "coordinator@demo.local";
-
-      bypassUser = {
-        id: defaultUserId,
-        email: defaultEmail,
-        role: defaultRole,
-      };
-    }
-
-    requestHeaders.set("x-user-id", bypassUser.id);
-    requestHeaders.set("x-user-email", bypassUser.email);
-    requestHeaders.set("x-user-role", bypassUser.role);
-    return withRequestId(
-      NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      }),
-    );
+    requestHeaders.set("x-user-id",    process.env.BYPASS_AUTH_USER_ID    || "666666666666666666666601");
+    requestHeaders.set("x-user-role",  process.env.BYPASS_AUTH_USER_ROLE  || "coordinator");
+    requestHeaders.set("x-user-email", process.env.BYPASS_AUTH_USER_EMAIL || "coordinator@demo.local");
+    return withRequestId(NextResponse.next({ request: { headers: requestHeaders } }));
   }
 
   // Get required roles for protected route
@@ -114,27 +81,31 @@ export async function proxy(request) {
   const authToken = request.cookies.get("auth_token")?.value;
 
   if (!authToken) {
-    // No token — redirect to signin
-    return withRequestId(
-      NextResponse.redirect(new URL("/signin", request.url)),
-    );
+    // No token — redirect to signin, preserving destination
+    const url = new URL("/signin", request.url);
+    url.searchParams.set("redirect", pathname);
+    return withRequestId(NextResponse.redirect(url));
   }
 
   const payload = await verifyTokenEdge(authToken);
 
   if (!payload) {
-    // Invalid or expired token — redirect to signin
-    return withRequestId(
-      NextResponse.redirect(new URL("/signin", request.url)),
-    );
+    // Invalid or expired token — redirect to signin, preserving destination
+    const url = new URL("/signin", request.url);
+    url.searchParams.set("redirect", pathname);
+    return withRequestId(NextResponse.redirect(url));
   }
 
-  // Check role
+  // Cross-role guard: prevent users from accessing routes outside their role
   if (!requiredRoles.includes(payload.role)) {
-    // User doesn't have required role
-    return withRequestId(
-      NextResponse.redirect(new URL("/unauthorized", request.url)),
-    );
+    const ROLE_HOME = {
+      coordinator: "/coordinator/setup",
+      professor:   "/staff/schedule",
+      ta:          "/staff/schedule",
+      student:     "/student/schedule",
+    };
+    const dest = ROLE_HOME[payload.role] ?? "/unauthorized";
+    return withRequestId(NextResponse.redirect(new URL(dest, request.url)));
   }
 
   // Token valid and role matches — allow request
