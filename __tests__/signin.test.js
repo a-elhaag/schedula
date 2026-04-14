@@ -5,7 +5,7 @@
 import { POST } from '@/app/api/auth/signin/route';
 import { createTestRequest, createTestResponse, getJsonResponse, createTestUser, getAllUsers } from './utils';
 import { comparePassword } from '@/lib/password';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 describe('POST /api/auth/signin', () => {
   it('should sign in user with valid credentials', async () => {
