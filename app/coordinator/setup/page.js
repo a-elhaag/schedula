@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import "./styles.css";
 
 import Button     from "@/components/Button";
@@ -149,7 +150,12 @@ export default function CoordinatorSetupPage() {
             {form.institutionName} is set up for {form.termLabel}.
             Working days: {form.workingDays.join(", ")}.
           </p>
-          <Button variant="primary" onClick={() => setDone(false)}>Edit Setup</Button>
+          <div style={{ display:"flex", gap:"0.75rem", justifyContent:"center", flexWrap:"wrap" }}>
+            <Link href="/coordinator/courses">
+              <Button variant="primary">Go to Courses →</Button>
+            </Link>
+            <Button variant="secondary" onClick={() => setDone(false)}>Edit Setup</Button>
+          </div>
         </div>
       </main>
     </div>
