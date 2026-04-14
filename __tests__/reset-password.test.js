@@ -24,7 +24,7 @@ describe('POST /api/auth/reset-password', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(200);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.ok).toBe(true);
     expect(data.message).toContain('successfully');
 
@@ -44,7 +44,7 @@ describe('POST /api/auth/reset-password', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('invalid or has expired');
   });
 
@@ -66,7 +66,7 @@ describe('POST /api/auth/reset-password', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('invalid or has expired');
   });
 
@@ -86,7 +86,7 @@ describe('POST /api/auth/reset-password', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('Password must');
   });
 
@@ -99,7 +99,7 @@ describe('POST /api/auth/reset-password', () => {
     const response = await POST(req);
 
     expect(response.status).toBe(400);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.message).toContain('invalid or has expired');
   });
 });

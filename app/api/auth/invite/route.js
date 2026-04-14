@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { verifyToken } from "@/lib/jwt";
+import { getCurrentUser } from "@/lib/server/auth";
 import { generateToken } from "@/lib/auth";
 import { validateEmail, sendInviteEmail, INVITE_TTL_MS } from "@/lib/auth-helpers";
 import { logger } from "@/lib/logger";
@@ -65,14 +65,14 @@ export async function POST(request) {
     );
   }
 
-  const authToken = request.cookies.get("auth_token")?.value;
-  const payload = authToken ? verifyToken(authToken) : null;
-
-  if (!payload || payload.role !== "coordinator") {
+  let currentUser;
+  try {
+    currentUser = getCurrentUser(request, { requiredRole: "coordinator" });
+  } catch (err) {
     logger.warn({ requestId }, "Unauthorized invite attempt - coordinator access required");
     return NextResponse.json(
       { message: "Coordinator access required." },
-      { status: 401 },
+      { status: err.status ?? 401 },
     );
   }
 
@@ -96,13 +96,13 @@ export async function POST(request) {
     const inviteExpiresAt = new Date(Date.now() + INVITE_TTL_MS);
 
     const newUser = {
-      institution_id: new ObjectId(payload.institution),
+      institution_id: new ObjectId(currentUser.institutionId),
       email,
       password_hash: null,
       role,
       name: name || email.split("@")[0],
       invite_status: "pending",
-      invited_by: new ObjectId(payload.sub),
+      invited_by: new ObjectId(currentUser.userId),
       invite_token: inviteToken,
       invite_expires_at: inviteExpiresAt,
       email_verified_at: null,
@@ -135,7 +135,7 @@ export async function POST(request) {
     }
 
     logger.info(
-      { requestId, email, role, invitedBy: payload.sub },
+      { requestId, email, role, invitedBy: currentUser.userId },
       "Invite created successfully",
     );
     return NextResponse.json(

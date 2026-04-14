@@ -12,7 +12,7 @@ describe('GET /api/health', () => {
     const response = await GET(req);
 
     expect(response.status).toBe(200);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.status).toBe('healthy');
     expect(data.checks.database).toBe('ok');
     expect(data.timestamp).toBeTruthy();
@@ -23,7 +23,7 @@ describe('GET /api/health', () => {
     const req = createTestRequest('GET', '/api/health');
     const response = await GET(req);
 
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     const responseTime = new Date(data.timestamp);
 
     expect(responseTime.getTime()).toBeGreaterThanOrEqual(beforeTime.getTime() - 1000);
@@ -37,7 +37,7 @@ describe('GET /api/health', () => {
     const response = await GET(req);
 
     expect(response.status).toBe(200);
-    const data = getJsonResponse(response);
+    const data = await getJsonResponse(response);
     expect(data.status).toBe('healthy');
   });
 });

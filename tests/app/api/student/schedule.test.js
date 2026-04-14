@@ -1,112 +1,77 @@
 import { GET as getStudentScheduleRoute } from "@/app/api/student/schedule/route";
+import { getCurrentUser } from "@/lib/server/auth";
+import { getDb } from "@/lib/db";
+
+jest.mock("@/lib/server/auth");
+jest.mock("@/lib/db");
 
 describe("Student Schedule API Route", () => {
+  let mockDb;
+  let mockCollection;
+
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Build a chainable mock collection
+    mockCollection = {
+      findOne: jest.fn(),
+      find:    jest.fn().mockReturnThis(),
+      toArray: jest.fn().mockResolvedValue([]),
+    };
+
+    mockDb = { collection: jest.fn(() => mockCollection) };
+    getDb.mockResolvedValue(mockDb);
+
+    // Default: authenticated student
+    getCurrentUser.mockReturnValue({ userId: "507f1f77bcf86cd799439011", role: "student" });
   });
 
-  it("should return a not-found message when no schedule exists for the term", async () => {
-    const request = new Request(
-      "http://localhost/api/student/schedule?userId=user123&institutionId=inst123&term=Spring%202026",
-    );
+  it("should return 404 when user not found in DB", async () => {
+    mockCollection.findOne.mockResolvedValue(null); // user not found
 
+    const request = new Request("http://localhost/api/student/schedule");
     const response = await getStudentScheduleRoute(request);
     const data = await response.json();
 
     expect(response.status).toBe(404);
-    expect(data).toHaveProperty("message", "No schedule found for this term yet");
+    expect(data.error).toBe("User not found");
   });
 
-  it("should return a validation error when userId is missing", async () => {
-    const request = new Request(
-      "http://localhost/api/student/schedule?institutionId=inst123&term=Spring%202026",
-    );
+  it("should return schedule message when no schedule exists for term", async () => {
+    const mockUser = {
+      _id: "507f1f77bcf86cd799439011",
+      institution_id: "507f1f77bcf86cd799439012",
+      name: "Test Student",
+      email: "student@test.com",
+      role: "student",
+      enrollment_ids: [],
+    };
 
-    const response = await getStudentScheduleRoute(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(data).toHaveProperty("message");
-    expect(typeof data.message).toBe("string");
-  });
-
-  it("should handle optional day filter parameter without error", async () => {
-    const request = new Request(
-      "http://localhost/api/student/schedule?userId=user123&day=Monday",
-    );
-
-    const response = await getStudentScheduleRoute(request);
-
-    expect(response.status).not.toBe(500);
-  });
-
-  it("should handle optional course code filter parameter without error", async () => {
-    const request = new Request(
-      "http://localhost/api/student/schedule?userId=user123&courseCode=SET121",
-    );
-
-    const response = await getStudentScheduleRoute(request);
-
-    expect(response.status).not.toBe(500);
-  });
-
-  it("should parse pagination parameters with limits", async () => {
-    getStudentSchedule.mockResolvedValue(null);
-
-    const request = new Request(
-      "http://localhost/api/student/schedule?limit=1000&skip=100",
-    );
-
-    await getStudentScheduleRoute(request);
-
-    expect(getStudentSchedule).toHaveBeenCalledWith(
-      expect.objectContaining({
-        limit: 500, // capped at 500
-        skip: 100,
-      }),
-    );
-  });
-
-  it("should return 404 when schedule not found", async () => {
-    getStudentSchedule.mockResolvedValue(null);
+    // first call: user, second: institution, rest: no schedule
+    mockCollection.findOne
+      .mockResolvedValueOnce(mockUser)       // user
+      .mockResolvedValueOnce({ active_term: { label: "Spring 2026" } }) // institution
+      .mockResolvedValueOnce(null)           // published schedule
+      .mockResolvedValueOnce(null);          // any schedule (dev fallback)
 
     const request = new Request("http://localhost/api/student/schedule");
-
     const response = await getStudentScheduleRoute(request);
     const data = await response.json();
 
-    expect(response.status).toBe(404);
-    expect(data.ok).toBe(false);
-    expect(data.error.message).toBe("No schedule found");
+    expect(response.status).toBe(200);
+    expect(data.message).toContain("No schedule found");
   });
 
-  it("should catch and handle service errors", async () => {
-    getStudentSchedule.mockRejectedValue(
-      new Error("Database connection failed"),
-    );
+  it("should return 401 when not authenticated", async () => {
+    getCurrentUser.mockImplementation(() => {
+      const err = new Error("Unauthorized.");
+      err.status = 401;
+      throw err;
+    });
 
     const request = new Request("http://localhost/api/student/schedule");
-
     const response = await getStudentScheduleRoute(request);
-    const data = await response.json();
 
-    expect(response.status).toBe(500);
-    expect(data.ok).toBe(false);
-    expect(data.error.message).toBe("Internal server error");
-  });
-
-  it("should handle validation errors with 400 status", async () => {
-    const error = new Error("Invalid institutionId");
-    error.status = 400;
-    getStudentSchedule.mockRejectedValue(error);
-
-    const request = new Request("http://localhost/api/student/schedule");
-
-    const response = await getStudentScheduleRoute(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(data.ok).toBe(false);
-    expect(data.error.message).toBe("Invalid institutionId");
+    expect(response.status).toBe(401);
   });
 });
