@@ -40,8 +40,22 @@ export async function POST(request) {
 
     const text    = await file.text();
     const lines   = text.trim().split("\n").filter(Boolean);
-    const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
-    const rows    = lines.slice(1);
+    const rawHeaders = lines[0].split(",").map(h => h.trim().toLowerCase());
+    const dataRows = lines.slice(1);
+
+    const headerAliases = {
+      "course code": "code", "course_code": "code",
+      "course name": "name", "course_name": "name",
+      "credits": "credit_hours", "credit hours": "credit_hours",
+      "room label": "label", "room code": "label",
+      "seats": "capacity",
+      "term": "term_label",
+      "enrolled": "enrolled_students", "students": "enrolled_students",
+      "course_id": "course_id"
+    };
+
+    const headers = rawHeaders.map(h => headerAliases[h] || h);
+    const rows = dataRows;
 
     const db   = await getDb();
     const iOid = new ObjectId(institutionId);
@@ -151,10 +165,11 @@ export async function POST(request) {
         
         if (ObjectId.isValid(obj.course_id ?? "")) {
           courseId = new ObjectId(obj.course_id);
-        } else if (obj.course_code) {
+        } else if (obj.course_code || obj.code) {
+          const cCode = obj.course_code || obj.code;
           const course = await courseCollection.findOne({
             institution_id: iOid,
-            code: obj.course_code.toUpperCase(),
+            code: cCode.toUpperCase(),
             deleted_at: null,
           });
           if (course) {

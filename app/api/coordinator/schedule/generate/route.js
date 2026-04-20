@@ -98,56 +98,84 @@ export async function POST(request) {
     let solverUnavailable = false;
 
     if (fastApiUrl) {
-      try {
-        const solverRes = await fetch(`${fastApiUrl}/schedule/generate`, {
-          method:  "POST",
-          headers: { "Content-Type":"application/json" },
-          body:    JSON.stringify({ institution_id: iOid.toString(), term_label: termLabel }),
-          signal:  AbortSignal.timeout(65000),
-        });
-
-        let solved = {};
+      // Run the solver in the background to prevent Vercel/HTTP timeouts on large datasets
+      const runSolverAsync = async () => {
         try {
-          solved = await solverRes.json();
-        } catch {
-          solved = {};
-        }
+          const solverRes = await fetch(`${fastApiUrl}/schedule/generate`, {
+            method:  "POST",
+            headers: { "Content-Type":"application/json" },
+            body:    JSON.stringify({ institution_id: iOid.toString(), term_label: termLabel }),
+            signal:  AbortSignal.timeout(300000), // 5 min background timeout
+          });
 
-        if (solverRes.ok && isSolverInfeasibleResult(solved)) {
-          const infeasibleError = buildInfeasibleError(solved);
+          let solved = {};
+          try {
+            solved = await solverRes.json();
+          } catch {
+            solved = {};
+          }
+
+          if (solverRes.ok && isSolverInfeasibleResult(solved)) {
+            const infeasibleError = buildInfeasibleError(solved);
+            await updateJob({
+              status: ScheduleJobStatus.FAILED_INFEASIBLE,
+              status_message: "Solver returned an infeasible schedule.",
+              error: infeasibleError,
+            });
+            return;
+          }
+
+          if (solverRes.ok && Array.isArray(solved.entries) && solved.entries.length > 0) {
+            const scheduleResult = await db.collection("schedules").insertOne({
+              institution_id: iOid,
+              term_label:     termLabel,
+              entries:        solved.entries,
+              is_published:   false,
+              created_at:     new Date(),
+            });
+
+            await updateJob({
+              status: ScheduleJobStatus.COMPLETED,
+              sessions_count: solved.entries.length,
+              schedule_id: scheduleResult.insertedId,
+              status_message: "Done.",
+              error: null,
+            });
+            return;
+          }
+
+          const solverError = {
+            type: "solver_error",
+            message:
+              solved?.detail ??
+              solved?.message ??
+              `Solver request failed with HTTP ${solverRes.status}`,
+            details: solved,
+          };
+
           await updateJob({
-            status: ScheduleJobStatus.FAILED_INFEASIBLE,
-            status_message: "Solver returned an infeasible schedule.",
-            error: infeasibleError,
+            status: ScheduleJobStatus.FAILED,
+            status_message: "Solver request failed.",
+            error: solverError,
           });
-
-          return NextResponse.json({
-            ok: false,
-            jobId: jobId.toString(),
-            status: ScheduleJobStatus.FAILED_INFEASIBLE,
-            error: infeasibleError,
-          });
-        }
-
-        if (solverRes.ok && Array.isArray(solved.entries) && solved.entries.length > 0) {
-          const scheduleResult = await db.collection("schedules").insertOne({
-            institution_id: iOid,
-            term_label:     termLabel,
-            entries:        solved.entries,
-            is_published:   false,
-            created_at:     new Date(),
-          });
-
+        } catch (solverErr) {
+          solverUnavailable = true;
           await updateJob({
-            status: ScheduleJobStatus.COMPLETED,
-            sessions_count: solved.entries.length,
-            schedule_id: scheduleResult.insertedId,
-            status_message: "Done.",
-            error: null,
+            status_message: "Primary solver unavailable. Switching to fallback generator...",
+            error: {
+              type: "solver_unavailable",
+              message: solverErr?.message ?? "Solver unavailable",
+            },
           });
-
-          return NextResponse.json({ ok:true, jobId: jobId.toString(), schedule: { id: scheduleResult.insertedId.toString() } });
+          runFallbackAsync();
         }
+      };
+
+      runSolverAsync().catch(console.error);
+
+      // Return immediately so the client can start polling
+      return NextResponse.json({ ok: true, jobId: jobId.toString(), message: "Job started in background" });
+    }
 
         const solverError = {
           type: "solver_error",
@@ -185,84 +213,91 @@ export async function POST(request) {
       }
     }
 
-    // Fallback: generate basic schedule from existing data
-    const [courses, staff, rooms, availability] = await Promise.all([
-      db.collection("courses").find({ institution_id: iOid, deleted_at: null }).toArray(),
-      db.collection("users").find({   institution_id: iOid, deleted_at: null, role: { $in: ["professor","ta"] } }).toArray(),
-      db.collection("rooms").find({   institution_id: iOid, deleted_at: null }).toArray(),
-      db.collection("availability").find({ institution_id: iOid, term_label: termLabel }).toArray(),
-    ]);
+    const runFallbackAsync = async () => {
+      try {
+        const [courses, staff, rooms, availability] = await Promise.all([
+          db.collection("courses").find({ institution_id: iOid, deleted_at: null }).toArray(),
+          db.collection("users").find({   institution_id: iOid, deleted_at: null, role: { $in: ["professor","ta"] } }).toArray(),
+          db.collection("rooms").find({   institution_id: iOid, deleted_at: null }).toArray(),
+          db.collection("availability").find({ institution_id: iOid, term_label: termLabel }).toArray(),
+        ]);
 
-    const workingDays = institution?.active_term?.working_days ?? ["Saturday","Sunday","Monday","Tuesday","Wednesday"];
-    const dailyStart  = institution?.settings?.daily_start ?? "08:00";
-    const slotMins    = institution?.settings?.slot_duration_minutes ?? 60;
-    const entries     = [];
+        const workingDays = institution?.active_term?.working_days ?? ["Saturday","Sunday","Monday","Tuesday","Wednesday"];
+        const dailyStart  = institution?.settings?.daily_start ?? "08:00";
+        const slotMins    = institution?.settings?.slot_duration_minutes ?? 60;
+        const entries     = [];
 
-    let dayIdx = 0, slotHour = parseInt(dailyStart.split(":")[0]);
-    const dailyEndHour = parseInt((institution?.settings?.daily_end ?? "17:00").split(":")[0]);
+        let dayIdx = 0, slotHour = parseInt(dailyStart.split(":")[0]);
+        const dailyEndHour = parseInt((institution?.settings?.daily_end ?? "17:00").split(":")[0]);
 
-    for (const course of courses) {
-      for (const section of (course.sections ?? [])) {
-        const day      = workingDays[dayIdx % workingDays.length];
-        const staffMember = staff.find(s =>
-          section.assigned_staff?.some(id => id?.toString() === s._id.toString())
-        ) ?? staff[dayIdx % Math.max(staff.length, 1)];
-        const room = rooms.find(r => r.label === section.required_room_label)
-          ?? rooms[dayIdx % Math.max(rooms.length, 1)];
+        for (const course of courses) {
+          for (const section of (course.sections ?? [])) {
+            const day      = workingDays[dayIdx % workingDays.length];
+            const staffMember = staff.find(s =>
+              section.assigned_staff?.some(id => id?.toString() === s._id.toString())
+            ) ?? staff[dayIdx % Math.max(staff.length, 1)];
+            const room = rooms.find(r => r.label === section.required_room_label)
+              ?? rooms[dayIdx % Math.max(rooms.length, 1)];
 
-        if (!staffMember || !room) { dayIdx++; continue; }
+            if (!staffMember || !room) { dayIdx++; continue; }
 
-        const startH = slotHour;
-        const endH   = startH + Math.ceil(slotMins / 60);
-        if (endH > dailyEndHour) { slotHour = parseInt(dailyStart.split(":")[0]); dayIdx++; continue; }
+            const startH = slotHour;
+            const endH   = startH + Math.ceil(slotMins / 60);
+            if (endH > dailyEndHour) { slotHour = parseInt(dailyStart.split(":")[0]); dayIdx++; continue; }
 
-        entries.push({
-          course_id:  course._id,
-          section_id: section.section_id,
-          room_id:    room._id,
-          staff_id:   staffMember._id,
-          day,
-          start:      `${String(startH).padStart(2,"0")}:00`,
-          end:        `${String(endH).padStart(2,"0")}:00`,
+            entries.push({
+              course_id:  course._id,
+              section_id: section.section_id,
+              room_id:    room._id,
+              staff_id:   staffMember._id,
+              day,
+              start:      `${String(startH).padStart(2,"0")}:00`,
+              end:        `${String(endH).padStart(2,"0")}:00`,
+            });
+
+            slotHour = endH;
+            if (slotHour >= dailyEndHour) { slotHour = parseInt(dailyStart.split(":")[0]); dayIdx++; }
+            dayIdx++;
+          }
+        }
+
+        const scheduleResult = await db.collection("schedules").insertOne({
+          institution_id: iOid,
+          term_label:     termLabel,
+          entries,
+          is_published:   false,
+          created_at:     new Date(),
         });
 
-        slotHour = endH;
-        if (slotHour >= dailyEndHour) { slotHour = parseInt(dailyStart.split(":")[0]); dayIdx++; }
-        dayIdx++;
+        const usedFallback = Boolean(fastApiUrl) && solverUnavailable;
+
+        await updateJob({
+          status: usedFallback ? ScheduleJobStatus.COMPLETED_FALLBACK : ScheduleJobStatus.COMPLETED,
+          sessions_count: entries.length,
+          schedule_id: scheduleResult.insertedId,
+          status_message: usedFallback
+            ? "Generated using fallback scheduler because primary solver was unavailable."
+            : "Done.",
+          error: usedFallback
+            ? {
+                type: "fallback_used",
+                message: "Primary solver unavailable. Generated with basic scheduler.",
+              }
+            : null,
+        });
+      } catch (err) {
+        await updateJob({
+          status: ScheduleJobStatus.FAILED,
+          status_message: "Fallback scheduler failed.",
+          error: { message: err.message },
+        });
       }
+    };
+
+    if (!fastApiUrl) {
+      runFallbackAsync().catch(console.error);
+      return NextResponse.json({ ok: true, jobId: jobId.toString(), message: "Fallback job started in background" });
     }
-
-    const scheduleResult = await db.collection("schedules").insertOne({
-      institution_id: iOid,
-      term_label:     termLabel,
-      entries,
-      is_published:   false,
-      created_at:     new Date(),
-    });
-
-    const usedFallback = Boolean(fastApiUrl) && solverUnavailable;
-
-    await updateJob({
-      status: usedFallback ? ScheduleJobStatus.COMPLETED_FALLBACK : ScheduleJobStatus.COMPLETED,
-      sessions_count: entries.length,
-      schedule_id: scheduleResult.insertedId,
-      status_message: usedFallback
-        ? "Generated using fallback scheduler because primary solver was unavailable."
-        : "Done.",
-      error: usedFallback
-        ? {
-            type: "fallback_used",
-            message: "Primary solver unavailable. Generated with basic scheduler.",
-          }
-        : null,
-    });
-
-    return NextResponse.json({
-      ok:       true,
-      jobId:    jobId.toString(),
-      status:   usedFallback ? ScheduleJobStatus.COMPLETED_FALLBACK : ScheduleJobStatus.COMPLETED,
-      schedule: { id: scheduleResult.insertedId.toString(), entriesCount: entries.length },
-    });
 
   } catch (err) {
     return NextResponse.json({ message: err.message ?? "Server error" }, { status: err.status ?? 500 });
