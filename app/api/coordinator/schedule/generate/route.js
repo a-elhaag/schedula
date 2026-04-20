@@ -3,6 +3,11 @@ import { getCurrentUser } from "@/lib/server/auth";
 import { resolveInstitutionId } from "@/app/api/coordinator/_helpers/resolve-institution";
 import { getDb } from "@/lib/db";
 import { ObjectId } from "mongodb";
+import {
+  ScheduleJobStatus,
+  isSolverInfeasibleResult,
+  buildInfeasibleError,
+} from "@/lib/scheduleJobContract";
 
 // ── GET /api/coordinator/schedule/generate ────────────────────────────────────
 // Returns readiness stats + recent jobs. Also polls job status if jobId given.
@@ -49,8 +54,10 @@ export async function GET(request) {
       recentJobs: recentJobs.map(j => ({
         id:             j._id.toString(),
         status:         j.status,
+        status_message: j.status_message ?? null,
         term_label:     j.term_label,
         sessions_count: j.sessions_count ?? 0,
+        error:          j.error ?? null,
         created_at:     j.created_at,
       })),
     });
@@ -76,16 +83,20 @@ export async function POST(request) {
     const job = {
       institution_id: iOid,
       term_label:     termLabel,
-      status:         "running",
+      status:         ScheduleJobStatus.RUNNING,
       status_message: "Initializing...",
       created_at:     new Date(),
       created_by:     ObjectId.isValid(user.userId) ? new ObjectId(user.userId) : null,
     };
     const jobResult = await db.collection("schedule_jobs").insertOne(job);
     const jobId     = jobResult.insertedId;
+    const updateJob = (patch) =>
+      db.collection("schedule_jobs").updateOne({ _id: jobId }, { $set: patch });
 
     // Try FastAPI solver if configured
     const fastApiUrl = process.env.FASTAPI_URL;
+    let solverUnavailable = false;
+
     if (fastApiUrl) {
       try {
         const solverRes = await fetch(`${fastApiUrl}/schedule/generate`, {
@@ -94,8 +105,31 @@ export async function POST(request) {
           body:    JSON.stringify({ institution_id: iOid.toString(), term_label: termLabel }),
           signal:  AbortSignal.timeout(65000),
         });
-        const solved = await solverRes.json();
-        if (solverRes.ok && solved.entries) {
+
+        let solved = {};
+        try {
+          solved = await solverRes.json();
+        } catch {
+          solved = {};
+        }
+
+        if (solverRes.ok && isSolverInfeasibleResult(solved)) {
+          const infeasibleError = buildInfeasibleError(solved);
+          await updateJob({
+            status: ScheduleJobStatus.FAILED_INFEASIBLE,
+            status_message: "Solver returned an infeasible schedule.",
+            error: infeasibleError,
+          });
+
+          return NextResponse.json({
+            ok: false,
+            jobId: jobId.toString(),
+            status: ScheduleJobStatus.FAILED_INFEASIBLE,
+            error: infeasibleError,
+          });
+        }
+
+        if (solverRes.ok && Array.isArray(solved.entries) && solved.entries.length > 0) {
           const scheduleResult = await db.collection("schedules").insertOne({
             institution_id: iOid,
             term_label:     termLabel,
@@ -103,14 +137,51 @@ export async function POST(request) {
             is_published:   false,
             created_at:     new Date(),
           });
-          await db.collection("schedule_jobs").updateOne(
-            { _id: jobId },
-            { $set: { status:"completed", sessions_count: solved.entries.length, schedule_id: scheduleResult.insertedId, status_message:"Done." } }
-          );
+
+          await updateJob({
+            status: ScheduleJobStatus.COMPLETED,
+            sessions_count: solved.entries.length,
+            schedule_id: scheduleResult.insertedId,
+            status_message: "Done.",
+            error: null,
+          });
+
           return NextResponse.json({ ok:true, jobId: jobId.toString(), schedule: { id: scheduleResult.insertedId.toString() } });
         }
+
+        const solverError = {
+          type: "solver_error",
+          message:
+            solved?.detail ??
+            solved?.message ??
+            `Solver request failed with HTTP ${solverRes.status}`,
+          details: solved,
+        };
+
+        await updateJob({
+          status: ScheduleJobStatus.FAILED,
+          status_message: "Solver request failed.",
+          error: solverError,
+        });
+
+        return NextResponse.json(
+          {
+            ok: false,
+            jobId: jobId.toString(),
+            status: ScheduleJobStatus.FAILED,
+            error: solverError,
+          },
+          { status: 502 }
+        );
       } catch (solverErr) {
-        // FastAPI unavailable -- fall through to basic generation
+        solverUnavailable = true;
+        await updateJob({
+          status_message: "Primary solver unavailable. Switching to fallback generator...",
+          error: {
+            type: "solver_unavailable",
+            message: solverErr?.message ?? "Solver unavailable",
+          },
+        });
       }
     }
 
@@ -169,14 +240,27 @@ export async function POST(request) {
       created_at:     new Date(),
     });
 
-    await db.collection("schedule_jobs").updateOne(
-      { _id: jobId },
-      { $set: { status:"completed", sessions_count: entries.length, schedule_id: scheduleResult.insertedId, status_message:"Done." } }
-    );
+    const usedFallback = Boolean(fastApiUrl) && solverUnavailable;
+
+    await updateJob({
+      status: usedFallback ? ScheduleJobStatus.COMPLETED_FALLBACK : ScheduleJobStatus.COMPLETED,
+      sessions_count: entries.length,
+      schedule_id: scheduleResult.insertedId,
+      status_message: usedFallback
+        ? "Generated using fallback scheduler because primary solver was unavailable."
+        : "Done.",
+      error: usedFallback
+        ? {
+            type: "fallback_used",
+            message: "Primary solver unavailable. Generated with basic scheduler.",
+          }
+        : null,
+    });
 
     return NextResponse.json({
       ok:       true,
       jobId:    jobId.toString(),
+      status:   usedFallback ? ScheduleJobStatus.COMPLETED_FALLBACK : ScheduleJobStatus.COMPLETED,
       schedule: { id: scheduleResult.insertedId.toString(), entriesCount: entries.length },
     });
 

@@ -1027,4 +1027,113 @@
 .week-session-dot--lecture     { background: rgba(0,113,227,0.6); }
 .week-session-dot--tutorial    { background: rgba(0,113,227,0.35); }
 .week-session-dot--lab         { background: rgba(0,113,227,0.85); }
+
+/* ── Revision comparison ── */
+.revision-controls {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.revision-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 220px;
+}
+
+.revision-field span {
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.revision-field select {
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  padding: 0 10px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background: var(--color-background);
+}
+
+.revision-error {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  color: #b91c1c;
+  margin: 6px 0 12px;
+}
+
+.revision-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.revision-stat {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.revision-stat__label {
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin: 0 0 6px;
+}
+
+.revision-stat__value {
+  font-family: "DM Serif Display", serif;
+  font-size: 24px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.revision-stat__value--added { color: #065f46; }
+.revision-stat__value--removed { color: #991b1b; }
+.revision-stat__value--updated { color: #1d4ed8; }
+
+.revision-change-lists {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.revision-change-lists h3 {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+}
+
+.revision-change-item {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  color: var(--color-text-primary);
+  margin: 0 0 6px;
+}
+
+.revision-change-item--muted {
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 920px) {
+  .revision-summary-grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
+
+  .revision-change-lists {
+    grid-template-columns: 1fr;
+  }
+}
  

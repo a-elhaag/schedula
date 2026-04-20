@@ -1,5 +1,6 @@
 import Badge from "./Badge";
 import "./JobStatusCard.css";
+import { normalizeStatusLabel, ScheduleJobStatus } from "@/lib/scheduleJobContract";
 
 /**
  * JobStatusCard Component
@@ -14,10 +15,12 @@ import "./JobStatusCard.css";
  */
 export default function JobStatusCard({ job }) {
   const statusVariant = {
-    completed: "success",
-    running:   "info",
-    failed:    "danger",
-    pending:   "warning",
+    [ScheduleJobStatus.COMPLETED]: "success",
+    [ScheduleJobStatus.COMPLETED_FALLBACK]: "warning",
+    [ScheduleJobStatus.RUNNING]: "info",
+    [ScheduleJobStatus.FAILED]: "danger",
+    [ScheduleJobStatus.FAILED_INFEASIBLE]: "danger",
+    [ScheduleJobStatus.PENDING]: "warning",
   }[job.status] ?? "default";
 
   const date = job.created_at
@@ -35,6 +38,11 @@ export default function JobStatusCard({ job }) {
       })
     : "";
 
+  const metaText =
+    job.status_message ||
+    job.error?.message ||
+    `${job.sessions_count ?? "--"} sessions generated`;
+
   return (
     <div className="job-status-card">
       <div className="job-status-card__time">
@@ -43,11 +51,9 @@ export default function JobStatusCard({ job }) {
       </div>
       <div className="job-status-card__info">
         <p className="job-status-card__title">{job.term_label ?? "Schedule Job"}</p>
-        <p className="job-status-card__meta">
-          {job.sessions_count ?? "--"} sessions generated
-        </p>
+        <p className="job-status-card__meta">{metaText}</p>
       </div>
-      <Badge variant={statusVariant} size="sm">{job.status}</Badge>
+      <Badge variant={statusVariant} size="sm">{normalizeStatusLabel(job.status)}</Badge>
     </div>
   );
 }

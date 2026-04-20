@@ -13,6 +13,7 @@ import Badge         from "@/components/Badge";
 import ProgressBar   from "@/components/ProgressBar";
 import JobStatusCard from "@/components/JobStatusCard";
 import { BoltIcon, CalendarIcon, RocketIcon } from "@/components/icons/index";
+import { ScheduleJobStatus } from "@/lib/scheduleJobContract";
 
 export default function CoordinatorScheduleGeneratePage() {
   const [data,       setData]       = useState(null);
@@ -22,6 +23,7 @@ export default function CoordinatorScheduleGeneratePage() {
   const [statusMsg,  setStatusMsg]  = useState("");
   const [elapsed,    setElapsed]    = useState(0);
   const [error,      setError]      = useState(null);
+  const [generationError, setGenerationError] = useState(null);
   const [toast,      setToast]      = useState({ open:false, variant:"info", title:"", message:"", id:0 });
   const pollRef    = useRef(null);
   const timerRef   = useRef(null);
@@ -76,19 +78,43 @@ export default function CoordinatorScheduleGeneratePage() {
         const stepMsg = STATUS_STEPS[Math.min(Math.floor(tick / 2), STATUS_STEPS.length - 1)];
         setProgress(Math.min(tick * 8, 95));
         setStatusMsg(json.statusMessage ?? stepMsg);
-        if (json.status === "completed") {
+
+        if (json.status === ScheduleJobStatus.COMPLETED || json.status === ScheduleJobStatus.COMPLETED_FALLBACK) {
           clearInterval(pollRef.current);
           stopElapsedTimer();
           setProgress(100);
-          setStatusMsg("Schedule generated successfully.");
+          setStatusMsg(
+            json.status === ScheduleJobStatus.COMPLETED_FALLBACK
+              ? "Schedule generated using fallback scheduler."
+              : "Schedule generated successfully."
+          );
           setGenerating(false);
-          showToast("success", "Done", "Schedule generated and saved.");
+          if (json.status === ScheduleJobStatus.COMPLETED_FALLBACK) {
+            const msg = json.error?.message ?? "Primary solver was unavailable; basic scheduler was used.";
+            setGenerationError(msg);
+            showToast("info", "Fallback Used", msg);
+          } else {
+            setGenerationError(null);
+            showToast("success", "Done", "Schedule generated and saved.");
+          }
           load();
-        } else if (json.status === "failed") {
+        } else if (json.status === ScheduleJobStatus.FAILED_INFEASIBLE) {
           clearInterval(pollRef.current);
           stopElapsedTimer();
           setGenerating(false);
-          showToast("danger", "Failed", json.error ?? "Solver encountered an error.");
+          setProgress(100);
+          setStatusMsg("Solver reported an infeasible schedule.");
+          const details = json.error?.validationErrors?.[0] ?? json.error?.message ?? "No feasible schedule found.";
+          setGenerationError(details);
+          showToast("danger", "Infeasible", details);
+          load();
+        } else if (json.status === ScheduleJobStatus.FAILED) {
+          clearInterval(pollRef.current);
+          stopElapsedTimer();
+          setGenerating(false);
+          const msg = json.error?.message ?? json.error ?? "Solver encountered an error.";
+          setGenerationError(msg);
+          showToast("danger", "Failed", msg);
           load();
         }
       } catch (e) {
@@ -103,6 +129,7 @@ export default function CoordinatorScheduleGeneratePage() {
 
   async function handleGenerate() {
     setGenerating(true);
+    setGenerationError(null);
     setProgress(5);
     setStatusMsg("Initializing solver...");
     startElapsedTimer();
@@ -124,6 +151,7 @@ export default function CoordinatorScheduleGeneratePage() {
         load();
       }
     } catch (e) {
+      setGenerationError(e.message);
       setGenerating(false);
       showToast("danger", "Error", e.message);
     }
@@ -219,6 +247,22 @@ export default function CoordinatorScheduleGeneratePage() {
 
           {!generating && jobs.length === 0 && (
             <p className="empty-msg">No schedules generated yet.</p>
+          )}
+
+          {!generating && generationError && (
+            <div className="gen-status" style={{ marginTop: 16, borderColor: "#ef4444", background: "#fef2f2" }}>
+              <div className="gen-status__header">
+                <span className="gen-status__label" style={{ color: "#b91c1c" }}>
+                  Solver feedback
+                </span>
+              </div>
+              <p className="gen-status__hint" style={{ marginTop: 8, color: "#7f1d1d" }}>
+                {generationError}
+              </p>
+              <p className="gen-status__hint" style={{ marginTop: 4, color: "#7f1d1d" }}>
+                Recommended checks: room capacity, required room labels, and staff availability coverage.
+              </p>
+            </div>
           )}
         </section>
 
