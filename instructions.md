@@ -33,14 +33,14 @@ Schedula is a university scheduling SaaS with a premium, academic design languag
 ### Design System Rules (Non-Negotiable)
 
 1. **Color System:**
-   - Use token-based color classes: `bg-accent`, `text-primary`, `border-border`, `bg-background`
-   - **Never** hardcode Tailwind colors (`bg-blue-50`, `text-emerald-700`, etc.) for component-level colors
+   - Use CSS variables for all colors: `var(--color-accent)`, `var(--color-text-primary)`, etc.
+   - **Never** hardcode hex values or magic color codes in component styles
    - Exception: semantic status colors (Conflict red `#FF3B30`, Available green `#34C759`, Pending orange `#FF9500`) are fixed
 
 2. **Typography:**
    - Font stack: DM Serif Display (headings), DM Sans (body/UI), system-ui monospace (code)
    - Never use Inter, Roboto, Arial, or generic system fonts as primary typeface
-   - Use Tailwind typography classes: `text-display`, `text-heading`, `text-body`, `text-label`
+   - Use semantic utility classes: `.text-display`, `.text-heading`, `.text-body`, `.text-label`
 
 3. **Component Consistency:**
    - All components must match specifications in `DesignSpec.md` exactly
@@ -76,10 +76,10 @@ Write code for clarity, longevity, and team collaboration.
 
 ### CSS & Styling
 
-- Use Tailwind classes exclusively; avoid inline `style` attributes
+- Use Vanilla CSS and CSS modules; avoid inline `style` attributes
 - Never use `!important` — restructure selectors instead
-- Group related Tailwind classes for readability (layout, sizing, colors, spacing, effects)
-- Create Tailwind component classes in CSS modules for repeated patterns
+- Use CSS variables for all design tokens (colors, spacing, shadows)
+- Group related styles logically in CSS files
 - All spacing must respect the design system scale (8px, 16px, 24px, 32px, etc.)
 
 ### State Management
@@ -158,11 +158,8 @@ utils/
   └── validation.js
 ```
 
-### Reusability & DRY
-
 - Extract repeated logic into utilities or hooks
 - Create component variants using props rather than copying code
-- Use Tailwind @apply for repeated class patterns
 - Build small, focused utilities for common operations
 
 ---
@@ -172,7 +169,7 @@ utils/
 Before committing code, verify:
 
 - [ ] Design matches `DesignSpec.md` exactly (colors, spacing, typography, shadows)
-- [ ] No hardcoded Tailwind color classes (use tokens from design system)
+- [ ] No hardcoded hex values (use CSS variables from design system)
 - [ ] Component has clear, single responsibility
 - [ ] Props are documented with JSDoc comments
 - [ ] State is managed at the lowest necessary level
@@ -191,7 +188,7 @@ Before committing code, verify:
 - **Design System:** `DesignSpec.md` (single source of truth for UI)
 - **Type Scale & Components:** See DesignSpec sections 3, 4, 6
 - **Motion Guidelines:** DesignSpec section 7
-- **Tailwind Config:** Configured in `tailwind.config.js` with design tokens
+- **CSS Tokens:** Defined in `app/globals.css` with design variables
 
 ---
 
