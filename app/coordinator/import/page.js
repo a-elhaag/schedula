@@ -115,7 +115,19 @@ export default function CoordinatorImportPage() {
         courses: ["code", "name", "credit_hours"],
         staff:   ["name", "email", "role"],
         rooms:   ["name", "label", "building"],
+        enrollments: ["term_label", "capacity"]
       }[datasetType] ?? [];
+
+      // Enrollment exception
+      if (datasetType === "enrollments" && !headers.includes("course_code") && !headers.includes("course_id") && !headers.includes("code")) {
+        setValidation({
+          valid:    0,
+          errors:   [`Missing required column: course_code or course_id`],
+          warnings: [],
+        });
+        showToast("warning", "Validation Failed", "Fix missing columns and re-upload.");
+        return;
+      }
 
       const missing = requiredHeaders.filter(h => !headers.includes(h));
       if (missing.length > 0) {
@@ -216,7 +228,7 @@ export default function CoordinatorImportPage() {
 
           {/* Dataset type selector */}
           <div className="dataset-type-tabs">
-            {["courses","staff","rooms"].map(t => (
+            {["courses","staff","rooms","enrollments"].map((t) => (
               <button
                 key={t}
                 className={`filter-tab ${datasetType === t ? "filter-tab--active" : ""}`}

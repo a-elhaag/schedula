@@ -24,6 +24,7 @@ export default function CoordinatorRoomsPage() {
   const [building,  setBuilding]  = useState("all");
   const [toast,     setToast]     = useState({ open:false, variant:"info", title:"", message:"", id:0 });
   const [form,      setForm]      = useState({ name:"", label:"", building:"", capacity:"30" });
+  const [editingId, setEditingId] = useState(null);
 
   const showToast = (variant, title, message) =>
     setToast({ open:true, variant, title, message, id:Date.now() });
@@ -43,26 +44,53 @@ export default function CoordinatorRoomsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  async function handleCreate() {
+  async function handleCreateOrUpdate() {
     if (!form.name.trim() || !form.label.trim()) {
       showToast("warning", "Validation", "Room name and label are required.");
       return;
     }
     setSaving(true);
     try {
-      const res  = await fetch("/api/coordinator/rooms", {
-        method:  "POST",
+      const url = editingId ? `/api/coordinator/rooms/${editingId}` : "/api/coordinator/rooms";
+      const method = editingId ? "PUT" : "POST";
+      const res  = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify(form),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.message ?? "Failed to create");
-      showToast("success", "Room Added", `${form.name} has been added.`);
+      if (!res.ok) throw new Error(json.message ?? "Failed to save");
+      showToast("success", editingId ? "Room Updated" : "Room Added", `${form.name} has been saved.`);
       setShowModal(false);
       setForm({ name:"", label:"", building:"", capacity:"30" });
+      setEditingId(null);
       load();
     } catch (e) { showToast("danger", "Error", e.message); }
     finally { setSaving(false); }
+  }
+
+  async function handleDelete(roomId) {
+    if (!confirm("Are you sure you want to delete this room? This action cannot be undone.")) return;
+    try {
+      const res = await fetch(`/api/coordinator/rooms/${roomId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete room");
+      showToast("success", "Deleted", "Room has been deleted.");
+      load();
+    } catch (e) {
+      showToast("danger", "Error", e.message);
+    }
+  }
+
+  function openCreate() {
+    setEditingId(null);
+    setForm({ name:"", label:"", building:"", capacity:"30" });
+    setShowModal(true);
+  }
+
+  function openEdit(room) {
+    setEditingId(room.id);
+    setForm({ name: room.name, label: room.label, building: room.building || "", capacity: room.capacity || 30 });
+    setShowModal(true);
   }
 
   const rooms     = data?.items ?? [];
@@ -106,7 +134,7 @@ export default function CoordinatorRoomsPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
-              <Button variant="primary" onClick={() => setShowModal(true)}>Add Room</Button>
+              <Button variant="primary" onClick={openCreate}>Add Room</Button>
             </div>
           </div>
 
@@ -126,9 +154,8 @@ export default function CoordinatorRoomsPage() {
             <p className="empty-msg">No rooms found.</p>
           ) : (
             <div className="courses-grid">
-              {/* RoomCard from components/ */}
               {filtered.map(room => (
-                <RoomCard key={room.id} room={room} />
+                <RoomCard key={room.id} room={room} onEdit={openEdit} onDelete={handleDelete} />
               ))}
             </div>
           )}
@@ -144,13 +171,13 @@ export default function CoordinatorRoomsPage() {
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title="Add New Room"
-        description="Add a classroom, lab, or tutorial room."
+        title={editingId ? "Edit Room" : "Add New Room"}
+        description={editingId ? "Update room details." : "Add a classroom, lab, or tutorial room."}
         footer={
           <div className="modal-footer-actions">
             <Button variant="ghost" onClick={() => setShowModal(false)}>Cancel</Button>
-            <Button variant="primary" onClick={handleCreate} disabled={saving}>
-              {saving ? "Adding..." : "Add Room"}
+            <Button variant="primary" onClick={handleCreateOrUpdate} disabled={saving}>
+              {saving ? "Saving..." : (editingId ? "Update Room" : "Add Room")}
             </Button>
           </div>
         }

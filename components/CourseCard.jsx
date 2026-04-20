@@ -1,4 +1,6 @@
 import Badge from "./Badge";
+import Button from "./Button";
+import { EditIcon, TrashIcon } from "./icons/index";
 import "./CourseCard.css";
 
 /**
@@ -11,7 +13,7 @@ import "./CourseCard.css";
  * @example
  * <CourseCard course={course} />
  */
-export default function CourseCard({ course }) {
+export default function CourseCard({ course, onEdit, onDelete }) {
   const typeVariant = {
     Lecture:  "info",
     Lab:      "warning",
@@ -25,10 +27,16 @@ export default function CourseCard({ course }) {
   return (
     <article className="course-card">
       <div className="course-head">
-        <span className="course-code">{course.code}</span>
-        {course.type && (
-          <Badge variant={typeVariant} size="sm">{course.type}</Badge>
-        )}
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <span className="course-code">{course.code}</span>
+          {course.type && (
+            <Badge variant={typeVariant} size="sm">{course.type}</Badge>
+          )}
+        </div>
+        <div style={{ display: "flex", gap: "4px" }}>
+          {onEdit && <Button variant="ghost" size="sm" icon={<EditIcon size={14} />} onClick={() => onEdit(course)} />}
+          {onDelete && <Button variant="ghost" size="sm" icon={<TrashIcon size={14} />} onClick={() => onDelete(course.id)} />}
+        </div>
       </div>
       <h3>{course.name}</h3>
       <p className="course-credits">{course.credits} credit hours</p>
