@@ -1,4 +1,4 @@
-# Schedula — Design Specification
+th # Schedula — Design Specification
 
 > This file is the single source of truth for all UI decisions in this codebase.
 > GitHub Copilot, all contributors, and all AI tools must follow this document exactly.
@@ -31,44 +31,38 @@ The experience should feel like using a well-designed university portal crossed 
 | `text-muted`   | `#6E6E73` | Secondary text          | Captions, placeholders, nav items, metadata                         |
 | `border`       | `#E8E8ED` | Structural lines        | Dividers, input borders, card outlines                              |
 
-### Tailwind Config
+### CSS Variable Configuration
 
-Add this to `tailwind.config.js`:
+The theme tokens are managed as CSS variables in `app/globals.css`.
 
-```js
-theme: {
-  extend: {
-    colors: {
-      background: '#F5F5F7',
-      surface: '#FFFFFF',
-      accent: '#0071E3',
-      border: '#E8E8ED',
-      text: {
-        primary: '#1D1D1F',
-        muted: '#6E6E73',
-      },
-    },
-  },
+```css
+:root {
+  --color-background: #F5F5F7;
+  --color-surface: #FFFFFF;
+  --color-accent: #0071E3;
+  --color-border: #E8E8ED;
+  --color-text-primary: #1D1D1F;
+  --color-text-muted: #6E6E73;
 }
 ```
 
 ### Color Rules
 
-- **Never** hardcode Tailwind color classes (`bg-blue-50`, `text-emerald-700`, `bg-purple-50`) for component-level colors — they break palette switching
-- **Always** use token classes: `bg-accent`, `text-accent`, `bg-accent/10`, `text-text-primary`, `bg-background`, `border-border`
+- **Never** hardcode hex values or magic color codes in component styles — they break palette switching
+- **Always** use variable tokens: `var(--color-accent)`, `var(--color-text-primary)`, `var(--color-background)`, `var(--color-border)`
 - **Exception:** semantic status colors (Conflict red, Available green, Pending orange) may use fixed values since they carry meaning independent of palette
 
 ### Status / Badge Colors (fixed, not palette-dependent)
 
 | Status    | Background   | Text      |
 | --------- | ------------ | --------- |
-| Lecture   | `accent/10`  | `accent`  |
-| Tutorial  | `accent/20`  | `accent`  |
-| Lab       | `accent/30`  | `accent`  |
-| Conflict  | `#FF3B30/10` | `#FF3B30` |
-| Available | `#34C759/10` | `#34C759` |
-| Pending   | `#FF9500/10` | `#FF9500` |
-| Active    | `#34C759/10` | `#34C759` |
+| Lecture   | `var(--color-accent) [opacity 0.1]` | `var(--color-accent)` |
+| Tutorial  | `var(--color-accent) [opacity 0.2]` | `var(--color-accent)` |
+| Lab       | `var(--color-accent) [opacity 0.3]` | `var(--color-accent)` |
+| Conflict  | `#FF3B30 [opacity 0.1]` | `#FF3B30` |
+| Available | `#34C759 [opacity 0.1]` | `#34C759` |
+| Pending   | `#FF9500 [opacity 0.1]` | `#FF9500` |
+| Active    | `#34C759 [opacity 0.1]` | `#34C759` |
 
 ---
 
@@ -105,17 +99,6 @@ Code / Hex:         ui-monospace, monospace
 | Nav / UI             | DM Sans          | 500    | 13px    | normal           | —                 |
 | Monospace            | system mono      | 400    | 10–11px | normal           | `font-mono`       |
 
-### Tailwind Typography Extension
-
-```js
-fontSize: {
-  display: ['48px', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
-  heading: ['28px', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '800' }],
-  subheading: ['17px', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '700' }],
-  body: ['14px', { lineHeight: '1.6' }],
-  label: ['11px', { lineHeight: '1', letterSpacing: '0.08em', fontWeight: '700', textTransform: 'uppercase' }],
-}
-```
 
 ---
 
@@ -281,12 +264,11 @@ Properties animated: top, left, width, height, border-radius, box-shadow
 [action buttons: Download Syllabus | View Roster]
 ```
 
-**Type badges (use accent-based tokens, not hardcoded Tailwind colors):**
+**Type badges (use accent-based tokens, not hardcoded CSS colors):**
 
-```
-Lecture:  bg-accent/10, text-accent
-Tutorial: bg-accent/20, text-accent
-Lab:      bg-accent/30, text-accent
+```css
+.type-lecture  { background: var(--color-accent-light); color: var(--color-accent); }
+/* etc using global classes */
 ```
 
 ---
@@ -326,9 +308,9 @@ hover:         shadow elevation
 [file icon container] [filename + type badge + size + date] [download button — hidden until hover]
 ```
 
-- Icon container: 48px, border-radius 28px, `bg-blue-50` → change to `bg-accent/8`
+- Icon container: 48px, border-radius 28px, `var(--color-accent-light)`
 - Type badge: `bg-accent/8`, `text-accent`, pill shape
-- Download button: `opacity-0 group-hover:opacity-100` — keep this pattern
+- Download button: transition from opacity 0 to 1 on container hover
 - Filename hover: `text-accent` transition
 
 ---
@@ -512,7 +494,7 @@ These need to be updated to match the spec:
 | Hardcoded badge colors   | `SessionCard.jsx` `BadgeVariant` | Replace `bg-blue-50 text-blue-700`, `bg-emerald-50 text-emerald-700`, `bg-purple-50 text-purple-700` with `bg-accent/10 text-accent`, `bg-accent/20 text-accent`, `bg-accent/30 text-accent` |
 | Hardcoded icon bg        | `FileComponent.jsx`              | Replace `bg-blue-50 text-blue-600` with `bg-accent/8 text-accent`                                                                                                                            |
 | Generic icon in StatCard | `StatCard.jsx`                   | Replace `BookOpenIcon` default with schedule-relevant icons per use case                                                                                                                     |
-| Color palette section    | `DesignShowcase.jsx`             | Hardcoded hex values — should pull from Tailwind config tokens                                                                                                                               |
+| Color palette section    | `DesignShowcase.jsx`             | Hardcoded hex values — should pull from CSS variable tokens                                                                                                                                  |
 
 ---
 
@@ -528,13 +510,13 @@ These need to be updated to match the spec:
 - Animate structural layout changes with `cubic-bezier(0.4,0,0.2,1)`
 - Add hover scale + shadow elevation on all interactive cards
 - Use soft diffused shadows — never hard outlines as the primary depth signal
-- Reference color tokens (`bg-accent`, `text-text-primary`) — never hardcode hex in components
+- Reference color tokens (`var(--color-accent)`, `var(--color-text-primary)`) — never hardcode hex in components
 
 ### Don't
 
 - Use dark backgrounds, dark surfaces, or dark mode anywhere
 - Use Inter, Roboto, Arial, or system-ui as the primary font
-- Use hardcoded Tailwind color classes (`bg-blue-50`, `text-emerald-700`) for palette-dependent colors
+- Use hardcoded magic color values for palette-dependent colors
 - Use spring physics or `animate()` from Framer Motion — CSS transitions only
 - Add neon colors, gradients, or decorative patterns
 - Use border-radius below 16px on any visible UI element
