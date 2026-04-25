@@ -177,42 +177,6 @@ export async function POST(request) {
       return NextResponse.json({ ok: true, jobId: jobId.toString(), message: "Job started in background" });
     }
 
-        const solverError = {
-          type: "solver_error",
-          message:
-            solved?.detail ??
-            solved?.message ??
-            `Solver request failed with HTTP ${solverRes.status}`,
-          details: solved,
-        };
-
-        await updateJob({
-          status: ScheduleJobStatus.FAILED,
-          status_message: "Solver request failed.",
-          error: solverError,
-        });
-
-        return NextResponse.json(
-          {
-            ok: false,
-            jobId: jobId.toString(),
-            status: ScheduleJobStatus.FAILED,
-            error: solverError,
-          },
-          { status: 502 }
-        );
-      } catch (solverErr) {
-        solverUnavailable = true;
-        await updateJob({
-          status_message: "Primary solver unavailable. Switching to fallback generator...",
-          error: {
-            type: "solver_unavailable",
-            message: solverErr?.message ?? "Solver unavailable",
-          },
-        });
-      }
-    }
-
     const runFallbackAsync = async () => {
       try {
         const [courses, staff, rooms, availability] = await Promise.all([
