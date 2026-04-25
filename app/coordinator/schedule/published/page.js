@@ -19,6 +19,12 @@ export default function CoordinatorSchedulePublishedPage() {
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState(null);
   const [activeDay,    setActiveDay]    = useState("Saturday");
+  const [revisions,    setRevisions]    = useState([]);
+  const [leftRevision, setLeftRevision] = useState("");
+  const [rightRevision, setRightRevision] = useState("");
+  const [compareData,  setCompareData]  = useState(null);
+  const [compareLoading, setCompareLoading] = useState(false);
+  const [compareError, setCompareError] = useState(null);
   const [unpublishing, setUnpublishing] = useState(false);
   const [toast,        setToast]        = useState({ open:false, variant:"info", title:"", message:"", id:0 });
 
@@ -32,6 +38,24 @@ export default function CoordinatorSchedulePublishedPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.message ?? "Failed to load");
       setData(json);
+
+      const revRes = await fetch(`/api/coordinator/schedule/revisions?termLabel=${encodeURIComponent(json.termLabel ?? "")}`);
+      const revJson = await revRes.json();
+      if (!revRes.ok) throw new Error(revJson.message ?? "Failed to load revisions");
+      const sortedRevisions = revJson.revisions ?? [];
+      setRevisions(sortedRevisions);
+
+      if (sortedRevisions.length >= 2) {
+        const left = String(sortedRevisions[1].revisionNumber);
+        const right = String(sortedRevisions[0].revisionNumber);
+        setLeftRevision(left);
+        setRightRevision(right);
+      } else if (sortedRevisions.length === 1) {
+        const only = String(sortedRevisions[0].revisionNumber);
+        setLeftRevision(only);
+        setRightRevision(only);
+      }
+
       const firstDay = DAYS.find(d => (json.sessions?.[d]?.length ?? 0) > 0);
       if (firstDay) setActiveDay(firstDay);
     } catch (e) { setError(e.message); }
@@ -39,6 +63,42 @@ export default function CoordinatorSchedulePublishedPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  const loadComparison = useCallback(async () => {
+    if (!leftRevision || !rightRevision || !data?.termLabel) {
+      setCompareData(null);
+      return;
+    }
+    if (leftRevision === rightRevision) {
+      setCompareData(null);
+      setCompareError("Choose two different revisions to compare.");
+      return;
+    }
+
+    setCompareLoading(true);
+    setCompareError(null);
+    try {
+      const res = await fetch(
+        `/api/coordinator/schedule/revisions/compare?termLabel=${encodeURIComponent(
+          data.termLabel
+        )}&left=${encodeURIComponent(leftRevision)}&right=${encodeURIComponent(rightRevision)}`
+      );
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message ?? "Failed to compare revisions");
+      setCompareData(json);
+    } catch (e) {
+      setCompareData(null);
+      setCompareError(e.message);
+    } finally {
+      setCompareLoading(false);
+    }
+  }, [leftRevision, rightRevision, data?.termLabel]);
+
+  useEffect(() => {
+    if (!loading && data?.termLabel && leftRevision && rightRevision) {
+      loadComparison();
+    }
+  }, [loading, data?.termLabel, leftRevision, rightRevision, loadComparison]);
 
   async function handleUnpublish() {
     if (!data?.scheduleId) return;
@@ -106,6 +166,112 @@ export default function CoordinatorSchedulePublishedPage() {
           <StatCard label="Total Sessions" value={String(allSessions.length)} trend={data?.termLabel ?? ""} Icon={CalendarIcon} />
           <StatCard label="Courses"        value={String(stats.courses ?? 0)} trend="Scheduled"            Icon={BoltIcon}     />
           <StatCard label="Staff"          value={String(stats.staff   ?? 0)} trend="Assigned"             Icon={UserIcon}     />
+        </section>
+
+        <section className="panel reveal reveal-2">
+          <div className="panel-head">
+            <div>
+              <h2>Revision History & Compare</h2>
+              <p>Select two revisions to inspect schedule changes before and after publication updates.</p>
+            </div>
+          </div>
+
+          {revisions.length === 0 ? (
+            <p className="empty-msg">No schedule revisions available yet.</p>
+          ) : (
+            <>
+              <div className="revision-controls">
+                <label className="revision-field">
+                  <span>Baseline revision</span>
+                  <select value={leftRevision} onChange={(e) => setLeftRevision(e.target.value)}>
+                    {revisions.map((rev) => (
+                      <option key={`left-${rev.id}`} value={String(rev.revisionNumber)}>
+                        Rev {rev.revisionNumber} ({rev.sessionCount} sessions)
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="revision-field">
+                  <span>Compare against</span>
+                  <select value={rightRevision} onChange={(e) => setRightRevision(e.target.value)}>
+                    {revisions.map((rev) => (
+                      <option key={`right-${rev.id}`} value={String(rev.revisionNumber)}>
+                        Rev {rev.revisionNumber} ({rev.sessionCount} sessions)
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <Button variant="ghost" onClick={loadComparison} disabled={compareLoading || !leftRevision || !rightRevision}>
+                  {compareLoading ? "Comparing..." : "Compare Revisions"}
+                </Button>
+              </div>
+
+              {compareError && <p className="revision-error">{compareError}</p>}
+
+              {compareData && (
+                <div className="revision-summary-grid">
+                  <div className="revision-stat">
+                    <p className="revision-stat__label">Added Sessions</p>
+                    <p className="revision-stat__value revision-stat__value--added">{compareData.summary.added}</p>
+                  </div>
+                  <div className="revision-stat">
+                    <p className="revision-stat__label">Removed Sessions</p>
+                    <p className="revision-stat__value revision-stat__value--removed">{compareData.summary.removed}</p>
+                  </div>
+                  <div className="revision-stat">
+                    <p className="revision-stat__label">Reassigned Slots</p>
+                    <p className="revision-stat__value revision-stat__value--updated">{compareData.summary.reassigned}</p>
+                  </div>
+                  <div className="revision-stat">
+                    <p className="revision-stat__label">Unchanged Sessions</p>
+                    <p className="revision-stat__value">{compareData.summary.unchanged}</p>
+                  </div>
+                </div>
+              )}
+
+              {compareData && (
+                <div className="revision-change-lists">
+                  <div>
+                    <h3>Added</h3>
+                    {(compareData.changes.added ?? []).slice(0, 5).map((item, idx) => (
+                      <p key={`added-${idx}`} className="revision-change-item">
+                        {item.day} {item.start}-{item.end} · {item.code} · {item.room}
+                      </p>
+                    ))}
+                    {(compareData.changes.added ?? []).length === 0 && (
+                      <p className="revision-change-item revision-change-item--muted">No added sessions.</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <h3>Removed</h3>
+                    {(compareData.changes.removed ?? []).slice(0, 5).map((item, idx) => (
+                      <p key={`removed-${idx}`} className="revision-change-item">
+                        {item.day} {item.start}-{item.end} · {item.code} · {item.room}
+                      </p>
+                    ))}
+                    {(compareData.changes.removed ?? []).length === 0 && (
+                      <p className="revision-change-item revision-change-item--muted">No removed sessions.</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <h3>Reassigned</h3>
+                    {(compareData.changes.reassigned ?? []).slice(0, 5).map((change, idx) => (
+                      <p key={`reassigned-${idx}`} className="revision-change-item">
+                        {change.after?.code} · {change.before?.room} to {change.after?.room}
+                      </p>
+                    ))}
+                    {(compareData.changes.reassigned ?? []).length === 0 && (
+                      <p className="revision-change-item revision-change-item--muted">No reassigned sessions.</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </section>
 
         <section className="panel reveal reveal-3">

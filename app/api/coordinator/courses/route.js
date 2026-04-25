@@ -10,21 +10,23 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const departmentId   = searchParams.get("departmentId") ?? undefined;
+    const termLabel      = searchParams.get("termLabel") ?? undefined;
     const parsedLimit    = parseInt(searchParams.get("limit") ?? "100");
     const limit          = Math.min(isNaN(parsedLimit) ? 100 : parsedLimit, 500);
     const skip           = Math.max(parseInt(searchParams.get("skip") ?? "0"), 0);
 
     const iOid      = await resolveInstitutionId(institutionId);
     const resolvedId = iOid.toString();
-    const result     = await getCoordinatorCourses(resolvedId, { departmentId, limit, skip });
+    
+    // Fetch courses with real enrollment data (termLabel optional)
+    const result     = await getCoordinatorCourses(resolvedId, { 
+      departmentId, 
+      termLabel,
+      limit, 
+      skip 
+    });
 
-    // Add mock fill rate for now (real data needs enrollment tracking)
-    const items = result.items.map(c => ({
-      ...c,
-      fillRate: Math.floor(60 + Math.random() * 35), // replace with real enrollment data
-    }));
-
-    return NextResponse.json({ ...result, items });
+    return NextResponse.json(result);
 
   } catch (err) {
     const status = err.status ?? 500;
