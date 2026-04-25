@@ -1,3 +1,4 @@
+export { default as EditIcon } from "./Edit";
 export { default as DownloadIcon } from "./Download";
 export { default as EyeIcon } from "./Eye";
 export { default as CopyIcon } from "./Copy";
