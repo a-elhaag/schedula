@@ -168,14 +168,10 @@ export default function CoordinatorScheduleGeneratePage() {
     <div className="courses-page">
       <main className="courses-shell">
 
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Generate Schedule</h1>
-          <p className="hero-subtitle">
-            Run the constraint-based solver to generate an optimal timetable
-            from your courses, staff availability, and room data.
-          </p>
-        </section>
+          <p>Run the constraint-based solver to generate an optimal timetable from your courses, staff availability, and room data.</p>
+        </div>
 
         <section className="stats-grid reveal reveal-2">
           <StatCard label="Courses" value={String(stats.courses ?? 0)} trend="Ready for scheduling" Icon={CalendarIcon} />

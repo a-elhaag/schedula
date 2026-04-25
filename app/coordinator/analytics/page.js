@@ -56,15 +56,10 @@ export default function CoordinatorAnalyticsPage() {
     <div className="page-container">
       <main className="analytics-shell">
 
-        {/* Hero */}
-        <section className="analytics-hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Analytics</p>
-          <h1>Room Occupancy Heatmap</h1>
-          <p>
-            Visualize room usage by day and timeslot to spot overload periods
-            and improve schedule balance.
-          </p>
-        </section>
+        <div className="page-header">
+          <h1>Analytics</h1>
+          <p>Visualize room usage by day and timeslot to spot overload periods and improve schedule balance.</p>
+        </div>
 
         {/* Stats */}
         <section className="stats-grid reveal reveal-2">

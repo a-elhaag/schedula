@@ -90,14 +90,10 @@ export default function CoordinatorConstraintsPage() {
     <div className="courses-page">
       <main className="courses-shell">
 
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Scheduling Constraints</h1>
-          <p className="hero-subtitle">
-            Define hard rules the solver must follow, and soft preferences it should
-            optimize for when generating the timetable.
-          </p>
-        </section>
+          <p>Define hard rules the solver must follow, and soft preferences it should optimize for when generating the timetable.</p>
+        </div>
 
         <section className="stats-grid reveal reveal-2">
           <StatCard label="Hard Constraints" value={`${hardEnabled}/${HARD_CONSTRAINTS.length}`} trend="Must be satisfied"    trendUp={false} Icon={WarningIcon} />

@@ -200,15 +200,10 @@ export default function CoordinatorImportPage() {
     <div className="import-page">
       <main className="import-shell">
 
-        {/* Hero */}
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Import Data</h1>
-          <p className="hero-subtitle">
-            Bring in course, staff, and room datasets with validation checks
-            before publishing the scheduling baseline.
-          </p>
-        </section>
+          <p>Bring in course, staff, and room datasets with validation checks before publishing the scheduling baseline.</p>
+        </div>
 
         {/* Stats */}
         <section className="stats-grid reveal reveal-2">

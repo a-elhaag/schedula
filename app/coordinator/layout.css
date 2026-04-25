@@ -1,0 +1,142 @@
+/* ── Coordinator Shell ─────────────────────────────────────────────────────── */
+.coord-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-bg, #0f1117);
+}
+
+/* ── Sidebar ───────────────────────────────────────────────────────────────── */
+.coord-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--color-surface, #16181f);
+  border-right: 1px solid var(--color-border, rgba(255,255,255,0.07));
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.coord-sidebar__brand {
+  padding: 24px 20px 20px;
+  font-family: "DM Serif Display", serif;
+  font-size: 20px;
+  color: var(--color-text, #fff);
+  border-bottom: 1px solid var(--color-border, rgba(255,255,255,0.07));
+  flex-shrink: 0;
+}
+
+.coord-sidebar__nav {
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.coord-sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: var(--color-text-muted, rgba(255,255,255,0.5));
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.coord-sidebar__item:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--color-text, #fff);
+}
+
+.coord-sidebar__item--active {
+  background: rgba(255,255,255,0.09);
+  color: var(--color-text, #fff);
+}
+
+/* Sign-out button at sidebar bottom */
+.coord-sidebar__signout {
+  margin: auto 10px 16px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted, rgba(255,255,255,0.4));
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.coord-sidebar__signout:hover:not(:disabled) {
+  background: rgba(255,255,255,0.05);
+  color: var(--color-text, #fff);
+}
+
+/* ── Content area ──────────────────────────────────────────────────────────── */
+.coord-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+/* Page header (replaces hero sections) */
+.page-header {
+  padding: 32px 40px 0;
+  margin-bottom: 28px;
+}
+
+.page-header h1 {
+  font-family: "DM Serif Display", serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--color-text, #fff);
+  margin: 0 0 4px;
+}
+
+.page-header p {
+  color: var(--color-text-muted, rgba(255,255,255,0.5));
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ── Mobile: collapse sidebar to top bar ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .coord-shell {
+    flex-direction: column;
+  }
+
+  .coord-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border, rgba(255,255,255,0.07));
+  }
+
+  .coord-sidebar__nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 8px;
+    gap: 4px;
+  }
+
+  .coord-sidebar__item span {
+    display: none;
+  }
+
+  .coord-sidebar__item {
+    padding: 10px 12px;
+  }
+
+  .page-header {
+    padding: 20px 20px 0;
+  }
+}

@@ -105,15 +105,10 @@ export default function CoordinatorCoursesPage() {
   return (
     <div className="courses-page">
       <main className="courses-shell">
-
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Course Offerings</h1>
-          <p className="hero-subtitle">
-            Build sections, monitor enrollment pressure, and keep every course
-            aligned with available rooms and teaching capacity.
-          </p>
-        </section>
+          <p>Build sections, monitor enrollment pressure, and keep every course aligned with available rooms and teaching capacity.</p>
+        </div>
 
         <section className="stats-grid reveal reveal-2">
           <StatCard label="Total Courses"  value={String(data?.total ?? 0)} trend="This term"           Icon={BookOpenIcon}    />
