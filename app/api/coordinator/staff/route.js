@@ -4,6 +4,8 @@ import { getCoordinatorStaff, getStaffWorkload } from "@/lib/server/coordinatorS
 import { getDb } from "@/lib/db";
 import { ObjectId } from "mongodb";
 import { resolveInstitutionId } from "@/app/api/coordinator/_helpers/resolve-institution";
+import { generateToken, hashPassword } from "@/lib/auth";
+import { getBaseUrl, buildEmailTemplate, sendEmail } from "@/lib/email";
 
 // ── GET /api/coordinator/staff ────────────────────────────────────────────────
 export async function GET(request) {
@@ -69,6 +71,9 @@ export async function POST(request) {
       return NextResponse.json({ message: "A user with this email already exists." }, { status: 409 });
     }
 
+    const rawToken = generateToken(32);
+    const tokenHash = await hashPassword(rawToken);
+
     const newUser = {
       institution_id:    new ObjectId(institutionId),
       email:             email.trim().toLowerCase(),
@@ -76,12 +81,27 @@ export async function POST(request) {
       role,
       name:              name.trim(),
       invite_status:     "pending",
+      invite_token_hash: tokenHash,
       email_verified_at: null,
       created_at:        new Date(),
       deleted_at:        null,
     };
 
     const result = await db.collection("users").insertOne(newUser);
+
+    // Send Invite Email
+    const actionUrl = `${getBaseUrl(request)}/accept-invite?token=${rawToken}&email=${encodeURIComponent(newUser.email)}`;
+    const template  = buildEmailTemplate({
+      type: "invite",
+      actionUrl,
+      inviterName: "Your Coordinator", // ideally dynamic
+      roleLabel: role === "ta" ? "Teaching Assistant" : "Professor",
+    });
+
+    sendEmail({
+      to: newUser.email,
+      ...template,
+    }).catch((e) => console.error("Email send failed:", e));
 
     return NextResponse.json({
       ok:   true,

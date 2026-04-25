@@ -40,8 +40,22 @@ export async function POST(request) {
 
     const text    = await file.text();
     const lines   = text.trim().split("\n").filter(Boolean);
-    const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
-    const rows    = lines.slice(1);
+    const rawHeaders = lines[0].split(",").map(h => h.trim().toLowerCase());
+    const dataRows = lines.slice(1);
+
+    const headerAliases = {
+      "course code": "code", "course_code": "code",
+      "course name": "name", "course_name": "name",
+      "credits": "credit_hours", "credit hours": "credit_hours",
+      "room label": "label", "room code": "label",
+      "seats": "capacity",
+      "term": "term_label",
+      "enrolled": "enrolled_students", "students": "enrolled_students",
+      "course_id": "course_id"
+    };
+
+    const headers = rawHeaders.map(h => headerAliases[h] || h);
+    const rows = dataRows;
 
     const db   = await getDb();
     const iOid = new ObjectId(institutionId);
@@ -127,6 +141,81 @@ export async function POST(request) {
         }));
         const result = await db.collection("rooms").bulkWrite(ops);
         imported = result.upsertedCount;
+      }
+
+    } else if (type === "enrollments") {
+      // Import enrollments: course_code (or course_id), term_label, enrolled_students, capacity
+      const courseCollection = db.collection("courses");
+      const enrollmentCollection = db.collection("enrollments");
+      
+      const enrollmentDocs = [];
+      
+      for (const row of rows) {
+        const vals = row.split(",").map(v => v.trim().replace(/^"|"$/g, ""));
+        const obj = Object.fromEntries(headers.map((h, i) => [h, vals[i] ?? ""]));
+        
+        const termLabel = obj.term_label ?? "";
+        const enrolledStudents = parseInt(obj.enrolled_students) || 0;
+        const capacity = parseInt(obj.capacity) || 0;
+        
+        if (!termLabel || capacity <= 0) continue;
+        
+        // Try to find course by code or ID
+        let courseId = null;
+        
+        if (ObjectId.isValid(obj.course_id ?? "")) {
+          courseId = new ObjectId(obj.course_id);
+        } else if (obj.course_code || obj.code) {
+          const cCode = obj.course_code || obj.code;
+          const course = await courseCollection.findOne({
+            institution_id: iOid,
+            code: cCode.toUpperCase(),
+            deleted_at: null,
+          });
+          if (course) {
+            courseId = course._id;
+          }
+        }
+        
+        if (!courseId) continue;
+        
+        enrollmentDocs.push({
+          institution_id: iOid,
+          term_label: termLabel,
+          course_id: courseId,
+          enrolled_students: enrolledStudents,
+          capacity: capacity,
+          updated_at: new Date(),
+          deleted_at: null,
+        });
+      }
+      
+      if (enrollmentDocs.length > 0) {
+        const ops = enrollmentDocs.map(d => ({
+          updateOne: {
+            filter: {
+              institution_id: iOid,
+              term_label: d.term_label,
+              course_id: d.course_id,
+            },
+            update: {
+              $set: {
+                enrolled_students: d.enrolled_students,
+                capacity: d.capacity,
+                updated_at: new Date(),
+              },
+              $setOnInsert: {
+                institution_id: iOid,
+                term_label: d.term_label,
+                course_id: d.course_id,
+                created_at: new Date(),
+              },
+            },
+            upsert: true,
+          },
+        }));
+        const result = await enrollmentCollection.bulkWrite(ops);
+        imported = result.upsertedCount + result.modifiedCount;
       }
     }
 

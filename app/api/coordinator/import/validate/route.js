@@ -21,7 +21,22 @@ export async function POST(request) {
       return NextResponse.json({ valid: 0, errors: ["File is empty or has no data rows."], warnings: [] });
     }
 
-    const headers  = lines[0].split(",").map(h => h.trim().toLowerCase());
+    const rawHeaders = lines[0].split(",").map(h => h.trim().toLowerCase());
+    
+    // Flexible header mapping
+    const headerAliases = {
+      "course code": "code", "course_code": "code",
+      "course name": "name", "course_name": "name",
+      "credits": "credit_hours", "credit hours": "credit_hours",
+      "room label": "label", "room code": "label",
+      "seats": "capacity",
+      "term": "term_label",
+      "enrolled": "enrolled_students", "students": "enrolled_students",
+      "course_id": "course_id"
+    };
+
+    const headers = rawHeaders.map(h => headerAliases[h] || h);
+
     const dataRows = lines.slice(1);
     const errors   = [];
     const warnings = [];
@@ -31,7 +46,13 @@ export async function POST(request) {
       courses: ["code","name","credit_hours"],
       staff:   ["name","email","role"],
       rooms:   ["name","label","building"],
+      enrollments: ["term_label", "capacity"]
     }[type] ?? [];
+
+    // For enrollments, need either course_code or course_id
+    if (type === "enrollments" && !headers.includes("course_code") && !headers.includes("course_id") && !headers.includes("code")) {
+       errors.push("Missing required column for enrollments: course_code or course_id");
+    }
 
     const missing = required.filter(h => !headers.includes(h));
     if (missing.length > 0) {
@@ -60,6 +81,12 @@ export async function POST(request) {
         } else if (type === "rooms") {
           if (!obj.label)         errors.push(`Row ${rowNum}: missing label`);
           else if (!obj.name)     errors.push(`Row ${rowNum}: missing name`);
+          else                    valid++;
+        } else if (type === "enrollments") {
+          const hasCode = obj.course_code || obj.course_id || obj.code;
+          if (!hasCode)           errors.push(`Row ${rowNum}: missing course identifier`);
+          else if (!obj.term_label) errors.push(`Row ${rowNum}: missing term label`);
+          else if (!obj.capacity || isNaN(obj.capacity)) errors.push(`Row ${rowNum}: invalid capacity`);
           else                    valid++;
         }
       });

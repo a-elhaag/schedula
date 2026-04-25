@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { clearAllCached } from "@/lib/clientCache";
 import "./AuthSignOutButton.css";
 
 const PROTECTED_PREFIXES = [
@@ -27,6 +28,7 @@ export default function AuthSignOutButton() {
 
   async function handleSignOut() {
     setIsSubmitting(true);
+    clearAllCached();
     try {
       await fetch("/api/auth/signout", {
         method: "POST",

@@ -23,6 +23,7 @@ export default function CoordinatorCoursesPage() {
   const [search,    setSearch]    = useState("");
   const [toast,     setToast]     = useState({ open:false, variant:"info", title:"", message:"", id:0 });
   const [form,      setForm]      = useState({ code:"", name:"", credit_hours:"3", sections:"1" });
+  const [editingId, setEditingId] = useState(null);
 
   const showToast = (variant, title, message) =>
     setToast({ open:true, variant, title, message, id:Date.now() });
@@ -40,26 +41,53 @@ export default function CoordinatorCoursesPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  async function handleCreate() {
+  async function handleCreateOrUpdate() {
     if (!form.code.trim() || !form.name.trim()) {
       showToast("warning", "Validation", "Course code and name are required.");
       return;
     }
     setSaving(true);
     try {
-      const res  = await fetch("/api/coordinator/courses", {
-        method:  "POST",
+      const url = editingId ? `/api/coordinator/courses/${editingId}` : "/api/coordinator/courses";
+      const method = editingId ? "PUT" : "POST";
+      const res  = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify(form),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.message ?? "Failed to create");
-      showToast("success", "Course Created", `${form.code} has been added.`);
+      if (!res.ok) throw new Error(json.message ?? "Failed to save");
+      showToast("success", editingId ? "Course Updated" : "Course Created", `${form.code} has been saved.`);
       setShowModal(false);
       setForm({ code:"", name:"", credit_hours:"3", sections:"1" });
+      setEditingId(null);
       load();
     } catch (e) { showToast("danger", "Error", e.message); }
     finally { setSaving(false); }
+  }
+
+  async function handleDelete(courseId) {
+    if (!confirm("Are you sure you want to delete this course? This action cannot be undone.")) return;
+    try {
+      const res = await fetch(`/api/coordinator/courses/${courseId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete course");
+      showToast("success", "Deleted", "Course has been deleted.");
+      load();
+    } catch (e) {
+      showToast("danger", "Error", e.message);
+    }
+  }
+
+  function openCreate() {
+    setEditingId(null);
+    setForm({ code:"", name:"", credit_hours:"3", sections:"1" });
+    setShowModal(true);
+  }
+
+  function openEdit(course) {
+    setEditingId(course.id);
+    setForm({ code: course.code, name: course.name, credit_hours: course.credits || 3, sections: course.sectionCount || 1 });
+    setShowModal(true);
   }
 
   const courses  = data?.items ?? [];
@@ -106,7 +134,7 @@ export default function CoordinatorCoursesPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
-              <Button variant="primary" onClick={() => setShowModal(true)}>
+              <Button variant="primary" onClick={openCreate}>
                 Create New Course
               </Button>
             </div>
@@ -118,7 +146,7 @@ export default function CoordinatorCoursesPage() {
             <div className="courses-grid">
               {/* CourseCard from components/ */}
               {filtered.map(course => (
-                <CourseCard key={course.id} course={course} />
+                <CourseCard key={course.id} course={course} onEdit={openEdit} onDelete={handleDelete} />
               ))}
             </div>
           )}
@@ -134,13 +162,13 @@ export default function CoordinatorCoursesPage() {
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title="Create New Course"
-        description="Add a new course to the current term."
+        title={editingId ? "Edit Course" : "Create New Course"}
+        description={editingId ? "Update course details." : "Add a new course to the current term."}
         footer={
           <div className="modal-footer-actions">
             <Button variant="ghost" onClick={() => setShowModal(false)}>Cancel</Button>
-            <Button variant="primary" onClick={handleCreate} disabled={saving}>
-              {saving ? "Creating..." : "Create Course"}
+            <Button variant="primary" onClick={handleCreateOrUpdate} disabled={saving}>
+              {saving ? "Saving..." : (editingId ? "Update Course" : "Create Course")}
             </Button>
           </div>
         }

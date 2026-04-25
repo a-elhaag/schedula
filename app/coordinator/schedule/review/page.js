@@ -18,7 +18,7 @@ export default function CoordinatorScheduleReviewPage() {
   const [data,       setData]       = useState(null);
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState(null);
-  const [conflicts,  setConflicts]  = useState([]);
+  const [resolvingConflictKey, setResolvingConflictKey] = useState(null);
   const [approving,  setApproving]  = useState(false);
   const [showModal,  setShowModal]  = useState(false);
   const [toast,      setToast]      = useState({ open:false, variant:"info", title:"", message:"", id:0 });
@@ -33,7 +33,6 @@ export default function CoordinatorScheduleReviewPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.message ?? "Failed to load");
       setData(json);
-      setConflicts(json.conflicts ?? []);
     } catch (e) { setError(e.message); }
     finally { setLoading(false); }
   }, []);
@@ -57,11 +56,56 @@ export default function CoordinatorScheduleReviewPage() {
     finally { setApproving(false); }
   }
 
-  function dismissConflict(c) {
-    setConflicts(prev => prev.filter(x => x !== c));
-    showToast("info", "Conflict Dismissed", "You can re-detect conflicts at any time.");
+  async function handleResolveConflict(conflict, resolutionAction, notes) {
+    setResolvingConflictKey(conflict.conflictKey);
+    try {
+      const res = await fetch("/api/coordinator/schedule/review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "resolve_conflict",
+          scheduleId: data?.scheduleId,
+          conflict,
+          resolutionAction,
+          notes,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message ?? "Failed to resolve conflict");
+      showToast("success", "Conflict Resolved", "Conflict resolution has been saved.");
+      await load();
+    } catch (e) {
+      showToast("danger", "Resolution Failed", e.message);
+    } finally {
+      setResolvingConflictKey(null);
+    }
   }
 
+  async function handleReopenConflict(conflict) {
+    setResolvingConflictKey(conflict.conflictKey);
+    try {
+      const res = await fetch("/api/coordinator/schedule/review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "reopen_conflict",
+          scheduleId: data?.scheduleId,
+          conflict,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message ?? "Failed to reopen conflict");
+      showToast("info", "Conflict Reopened", "Conflict is now active and requires action.");
+      await load();
+    } catch (e) {
+      showToast("danger", "Reopen Failed", e.message);
+    } finally {
+      setResolvingConflictKey(null);
+    }
+  }
+
+  const conflicts = data?.conflicts ?? [];
+  const resolvedConflicts = data?.resolvedConflicts ?? [];
   const conflictSlots = new Set(conflicts.map(c => c.slot));
 
   if (loading) return <SkeletonPage stats={3} rows={6} />;
@@ -92,9 +136,13 @@ export default function CoordinatorScheduleReviewPage() {
         </section>
 
         {/* ConflictPanel from components/ */}
-        {conflicts.length > 0 && (
-          <ConflictPanel conflicts={conflicts} onDismiss={dismissConflict} />
-        )}
+        <ConflictPanel
+          conflicts={conflicts}
+          resolvedConflicts={resolvedConflicts}
+          onResolve={handleResolveConflict}
+          onReopen={handleReopenConflict}
+          resolvingConflictKey={resolvingConflictKey}
+        />
 
         <section className="panel reveal reveal-3">
           <div className="panel-head">
@@ -103,9 +151,6 @@ export default function CoordinatorScheduleReviewPage() {
               <p>Flagged conflicts are highlighted. Approve the full schedule below.</p>
             </div>
             <div className="panel-actions">
-              {conflicts.length > 0 && (
-                <Button variant="ghost" onClick={() => setConflicts([])}>Dismiss All</Button>
-              )}
               {!published && (
                 <Button variant="primary" onClick={() => setShowModal(true)} disabled={conflicts.length > 0}>
                   Approve Schedule
@@ -154,6 +199,7 @@ export default function CoordinatorScheduleReviewPage() {
         <div className="approve-summary">
           <p><strong>{sessions.length}</strong> sessions will be published</p>
           <p><strong>{conflicts.length}</strong> unresolved conflicts</p>
+          <p><strong>{resolvedConflicts.length}</strong> resolved conflicts</p>
         </div>
       </Modal>
 
