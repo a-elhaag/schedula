@@ -98,13 +98,10 @@ export default function CoordinatorSettingsPage() {
     <div className="courses-page">
       <main className="courses-shell">
 
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Settings</h1>
-          <p className="hero-subtitle">
-            Manage your profile, notification preferences, and scheduling display options.
-          </p>
-        </section>
+          <p>Manage your profile, notification preferences, and scheduling display options.</p>
+        </div>
 
         {/* Profile */}
         <SettingsSection title="Profile" description="Update your account information.">

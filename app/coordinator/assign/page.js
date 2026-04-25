@@ -205,14 +205,10 @@ export default function CoordinatorAssignPage() {
           </div>
         )}
 
-        <section className="assign-hero assign-reveal assign-reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Assign Staff to Courses</h1>
-          <p>
-            Drag a professor or TA from the left panel and drop them onto a
-            course card to assign. Click × to remove an assignment.
-          </p>
-        </section>
+          <p>Drag a professor or TA from the left panel and drop them onto a course card to assign. Click × to remove an assignment.</p>
+        </div>
 
         {/* Stats row */}
         <div className="assign-reveal assign-reveal-2" style={{ display:"flex", gap:16, marginBottom:28, flexWrap:"wrap" }}>

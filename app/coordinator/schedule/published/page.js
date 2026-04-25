@@ -128,10 +128,7 @@ export default function CoordinatorSchedulePublishedPage() {
   if (!data?.scheduleId) return (
     <div className="courses-page">
       <main className="courses-shell">
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
-          <h1>Published Schedule</h1>
-        </section>
+        <div className="page-header"><h1>Published Schedule</h1></div>
         <div className="panel reveal reveal-2" style={{ textAlign:"center", padding:60 }}>
           <h2 style={{ fontFamily:"DM Serif Display,serif", fontSize:24, marginBottom:10 }}>No Published Schedule</h2>
           <p style={{ color:"var(--color-text-muted)", marginBottom:24 }}>
@@ -149,18 +146,10 @@ export default function CoordinatorSchedulePublishedPage() {
     <div className="courses-page">
       <main className="courses-shell">
 
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Published Schedule</h1>
-          <p className="hero-subtitle">
-            {data?.termLabel} - Live timetable visible to all staff and students.
-          </p>
-          {data?.publishedAt && (
-            <div className="published-banner">
-              Published on {new Date(data.publishedAt).toLocaleDateString()}
-            </div>
-          )}
-        </section>
+          <p>{data?.termLabel} — Live timetable visible to all staff and students.{data?.publishedAt && ` Published ${new Date(data.publishedAt).toLocaleDateString()}.`}</p>
+        </div>
 
         <section className="stats-grid reveal reveal-2">
           <StatCard label="Total Sessions" value={String(allSessions.length)} trend={data?.termLabel ?? ""} Icon={CalendarIcon} />

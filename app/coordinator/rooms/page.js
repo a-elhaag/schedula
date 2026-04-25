@@ -106,14 +106,10 @@ export default function CoordinatorRoomsPage() {
   return (
     <div className="courses-page">
       <main className="courses-shell">
-
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Room Management</h1>
-          <p className="hero-subtitle">
-            Track all classrooms, labs, and tutorial rooms available for scheduling.
-          </p>
-        </section>
+          <p>Track all classrooms, labs, and tutorial rooms available for scheduling.</p>
+        </div>
 
         <section className="stats-grid reveal reveal-2">
           <StatCard label="Total Rooms"    value={String(data?.total ?? 0)}                                          trend="Available"       Icon={HomeIcon}          />

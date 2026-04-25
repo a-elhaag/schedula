@@ -49,13 +49,10 @@ export default function CoordinatorAvailabilityStatusPage() {
     <div className="courses-page">
       <main className="courses-shell">
 
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Availability Status</h1>
-          <p className="hero-subtitle">
-            Track which staff members have submitted their availability for the current term.
-          </p>
-        </section>
+          <p>Track which staff members have submitted their availability for the current term.</p>
+        </div>
 
         <section className="stats-grid reveal reveal-2">
           <StatCard label="Submitted" value={String(submitted)} trend={`of ${staff.length} staff`}   trendUp Icon={CalendarIcon} />

@@ -119,15 +119,11 @@ export default function CoordinatorScheduleReviewPage() {
     <div className="review-page">
       <main className="review-shell">
 
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Review Schedule</h1>
-          <p className="hero-subtitle">
-            Inspect every generated session, resolve flagged conflicts, and
-            approve the timetable before publishing to staff and students.
-          </p>
-          {published && <div className="published-banner">Schedule is live and published</div>}
-        </section>
+          <p>Inspect every generated session, resolve flagged conflicts, and approve the timetable before publishing to staff and students.</p>
+          {published && <div className="published-banner" style={{marginTop:8}}>Schedule is live and published</div>}
+        </div>
 
         <section className="stats-grid reveal reveal-2">
           <StatCard label="Sessions Scheduled" value={String(stats.totalSessions ?? sessions.length)} trend={`${stats.unresolved ?? 0} unresolved`} trendUp={false} Icon={CalendarIcon} />

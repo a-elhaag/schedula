@@ -5,8 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { clearAllCached } from "@/lib/clientCache";
 import "./AuthSignOutButton.css";
 
+// Coordinator has sign-out in the sidebar layout — exclude it here
 const PROTECTED_PREFIXES = [
-  "/coordinator",
   "/staff",
   "/student",
   "/onboarding",

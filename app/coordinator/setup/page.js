@@ -134,11 +134,10 @@ export default function CoordinatorSetupPage() {
   if (done) return (
     <div className="courses-page">
       <main className="courses-shell">
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Setup Complete</h1>
-          <p className="hero-subtitle">Your institution is configured for {form.termLabel}.</p>
-        </section>
+          <p>Your institution is configured for {form.termLabel}.</p>
+        </div>
         <div className="panel reveal reveal-2" style={{ textAlign:"center", padding:"48px" }}>
           <div style={{ marginBottom:20 }}>
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2">
@@ -165,14 +164,10 @@ export default function CoordinatorSetupPage() {
     <div className="courses-page">
       <main className="courses-shell">
 
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Institution Setup</h1>
-          <p className="hero-subtitle">
-            Configure your institution, active term, and scheduling parameters
-            before generating timetables.
-          </p>
-        </section>
+          <p>Configure your institution, active term, and scheduling parameters before generating timetables.</p>
+        </div>
 
         <StepIndicator steps={STEPS} currentStep={step} />
 

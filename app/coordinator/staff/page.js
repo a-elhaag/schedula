@@ -80,15 +80,10 @@ export default function CoordinatorStaffPage() {
   return (
     <div className="staff-page">
       <main className="staff-shell">
-
-        <section className="hero reveal reveal-1">
-          <p className="hero-eyebrow">Coordinator Workspace</p>
+        <div className="page-header">
           <h1>Staff Management</h1>
-          <p className="hero-subtitle">
-            Coordinate faculty and teaching assistants, balance workload, and
-            fill scheduling gaps before timetable generation.
-          </p>
-        </section>
+          <p>Coordinate faculty and teaching assistants, balance workload, and fill scheduling gaps before timetable generation.</p>
+        </div>
 
         <section className="overview-grid reveal reveal-2">
           <StatCard label="Academic Staff"      value={String(professors)} trend="Professors"         trendUp Icon={UserIcon}    />
