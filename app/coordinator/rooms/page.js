@@ -66,6 +66,7 @@ export default function CoordinatorRoomsPage() {
       setEditingId(null);
       setBuilding("all");
       setSearch("");
+      load();
     } catch (e) { showToast("danger", "Error", e.message); }
     finally { setSaving(false); }
   }
