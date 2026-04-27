@@ -120,6 +120,7 @@ export default function CoordinatorConstraintsPage() {
                 constraint={c}
                 enabled={hard[c.key] ?? true}
                 onChange={(key, val) => setHard(p => ({ ...p, [key]: val }))}
+                disabled={true}
               />
             ))}
           </div>
@@ -150,7 +151,7 @@ export default function CoordinatorConstraintsPage() {
         </section>
 
         <section className="quick-actions reveal reveal-4">
-          <Button variant="ghost" onClick={resetDefaults}>Reset to Defaults</Button>
+          <Button variant="secondary" onClick={resetDefaults}>Reset to Defaults</Button>
           <Button variant="primary" onClick={handleSave} disabled={saving}>
             {saving ? "Saving..." : "Save Constraints"}
           </Button>
