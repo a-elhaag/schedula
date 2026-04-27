@@ -41,6 +41,9 @@ export async function POST(request) {
   const email =
     typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
 
+  // Keep a consistent delay to reduce timing differences.
+  await new Promise((resolve) => setTimeout(resolve, 350));
+
   if (token.length < TOKEN_MIN_LENGTH) {
     return NextResponse.json(
       { message: "This invite link is invalid or has expired." },
@@ -52,9 +55,6 @@ export async function POST(request) {
   if (passwordError) {
     return NextResponse.json({ message: passwordError }, { status: 400 });
   }
-
-  // Keep a consistent delay to reduce timing differences.
-  await new Promise((resolve) => setTimeout(resolve, 350));
 
   try {
     const db = await getDb();
