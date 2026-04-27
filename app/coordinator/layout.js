@@ -10,6 +10,7 @@ import {
   CalendarIcon,
   BoltIcon,
   GearIcon,
+  SettingsIcon,
   GraduationCapIcon,
   DownloadIcon,
 } from "@/components/icons/index";
@@ -29,7 +30,7 @@ const NAV_ITEMS = [
   { href: "/coordinator/analytics",          label: "Analytics",  Icon: BoltIcon          },
   { href: "/coordinator/import",             label: "Import",     Icon: DownloadIcon      },
   { href: "/coordinator/users",              label: "Users",      Icon: UserIcon          },
-  { href: "/coordinator/settings",           label: "Settings",   Icon: GearIcon          },
+  { href: "/coordinator/settings",           label: "Settings",   Icon: SettingsIcon      },
 ];
 
 export default function CoordinatorLayout({ children }) {

@@ -7,6 +7,7 @@ export { default as GearIcon } from "./Gear";
 export { default as XIcon } from "./X";
 export { default as RocketIcon } from "./Rocket";
 export { default as WarningIcon } from "./Warning";
+export { default as SettingsIcon } from "./Settings";
 export { BookOpenIcon } from "./BookOpen";
 export { BoltIcon } from "./Bolt";
 export { GraduationCapIcon } from "./GraduationCap";
