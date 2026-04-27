@@ -56,7 +56,8 @@
 
 .coord-sidebar__item--active {
   background: rgba(255,255,255,0.09);
-  color: var(--color-text, #fff);
+  color: var(--color-accent, #0071E3);
+  font-weight: 600;
 }
 
 /* Sign-out button at sidebar bottom */
