@@ -64,7 +64,8 @@ export default function CoordinatorRoomsPage() {
       setShowModal(false);
       setForm({ name:"", label:"", building:"", capacity:"30" });
       setEditingId(null);
-      load();
+      setBuilding("all");
+      setSearch("");
     } catch (e) { showToast("danger", "Error", e.message); }
     finally { setSaving(false); }
   }
