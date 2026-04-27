@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
-import { generateToken } from "@/lib/auth";
-import { buildEmailTemplate, getBaseUrl, sendEmail } from "@/lib/email";
 import { logger } from "@/lib/logger";
 
 const TOKEN_MIN_LENGTH = 16;
@@ -86,18 +84,16 @@ export async function POST(request) {
     }
 
     const passwordHash = await hashPassword(password);
-    const emailVerifyToken = generateToken();
-    const emailVerifyExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     await usersCollection.updateOne(
       { _id: user._id },
       {
         $set: {
           password_hash: passwordHash,
-          invite_status: "pending",
-          email_verified_at: null,
-          email_verify_token: emailVerifyToken,
-          email_verify_expires_at: emailVerifyExpiresAt,
+          invite_status: "joined",
+          email_verified_at: new Date(),
+          email_verify_token: null,
+          email_verify_expires_at: null,
           invite_token: null,
           invite_expires_at: null,
           ...(name ? { name } : {}),
@@ -105,42 +101,13 @@ export async function POST(request) {
       },
     );
 
-    const baseUrl = getBaseUrl(request);
-    const verificationLink = `${baseUrl}/verify-email?token=${encodeURIComponent(
-      emailVerifyToken,
-    )}&email=${encodeURIComponent(user.email)}`;
-
-    const template = buildEmailTemplate({
-      type: "verify",
-      actionUrl: verificationLink,
-    });
-
-    const emailResult = await sendEmail({
-      to: user.email,
-      subject: template.subject,
-      text: template.text,
-      html: template.html,
-    });
-
-    if (emailResult?.skipped && process.env.NODE_ENV === "production") {
-      logger.warn({ requestId, userId: user._id.toString() }, "Verification email send skipped");
-      return NextResponse.json(
-        { message: "Unable to send verification email right now." },
-        { status: 503 },
-      );
-    }
-
     logger.info(
       { requestId, userId: user._id.toString(), email: user.email },
-      "Invite accepted successfully",
+      "Invite accepted and auto-verified successfully",
     );
     return NextResponse.json({
       ok: true,
-      message: "Invite accepted. Please verify your email to continue.",
-      verificationToken:
-        emailResult?.skipped && process.env.NODE_ENV !== "production"
-          ? emailVerifyToken
-          : undefined,
+      message: "Account created. You can now sign in.",
     });
   } catch (error) {
     logger.error(
