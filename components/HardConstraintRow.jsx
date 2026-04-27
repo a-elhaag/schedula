@@ -16,7 +16,7 @@ import "./HardConstraintRow.css";
  *   onChange={(key, value) => {}}
  * />
  */
-export default function HardConstraintRow({ constraint, enabled, onChange }) {
+export default function HardConstraintRow({ constraint, enabled, onChange, disabled = false }) {
   return (
     <div className="hard-constraint-row">
       <div className="hard-constraint-row__info">
@@ -27,6 +27,7 @@ export default function HardConstraintRow({ constraint, enabled, onChange }) {
         <Switch
           checked={enabled}
           onChange={val => onChange(constraint.key, val)}
+          disabled={disabled}
         />
         <span className="constraint-badge constraint-badge--hard">Hard</span>
       </div>
