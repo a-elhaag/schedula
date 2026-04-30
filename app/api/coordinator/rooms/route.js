@@ -7,6 +7,7 @@ import { getDb } from "@/lib/db";
 // ── GET /api/coordinator/rooms ────────────────────────────────────────────────
 export const GET = withApiErrorHandling(async function getCoordinatorRoomsRoute(request) {
   try {
+    console.log("📤 GET /api/coordinator/rooms - REQUEST");
     const user = getCurrentUser(request, { requiredRole: "coordinator" });
     const { searchParams } = new URL(request.url);
 
@@ -16,12 +17,15 @@ export const GET = withApiErrorHandling(async function getCoordinatorRoomsRoute(
     const parsedSkip  = Number.parseInt(searchParams.get("skip") ?? "", 10);
     const skip        = Math.max(Number.isNaN(parsedSkip) ? 0 : parsedSkip, 0);
 
+    console.log("📤 Query params:", { building, limit, skip });
     const iOid       = await resolveInstitutionId(user.institutionId);
     const resolvedId = iOid.toString();
 
     const result = await getCoordinatorRooms(resolvedId, { building, limit, skip });
+    console.log("📥 GET /api/coordinator/rooms - RESPONSE:", result);
     return jsonOk(result);
   } catch (error) {
+    console.error("❌ GET /api/coordinator/rooms - ERROR:", error);
     if (error?.status === 400) return jsonError(error.message, 400);
     throw error;
   }
@@ -30,13 +34,17 @@ export const GET = withApiErrorHandling(async function getCoordinatorRoomsRoute(
 // ── POST /api/coordinator/rooms ───────────────────────────────────────────────
 export async function POST(request) {
   try {
+    console.log("📤 POST /api/coordinator/rooms - REQUEST");
     const { NextResponse } = await import("next/server");
     const user   = getCurrentUser(request, { requiredRole: "coordinator" });
     const iOid   = await resolveInstitutionId(user.institutionId);
     const body   = await request.json();
     const { name, label, building, capacity } = body;
 
+    console.log("📤 POST body:", { name, label, building, capacity });
+
     if (!name?.trim() || !label?.trim()) {
+      console.log("❌ Validation failed: missing name or label");
       return NextResponse.json({ message: "Room name and label are required." }, { status: 400 });
     }
 
@@ -47,6 +55,7 @@ export async function POST(request) {
       label: label.trim().toUpperCase(),
     });
     if (existing) {
+      console.log("❌ Duplicate label:", label.trim().toUpperCase());
       return NextResponse.json({ message: "A room with this label already exists." }, { status: 409 });
     }
 
@@ -61,9 +70,11 @@ export async function POST(request) {
     };
 
     const result = await db.collection("rooms").insertOne(room);
+    console.log("📥 POST /api/coordinator/rooms - RESPONSE:", { id: result.insertedId.toString(), ...room });
     return NextResponse.json({ ok: true, room: { id: result.insertedId.toString(), ...room } }, { status: 201 });
 
   } catch (err) {
+    console.error("❌ POST /api/coordinator/rooms - ERROR:", err);
     const { NextResponse } = await import("next/server");
     return NextResponse.json({ message: err.message ?? "Server error" }, { status: err.status ?? 500 });
   }
