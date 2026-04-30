@@ -28,6 +28,11 @@ export async function POST(request) {
       "course code": "code", "course_code": "code",
       "course name": "name", "course_name": "name",
       "credits": "credit_hours", "credit hours": "credit_hours",
+      "year level": "year_levels", "year_level": "year_levels",
+      "num sections": "num_sections", "num_sections": "num_sections",
+      "lecture duration": "lecture_duration",
+      "lab duration": "lab_duration",
+      "tutorial duration": "tutorial_duration",
       "room label": "label", "room code": "label",
       "seats": "capacity",
       "term": "term_label",
@@ -69,7 +74,12 @@ export async function POST(request) {
         if (type === "courses") {
           if (!obj.code)          errors.push(`Row ${rowNum}: missing code`);
           else if (!obj.name)     errors.push(`Row ${rowNum}: missing name`);
-          else                    valid++;
+          else {
+            if (!obj.year_levels) warnings.push(`Row ${rowNum}: missing year_levels, defaulting to [1]`);
+            const hasSessionType = obj.has_lecture || obj.has_lab || obj.has_tutorial || obj.lecture_duration || obj.lab_duration || obj.tutorial_duration;
+            if (!hasSessionType) warnings.push(`Row ${rowNum}: no session types specified, defaulting to lecture 90min`);
+            valid++;
+          }
         } else if (type === "staff") {
           const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(obj.email ?? "");
           if (!obj.name)          errors.push(`Row ${rowNum}: missing name`);

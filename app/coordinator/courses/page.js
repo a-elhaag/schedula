@@ -37,7 +37,14 @@ export default function CoordinatorCoursesPage() {
     code: "",
     name: "",
     credit_hours: "3",
-    sections: "1",
+    num_sections: "1",
+    year_levels: [],
+    has_lecture: false,
+    lecture_duration: "90",
+    has_lab: false,
+    lab_duration: "120",
+    has_tutorial: false,
+    tutorial_duration: "60",
   });
   const [editingId, setEditingId] = useState(null);
 
@@ -68,8 +75,35 @@ export default function CoordinatorCoursesPage() {
       showToast("warning", "Validation", "Course code and name are required.");
       return;
     }
+
+    if (form.year_levels.length === 0) {
+      showToast("warning", "Validation", "At least one year level must be selected.");
+      return;
+    }
+
+    const hasSessionType = form.has_lecture || form.has_lab || form.has_tutorial;
+    if (!hasSessionType) {
+      showToast("warning", "Validation", "At least one session type must be selected.");
+      return;
+    }
+
     setSaving(true);
     try {
+      const section_types = [
+        ...(form.has_lecture ? [{ type: "lecture", duration_minutes: parseInt(form.lecture_duration) || 90 }] : []),
+        ...(form.has_lab ? [{ type: "lab", duration_minutes: parseInt(form.lab_duration) || 120 }] : []),
+        ...(form.has_tutorial ? [{ type: "tutorial", duration_minutes: parseInt(form.tutorial_duration) || 60 }] : []),
+      ];
+
+      const payload = {
+        code: form.code,
+        name: form.name,
+        credit_hours: parseInt(form.credit_hours) || 3,
+        num_sections: parseInt(form.num_sections) || 1,
+        year_levels: form.year_levels.map(Number),
+        section_types,
+      };
+
       const url = editingId
         ? `/api/coordinator/courses/${editingId}`
         : "/api/coordinator/courses";
@@ -77,7 +111,7 @@ export default function CoordinatorCoursesPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.message ?? "Failed to save");
@@ -87,7 +121,19 @@ export default function CoordinatorCoursesPage() {
         `${form.code} has been saved.`,
       );
       setShowModal(false);
-      setForm({ code: "", name: "", credit_hours: "3", sections: "1" });
+      setForm({
+        code: "",
+        name: "",
+        credit_hours: "3",
+        num_sections: "1",
+        year_levels: [],
+        has_lecture: false,
+        lecture_duration: "90",
+        has_lab: false,
+        lab_duration: "120",
+        has_tutorial: false,
+        tutorial_duration: "60",
+      });
       setEditingId(null);
       load();
     } catch (e) {
@@ -118,17 +164,46 @@ export default function CoordinatorCoursesPage() {
 
   function openCreate() {
     setEditingId(null);
-    setForm({ code: "", name: "", credit_hours: "3", sections: "1" });
+    setForm({
+      code: "",
+      name: "",
+      credit_hours: "3",
+      num_sections: "1",
+      year_levels: [],
+      has_lecture: false,
+      lecture_duration: "90",
+      has_lab: false,
+      lab_duration: "120",
+      has_tutorial: false,
+      tutorial_duration: "60",
+    });
     setShowModal(true);
   }
 
   function openEdit(course) {
     setEditingId(course.id);
+
+    const section_types = course.section_types || [];
+    const hasLecture = section_types.some(st => st.type === "lecture");
+    const hasLab = section_types.some(st => st.type === "lab");
+    const hasTutorial = section_types.some(st => st.type === "tutorial");
+
+    const lectureDuration = section_types.find(st => st.type === "lecture")?.duration_minutes || 90;
+    const labDuration = section_types.find(st => st.type === "lab")?.duration_minutes || 120;
+    const tutorialDuration = section_types.find(st => st.type === "tutorial")?.duration_minutes || 60;
+
     setForm({
       code: course.code,
       name: course.name,
-      credit_hours: course.credits || 3,
-      sections: course.sectionCount || 1,
+      credit_hours: String(course.credits || 3),
+      num_sections: String(course.sectionCount || 1),
+      year_levels: course.year_levels || [],
+      has_lecture: hasLecture,
+      lecture_duration: String(lectureDuration),
+      has_lab: hasLab,
+      lab_duration: String(labDuration),
+      has_tutorial: hasTutorial,
+      tutorial_duration: String(tutorialDuration),
     });
     setShowModal(true);
   }
@@ -158,15 +233,34 @@ export default function CoordinatorCoursesPage() {
         return;
       }
 
-      const headers = ["id", "code", "name", "credits", "sections", "fillRate"];
-      const rows = courses.map((c) => [
-        c.id ?? "",
-        c.code ?? "",
-        c.name ?? "",
-        String(c.credits ?? c.credit_hours ?? ""),
-        String(c.sectionCount ?? c.sections ?? ""),
-        String(c.fillRate ?? ""),
-      ]);
+      const headers = [
+        "id",
+        "code",
+        "name",
+        "credits",
+        "sections",
+        "year_levels",
+        "section_types",
+        "fillRate",
+      ];
+
+      const rows = courses.map((c) => {
+        const yearLevels = (c.year_levels || []).join("|");
+        const sectionTypes = (c.section_types || [])
+          .map((st) => `${st.type}:${st.duration_minutes}`)
+          .join("|");
+
+        return [
+          c.id ?? "",
+          c.code ?? "",
+          c.name ?? "",
+          String(c.credits ?? c.credit_hours ?? ""),
+          String(c.sectionCount ?? c.sections ?? ""),
+          yearLevels,
+          sectionTypes,
+          String(c.fillRate ?? ""),
+        ];
+      });
 
       const csv = [
         headers.join(","),
@@ -335,13 +429,117 @@ export default function CoordinatorCoursesPage() {
           />
           <Input
             label="Number of Sections"
-            value={form.sections}
+            value={form.num_sections}
             onChange={(e) =>
-              setForm((p) => ({ ...p, sections: e.target.value }))
+              setForm((p) => ({ ...p, num_sections: e.target.value }))
             }
             placeholder="1"
             type="number"
           />
+
+          <div style={{ gridColumn: "1 / -1", marginTop: "1rem" }}>
+            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "500" }}>Year Levels</label>
+            <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
+              {[1, 2, 3, 4].map((level) => (
+                <label key={level} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <input
+                    type="checkbox"
+                    checked={form.year_levels.includes(level)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setForm((p) => ({
+                          ...p,
+                          year_levels: [...p.year_levels, level].sort(),
+                        }));
+                      } else {
+                        setForm((p) => ({
+                          ...p,
+                          year_levels: p.year_levels.filter((y) => y !== level),
+                        }));
+                      }
+                    }}
+                  />
+                  Year {level}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ gridColumn: "1 / -1", marginTop: "1rem" }}>
+            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "500" }}>Session Types</label>
+
+            <div style={{ marginBottom: "1rem" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                <input
+                  type="checkbox"
+                  checked={form.has_lecture}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, has_lecture: e.target.checked }))
+                  }
+                />
+                Lecture
+              </label>
+              {form.has_lecture && (
+                <Input
+                  label="Duration (minutes)"
+                  value={form.lecture_duration}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, lecture_duration: e.target.value }))
+                  }
+                  type="number"
+                  style={{ marginLeft: "1.5rem" }}
+                />
+              )}
+            </div>
+
+            <div style={{ marginBottom: "1rem" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                <input
+                  type="checkbox"
+                  checked={form.has_lab}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, has_lab: e.target.checked }))
+                  }
+                />
+                Lab
+              </label>
+              {form.has_lab && (
+                <Input
+                  label="Duration (minutes)"
+                  value={form.lab_duration}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, lab_duration: e.target.value }))
+                  }
+                  type="number"
+                  style={{ marginLeft: "1.5rem" }}
+                />
+              )}
+            </div>
+
+            <div>
+              <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                <input
+                  type="checkbox"
+                  checked={form.has_tutorial}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, has_tutorial: e.target.checked }))
+                  }
+                />
+                Tutorial
+              </label>
+              {form.has_tutorial && (
+                <Input
+                  label="Duration (minutes)"
+                  value={form.tutorial_duration}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, tutorial_duration: e.target.value }))
+                  }
+                  type="number"
+                  style={{ marginLeft: "1.5rem" }}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </Modal>
 
