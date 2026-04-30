@@ -4,6 +4,9 @@ import { getCurrentUser } from "@/lib/server/auth";
 import { resolveInstitutionId } from "@/app/api/coordinator/_helpers/resolve-institution";
 import { getDb } from "@/lib/db";
 
+const VALID_ROOM_TYPES = ["lecture_hall", "tutorial_room", "lab"];
+const VALID_LAB_TYPES  = ["computer_lab", "physics_lab", "chemistry_lab", "metal_workshop"];
+
 // ── GET /api/coordinator/rooms ────────────────────────────────────────────────
 export const GET = withApiErrorHandling(async function getCoordinatorRoomsRoute(request) {
   try {
@@ -39,16 +42,57 @@ export async function POST(request) {
     const user   = getCurrentUser(request, { requiredRole: "coordinator" });
     const iOid   = await resolveInstitutionId(user.institutionId);
     const body   = await request.json();
-    const { name, label, building, capacity } = body;
+    const { name, label, building, room_type, lab_type, groups_capacity } = body;
 
-    console.log("📤 POST body:", { name, label, building, capacity });
+    console.log("📤 POST body:", { name, label, building, room_type, lab_type, groups_capacity });
 
+    // ── Core field presence ──────────────────────────────────────────────────
     if (!name?.trim() || !label?.trim()) {
       console.log("❌ Validation failed: missing name or label");
       return NextResponse.json({ message: "Room name and label are required." }, { status: 400 });
     }
 
-    const db  = await getDb();
+    // ── room_type ────────────────────────────────────────────────────────────
+    if (!room_type || !VALID_ROOM_TYPES.includes(room_type)) {
+      console.log("❌ Validation failed: invalid room_type:", room_type);
+      return NextResponse.json(
+        { message: `room_type must be one of: ${VALID_ROOM_TYPES.join(", ")}.` },
+        { status: 400 }
+      );
+    }
+
+    // ── lab_type (conditional on room_type) ──────────────────────────────────
+    let resolvedLabType = null;
+    if (room_type === "lab") {
+      if (!lab_type || !VALID_LAB_TYPES.includes(lab_type)) {
+        console.log("❌ Validation failed: invalid lab_type for lab room:", lab_type);
+        return NextResponse.json(
+          { message: `lab_type is required for lab rooms and must be one of: ${VALID_LAB_TYPES.join(", ")}.` },
+          { status: 400 }
+        );
+      }
+      resolvedLabType = lab_type;
+    }
+
+    // ── groups_capacity ──────────────────────────────────────────────────────
+    const parsedGroupsCapacity = Number.isInteger(groups_capacity)
+      ? groups_capacity
+      : Number.parseInt(groups_capacity, 10);
+
+    if (
+      !Number.isInteger(parsedGroupsCapacity) ||
+      parsedGroupsCapacity < 1 ||
+      parsedGroupsCapacity > 10
+    ) {
+      console.log("❌ Validation failed: invalid groups_capacity:", groups_capacity);
+      return NextResponse.json(
+        { message: "groups_capacity must be an integer between 1 and 10." },
+        { status: 400 }
+      );
+    }
+
+    // ── Duplicate label check ────────────────────────────────────────────────
+    const db = await getDb();
 
     const existing = await db.collection("rooms").findOne({
       institution_id: iOid,
@@ -59,14 +103,17 @@ export async function POST(request) {
       return NextResponse.json({ message: "A room with this label already exists." }, { status: 409 });
     }
 
+    // ── Insert ───────────────────────────────────────────────────────────────
     const room = {
-      institution_id: iOid,
-      name:           name.trim(),
-      label:          label.trim().toUpperCase(),
-      building:       building?.trim() ?? "",
-      capacity:       parseInt(capacity) || 30,
-      created_at:     new Date(),
-      deleted_at:     null,
+      institution_id:  iOid,
+      name:            name.trim(),
+      label:           label.trim().toUpperCase(),
+      building:        building?.trim() ?? "",
+      room_type,
+      lab_type:        resolvedLabType,
+      groups_capacity: parsedGroupsCapacity,
+      created_at:      new Date(),
+      deleted_at:      null,
     };
 
     const result = await db.collection("rooms").insertOne(room);
