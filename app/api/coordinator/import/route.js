@@ -39,14 +39,18 @@ export async function POST(request) {
     }
 
     const text    = await file.text();
-    const lines   = text.trim().split("\n").filter(Boolean);
-    const rawHeaders = lines[0].split(",").map(h => h.trim().toLowerCase());
-    const dataRows = lines.slice(1);
+    let rows = [];
+    let headers = [];
 
     const headerAliases = {
       "course code": "code", "course_code": "code",
       "course name": "name", "course_name": "name",
       "credits": "credit_hours", "credit hours": "credit_hours",
+      "year level": "year_levels", "year_level": "year_levels",
+      "num sections": "num_sections", "num_sections": "num_sections",
+      "lecture duration": "lecture_duration",
+      "lab duration": "lab_duration",
+      "tutorial duration": "tutorial_duration",
       "room label": "label", "room code": "label",
       "seats": "capacity",
       "term": "term_label",
@@ -54,23 +58,69 @@ export async function POST(request) {
       "course_id": "course_id"
     };
 
-    const headers = rawHeaders.map(h => headerAliases[h] || h);
-    const rows = dataRows;
+    // Detect JSON vs CSV
+    if (file.name.endsWith(".json")) {
+      const jsonData = JSON.parse(text);
+      if (!Array.isArray(jsonData)) {
+        return NextResponse.json({ message: "JSON file must contain an array of objects." }, { status: 400 });
+      }
+      rows = jsonData;
+      headers = jsonData.length > 0 ? Object.keys(jsonData[0]).map(h => h.toLowerCase()) : [];
+    } else {
+      const lines   = text.trim().split("\n").filter(Boolean);
+      const rawHeaders = lines[0].split(",").map(h => h.trim().toLowerCase());
+      const dataRows = lines.slice(1);
+      headers = rawHeaders.map(h => headerAliases[h] || h);
+      rows = dataRows;
+    }
 
     const db   = await getDb();
     const iOid = new ObjectId(institutionId);
     let imported = 0;
 
+    function buildSectionTypes(obj) {
+      const types = [];
+      if (obj.has_lecture === "true" || obj.lecture_duration) {
+        types.push({ type: "lecture", duration_minutes: parseInt(obj.lecture_duration) || 90 });
+      }
+      if (obj.has_lab === "true" || obj.lab_duration) {
+        types.push({ type: "lab", duration_minutes: parseInt(obj.lab_duration) || 120 });
+      }
+      if (obj.has_tutorial === "true" || obj.tutorial_duration) {
+        types.push({ type: "tutorial", duration_minutes: parseInt(obj.tutorial_duration) || 60 });
+      }
+      return types.length > 0 ? types : [{ type: "lecture", duration_minutes: 90 }];
+    }
+
+    function parseYearLevels(val) {
+      if (Array.isArray(val)) return val.filter(y => [1, 2, 3, 4].includes(Number(y))).map(Number);
+      if (typeof val === "string") {
+        return val.split("|").map(v => parseInt(v)).filter(y => [1, 2, 3, 4].includes(y));
+      }
+      return [1];
+    }
+
     if (type === "courses") {
       const docs = rows.map(row => {
-        const vals = row.split(",").map(v => v.trim().replace(/^"|"$/g, ""));
-        const obj  = Object.fromEntries(headers.map((h, i) => [h, vals[i] ?? ""]));
+        let obj;
+        if (file.name.endsWith(".json")) {
+          obj = row;
+        } else {
+          const vals = row.split(",").map(v => v.trim().replace(/^"|"$/g, ""));
+          obj = Object.fromEntries(headers.map((h, i) => [h, vals[i] ?? ""]));
+        }
+
+        const sectionTypes = buildSectionTypes(obj);
+        const yearLevels = parseYearLevels(obj.year_levels || [1]);
+
         return {
           institution_id: iOid,
           code:           obj.code?.toUpperCase() ?? "",
           name:           obj.name ?? "",
           credit_hours:   parseInt(obj.credit_hours) || 3,
-          sections:       [],
+          num_sections:   parseInt(obj.num_sections || obj.sections) || 1,
+          year_levels:    yearLevels,
+          section_types:  sectionTypes,
           created_at:     new Date(),
           deleted_at:     null,
         };

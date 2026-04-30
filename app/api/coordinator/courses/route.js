@@ -40,10 +40,28 @@ export async function POST(request) {
     const { institutionId } = getCurrentUser(request, { requiredRole: "coordinator" });
 
     const body = await request.json();
-    const { code, name, credit_hours, sections } = body;
+    const { code, name, credit_hours, num_sections, sections, year_levels, section_types } = body;
 
     if (!code?.trim() || !name?.trim()) {
       return NextResponse.json({ message: "Course code and name are required." }, { status: 400 });
+    }
+
+    if (!Array.isArray(year_levels) || year_levels.length === 0) {
+      return NextResponse.json({ message: "At least one year level must be selected." }, { status: 400 });
+    }
+
+    if (!Array.isArray(section_types) || section_types.length === 0) {
+      return NextResponse.json({ message: "At least one section type must be selected." }, { status: 400 });
+    }
+
+    const validSectionTypes = section_types.every(st =>
+      ["lecture", "lab", "tutorial"].includes(st.type) &&
+      typeof st.duration_minutes === "number" &&
+      st.duration_minutes > 0
+    );
+
+    if (!validSectionTypes) {
+      return NextResponse.json({ message: "Invalid section type or duration." }, { status: 400 });
     }
 
     const iOid       = await resolveInstitutionId(institutionId);
@@ -52,7 +70,9 @@ export async function POST(request) {
       code:         code.trim().toUpperCase(),
       name:         name.trim(),
       credit_hours: parseInt(credit_hours) || 3,
-      sections:     parseInt(sections)     || 1,
+      num_sections: parseInt(num_sections || sections) || 1,
+      year_levels:  year_levels.filter(y => [1, 2, 3, 4].includes(Number(y))).map(Number),
+      section_types,
     });
 
     return NextResponse.json({ ok: true, course }, { status: 201 });
