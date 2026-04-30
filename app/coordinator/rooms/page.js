@@ -3,16 +3,18 @@
 import { useState, useEffect, useCallback } from "react";
 import "./styles.css";
 
-import Button      from "@/components/Button";
+import Button       from "@/components/Button";
 import { StatCard } from "@/components/StatCard";
-import Modal       from "@/components/Modal";
-import Toast       from "@/components/Toast";
-import Spinner     from "@/components/Spinner";
+import Modal        from "@/components/Modal";
+import Toast        from "@/components/Toast";
+import Spinner      from "@/components/Spinner";
 import SkeletonPage from "@/components/SkeletonPage";
-import ErrorState  from "@/components/ErrorState";
-import { Input }   from "@/components/Input";
-import RoomCard    from "@/components/RoomCard";
+import ErrorState   from "@/components/ErrorState";
+import { Input }    from "@/components/Input";
+import RoomCard     from "@/components/RoomCard";
 import { HomeIcon, BoltIcon, GraduationCapIcon } from "@/components/icons/index";
+
+const EMPTY_FORM = { name: "", label: "", building: "", room_type: "lecture_hall", lab_type: "", groups_capacity: "1" };
 
 export default function CoordinatorRoomsPage() {
   const [data,      setData]      = useState(null);
@@ -22,12 +24,12 @@ export default function CoordinatorRoomsPage() {
   const [saving,    setSaving]    = useState(false);
   const [search,    setSearch]    = useState("");
   const [building,  setBuilding]  = useState("all");
-  const [toast,     setToast]     = useState({ open:false, variant:"info", title:"", message:"", id:0 });
-  const [form,      setForm]      = useState({ name:"", label:"", building:"", capacity:"30" });
+  const [toast,     setToast]     = useState({ open: false, variant: "info", title: "", message: "", id: 0 });
+  const [form,      setForm]      = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState(null);
 
   const showToast = (variant, title, message) =>
-    setToast({ open:true, variant, title, message, id:Date.now() });
+    setToast({ open: true, variant, title, message, id: Date.now() });
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -45,8 +47,9 @@ export default function CoordinatorRoomsPage() {
     } catch (e) {
       console.error("❌ GET ROOMS ERROR:", e);
       setError(e.message);
+    } finally {
+      setLoading(false);
     }
-    finally { setLoading(false); }
   }, [building]);
 
   useEffect(() => { load(); }, [load]);
@@ -58,29 +61,40 @@ export default function CoordinatorRoomsPage() {
     }
     setSaving(true);
     try {
-      const url = editingId ? `/api/coordinator/rooms/${editingId}` : "/api/coordinator/rooms";
+      const url    = editingId ? `/api/coordinator/rooms/${editingId}` : "/api/coordinator/rooms";
       const method = editingId ? "PUT" : "POST";
+      const body   = {
+        name:            form.name,
+        label:           form.label,
+        building:        form.building,
+        room_type:       form.room_type,
+        lab_type:        form.room_type === "lab" ? (form.lab_type || null) : null,
+        groups_capacity: parseInt(form.groups_capacity, 10),
+      };
       console.log(`📤 ${method} ROOM REQUEST:`, url);
-      console.log("📤 REQUEST BODY:", form);
+      console.log("📤 REQUEST BODY:", body);
       const res  = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(form),
+        body:    JSON.stringify(body),
       });
       console.log(`📥 ${method} ROOM RESPONSE STATUS:`, res.status);
       const json = await res.json();
       console.log(`📥 ${method} ROOM RESPONSE DATA:`, json);
       if (!res.ok) throw new Error(json.message ?? "Failed to save");
 
-      // Merge server response into local state so the new/updated room appears immediately
       const srvRoom = json.room || {};
       const roomObj = {
-        id: srvRoom.id,
-        label: srvRoom.label,
-        name: srvRoom.name,
-        building: srvRoom.building || "N/A",
-        capacity: srvRoom.capacity || 30,
-        createdAt: srvRoom.created_at ? (new Date(srvRoom.created_at)).toISOString() : (srvRoom.createdAt || new Date().toISOString()),
+        id:              srvRoom.id,
+        label:           srvRoom.label,
+        name:            srvRoom.name,
+        building:        srvRoom.building || "N/A",
+        room_type:       srvRoom.room_type,
+        lab_type:        srvRoom.lab_type ?? null,
+        groups_capacity: srvRoom.groups_capacity ?? body.groups_capacity,
+        createdAt:       srvRoom.created_at
+          ? new Date(srvRoom.created_at).toISOString()
+          : (srvRoom.createdAt || new Date().toISOString()),
       };
 
       setData(prev => {
@@ -88,20 +102,20 @@ export default function CoordinatorRoomsPage() {
         if (editingId) {
           const items = prevItems.map(r => (r.id === editingId ? roomObj : r));
           return { ...prev, items };
-        } else {
-          return { ...prev, items: [...prevItems, roomObj], total: (prev?.total ?? 0) + 1 };
         }
+        return { ...prev, items: [...prevItems, roomObj], total: (prev?.total ?? 0) + 1 };
       });
 
       showToast("success", editingId ? "Room Updated" : "Room Added", `${form.name} has been saved.`);
       setShowModal(false);
-      setForm({ name:"", label:"", building:"", capacity:"30" });
+      setForm(EMPTY_FORM);
       setEditingId(null);
     } catch (e) {
       console.error("❌ SAVE ROOM ERROR:", e);
       showToast("danger", "Error", e.message);
+    } finally {
+      setSaving(false);
     }
-    finally { setSaving(false); }
   }
 
   async function handleDelete(roomId) {
@@ -112,7 +126,6 @@ export default function CoordinatorRoomsPage() {
       const res = await fetch(url, { method: "DELETE" });
       console.log("📥 DELETE ROOM RESPONSE STATUS:", res.status);
       if (!res.ok) throw new Error("Failed to delete room");
-      // Remove from local state so the UI updates immediately
       setData(prev => {
         const prevItems = prev?.items ?? [];
         const items = prevItems.filter(r => r.id !== roomId);
@@ -127,13 +140,20 @@ export default function CoordinatorRoomsPage() {
 
   function openCreate() {
     setEditingId(null);
-    setForm({ name:"", label:"", building:"", capacity:"30" });
+    setForm(EMPTY_FORM);
     setShowModal(true);
   }
 
   function openEdit(room) {
     setEditingId(room.id);
-    setForm({ name: room.name, label: room.label, building: room.building || "", capacity: room.capacity || 30 });
+    setForm({
+      name:            room.name,
+      label:           room.label,
+      building:        room.building || "",
+      room_type:       room.room_type || "lecture_hall",
+      lab_type:        room.lab_type  || "",
+      groups_capacity: String(room.groups_capacity ?? 1),
+    });
     setShowModal(true);
   }
 
@@ -156,9 +176,9 @@ export default function CoordinatorRoomsPage() {
         </div>
 
         <section className="stats-grid reveal reveal-2">
-          <StatCard label="Total Rooms"    value={String(data?.total ?? 0)}                                          trend="Available"       Icon={HomeIcon}          />
-          <StatCard label="Buildings"      value={String(buildings.filter(b => b !== "all").length)}                 trend="On campus"       Icon={BoltIcon}          />
-          <StatCard label="Total Capacity" value={String(rooms.reduce((a, r) => a + (r.capacity ?? 0), 0))}          trend="Seats available" Icon={GraduationCapIcon} />
+          <StatCard label="Total Rooms"   value={String(data?.total ?? 0)}                                                  trend="Available"        Icon={HomeIcon}          />
+          <StatCard label="Buildings"     value={String(buildings.filter(b => b !== "all").length)}                          trend="On campus"        Icon={BoltIcon}          />
+          <StatCard label="Total Groups"  value={String(rooms.reduce((a, r) => a + (r.groups_capacity ?? 0), 0))}            trend="Groups available" Icon={GraduationCapIcon} />
         </section>
 
         <section className="panel reveal reveal-3">
@@ -205,7 +225,6 @@ export default function CoordinatorRoomsPage() {
           <Button variant="ghost">Export Room List</Button>
           <Button variant="ghost">Import Rooms CSV</Button>
         </section>
-
       </main>
 
       <Modal
@@ -223,14 +242,64 @@ export default function CoordinatorRoomsPage() {
         }
       >
         <div className="form-grid">
-          <Input label="Room Name"  value={form.name}     onChange={e => setForm(p => ({ ...p, name:     e.target.value }))} placeholder="e.g. Room A202"  />
-          <Input label="Label/Code" value={form.label}    onChange={e => setForm(p => ({ ...p, label:    e.target.value }))} placeholder="e.g. A202"        />
-          <Input label="Building"   value={form.building} onChange={e => setForm(p => ({ ...p, building: e.target.value }))} placeholder="e.g. Building A"  />
-          <Input label="Capacity"   value={form.capacity} onChange={e => setForm(p => ({ ...p, capacity: e.target.value }))} placeholder="30" type="number"  />
+          <Input label="Room Name"  value={form.name}     onChange={e => setForm(p => ({ ...p, name:     e.target.value }))} placeholder="e.g. Room A202" />
+          <Input label="Label/Code" value={form.label}    onChange={e => setForm(p => ({ ...p, label:    e.target.value }))} placeholder="e.g. A202"       />
+          <Input label="Building"   value={form.building} onChange={e => setForm(p => ({ ...p, building: e.target.value }))} placeholder="e.g. Building A" />
+
+          <div className="input-container">
+            <label className="input-label">Room Type</label>
+            <select
+              className="input-field"
+              value={form.room_type}
+              onChange={e => setForm(p => ({ ...p, room_type: e.target.value, lab_type: "" }))}
+            >
+              <option value="lecture_hall">Lecture Hall</option>
+              <option value="tutorial_room">Tutorial Room</option>
+              <option value="lab">Lab</option>
+            </select>
+          </div>
+
+          {form.room_type === "lab" && (
+            <div className="input-container">
+              <label className="input-label">Lab Type</label>
+              <select
+                className="input-field"
+                value={form.lab_type}
+                onChange={e => setForm(p => ({ ...p, lab_type: e.target.value }))}
+              >
+                <option value="">Select lab type...</option>
+                <option value="computer_lab">Computer Lab</option>
+                <option value="physics_lab">Physics Lab</option>
+                <option value="chemistry_lab">Chemistry Lab</option>
+                <option value="metal_workshop">Metal Workshop</option>
+              </select>
+            </div>
+          )}
+
+          <div className="input-container">
+            <label className="input-label">Groups Capacity</label>
+            <select
+              className="input-field"
+              value={form.groups_capacity}
+              onChange={e => setForm(p => ({ ...p, groups_capacity: e.target.value }))}
+            >
+              {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
+                <option key={n} value={String(n)}>{n}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </Modal>
 
-      <Toast key={toast.id} open={toast.open} variant={toast.variant} title={toast.title} message={toast.message} onClose={() => setToast(p => ({ ...p, open:false }))} duration={3200} />
+      <Toast
+        key={toast.id}
+        open={toast.open}
+        variant={toast.variant}
+        title={toast.title}
+        message={toast.message}
+        onClose={() => setToast(p => ({ ...p, open: false }))}
+        duration={3200}
+      />
     </div>
   );
 }
