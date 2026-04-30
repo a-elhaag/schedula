@@ -2,6 +2,7 @@
 
 import "./styles.css";
 import { useEffect, useState } from "react";
+import ScheduleTable from "@/components/ScheduleTable";
 
 const TYPE_CLASS_MAP = {
   Lecture: "type-lecture",
@@ -144,6 +145,16 @@ export default function ProfessorSchedulePage() {
   const { dayBlocks } = scheduleData;
   const totalSessions = dayBlocks.reduce((sum, day) => sum + (day.sessions?.length || 0), 0);
 
+  // Transform dayBlocks to ScheduleTable format
+  const tableData = {};
+  const days = [];
+  dayBlocks.forEach(block => {
+    if (!days.includes(block.day)) {
+      days.push(block.day);
+    }
+    tableData[block.day] = block.sessions || [];
+  });
+
   return (
     <div className="page-container">
       <main className="schedule-shell">
@@ -213,6 +224,13 @@ export default function ProfessorSchedulePage() {
                 )}
               </article>
             ))}
+          </section>
+        )}
+
+        {totalSessions > 0 && (
+          <section className="timetable-section" aria-label="Full schedule timetable">
+            <h2>Full Schedule Timetable</h2>
+            <ScheduleTable sessions={tableData} days={days} />
           </section>
         )}
       </main>

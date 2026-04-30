@@ -231,6 +231,19 @@
   to   { background-position: 6% 4%, 96% 94%, 0 0; }
 }
 
+/* ── Timetable section ── */
+.timetable-section {
+  animation: cardEnter 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 280ms;
+}
+
+.timetable-section h2 {
+  color: var(--color-text-primary);
+  margin: 0 0 1.125rem;
+  font-size: 1.625rem;
+  letter-spacing: -0.03em;
+}
+
 @media (min-width: 47.5rem) {
   .session-card {
     flex-direction: row;
