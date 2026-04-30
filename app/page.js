@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import "./landing.css";
 
 export default function LandingPage() {
@@ -14,7 +14,7 @@ export default function LandingPage() {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const vh = window.innerHeight;
-      
+
       // Global scroll parsing for parallax/marquees
       document.documentElement.style.setProperty("--scroll", scrollY);
 
@@ -27,28 +27,41 @@ export default function LandingPage() {
         return Math.max(0, Math.min(1, p));
       };
 
-      document.documentElement.style.setProperty("--explode", getProgress(explodeRef));
-      document.documentElement.style.setProperty("--graph", getProgress(graphRef));
-      document.documentElement.style.setProperty("--grid", getProgress(gridRef));
-      
+      document.documentElement.style.setProperty(
+        "--explode",
+        getProgress(explodeRef),
+      );
+      document.documentElement.style.setProperty(
+        "--graph",
+        getProgress(graphRef),
+      );
+      document.documentElement.style.setProperty(
+        "--grid",
+        getProgress(gridRef),
+      );
+
       // Balance progress will trace a sine wave to emulate "weighing" options
       const rawBalance = getProgress(balanceRef);
       // Damps out to 0 at the end
-      const tipAmount = Math.sin(rawBalance * Math.PI * 5) * (1 - rawBalance) * 25; 
+      const tipAmount =
+        Math.sin(rawBalance * Math.PI * 5) * (1 - rawBalance) * 25;
       document.documentElement.style.setProperty("--tip", tipAmount);
       document.documentElement.style.setProperty("--balance", rawBalance);
     };
-    
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
-    
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if(e.isIntersecting) e.target.classList.add("visible");
-      });
-    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
-    
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) e.target.classList.add("visible");
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" },
+    );
+
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -56,31 +69,37 @@ export default function LandingPage() {
     };
   }, []);
 
-  // Generate 25 scatter blocks for the timetable grid puzzle
-  const generateBlocks = () => {
-    const blocks = [];
+  // Seeded random for reproducible blocks (fixes React purity rules)
+  const seededRandom = (seed) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
+  // Generate 25 scatter blocks for the timetable grid puzzle (memoized to avoid re-rendering)
+  const blocks = useMemo(() => {
+    const blockList = [];
     const colors = ["#0071E3", "#34C759", "#FF9500", "#5856D6", "#FF2D55"];
     for (let i = 0; i < 20; i++) {
-        // Random scatter origin positions
-        const xStart = (Math.random() - 0.5) * 1000;
-        const yStart = (Math.random() - 0.5) * 1000;
-        const rotStart = (Math.random() - 0.5) * 360;
-        
-        blocks.push(
-          <div 
-            key={i} 
-            className="puzzle-block" 
-            style={{
-              backgroundColor: colors[i % colors.length],
-              '--x-start': `${xStart}px`,
-              '--y-start': `${yStart}px`,
-              '--rot-start': `${rotStart}deg`
-            }}
-          ></div>
-        );
+      // Seeded positions for reproducible randomness
+      const xStart = (seededRandom(i * 1.3) - 0.5) * 1000;
+      const yStart = (seededRandom(i * 2.7) - 0.5) * 1000;
+      const rotStart = (seededRandom(i * 3.9) - 0.5) * 360;
+
+      blockList.push(
+        <div
+          key={i}
+          className="puzzle-block"
+          style={{
+            backgroundColor: colors[i % colors.length],
+            "--x-start": `${xStart}px`,
+            "--y-start": `${yStart}px`,
+            "--rot-start": `${rotStart}deg`,
+          }}
+        ></div>,
+      );
     }
-    return blocks;
-  };
+    return blockList;
+  }, []);
 
   return (
     <div className="landing-wrapper">
@@ -88,23 +107,32 @@ export default function LandingPage() {
       <nav className="nav">
         <span className="nav-brand">Schedula</span>
         <div className="nav-actions">
-          <Link href="/signin" className="btn-ghost">Sign in</Link>
-          <Link href="/signup" className="btn-primary">Get started</Link>
+          <Link href="/signin" className="btn-ghost">
+            Sign in
+          </Link>
+          <Link href="/signup" className="btn-primary">
+            Get started
+          </Link>
         </div>
       </nav>
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section className="hero">
         <div className="hero-content">
-          <span className="hero-eyebrow reveal stagger-1">Intelligent Timetabling</span>
+          <span className="hero-eyebrow reveal stagger-1">
+            Intelligent Timetabling
+          </span>
           <h1 className="hero-title reveal stagger-2">
             Scheduling that <em>clicks</em> into place.
           </h1>
           <p className="hero-subtitle reveal stagger-3">
-            Watch how Schedula dissects your university constraints into a flawless, conflict-free master timetable.
+            Watch how Schedula dissects your university constraints into a
+            flawless, conflict-free master timetable.
           </p>
           <div className="hero-actions reveal stagger-4">
-            <Link href="/signup" className="btn-hero-primary">Start your instance</Link>
+            <Link href="/signup" className="btn-hero-primary">
+              Start your instance
+            </Link>
           </div>
         </div>
       </section>
@@ -112,9 +140,18 @@ export default function LandingPage() {
       {/* ── Infinite Scroll Marquee ───────────────────────────────────────── */}
       <div className="marquee-wrapper">
         <div className="marquee-track">
-          <span>NO DOUBLE BOOKINGS • 100% CONSTRAINTS MET • ZERO GUESSWORK • PERFECT BALANCE •</span>
-          <span>NO DOUBLE BOOKINGS • 100% CONSTRAINTS MET • ZERO GUESSWORK • PERFECT BALANCE •</span>
-          <span>NO DOUBLE BOOKINGS • 100% CONSTRAINTS MET • ZERO GUESSWORK • PERFECT BALANCE •</span>
+          <span>
+            NO DOUBLE BOOKINGS • 100% CONSTRAINTS MET • ZERO GUESSWORK • PERFECT
+            BALANCE •
+          </span>
+          <span>
+            NO DOUBLE BOOKINGS • 100% CONSTRAINTS MET • ZERO GUESSWORK • PERFECT
+            BALANCE •
+          </span>
+          <span>
+            NO DOUBLE BOOKINGS • 100% CONSTRAINTS MET • ZERO GUESSWORK • PERFECT
+            BALANCE •
+          </span>
         </div>
       </div>
 
@@ -124,14 +161,21 @@ export default function LandingPage() {
           <div className="explode-text-wrap">
             <h2 className="explode-title">Taking apart the complexity.</h2>
             <p className="explode-desc">
-              Every course session has multiple constraints. Schedula unpacks the data — combining staff availability, room capacity, and curriculum rules.
+              Every course session has multiple constraints. Schedula unpacks
+              the data — combining staff availability, room capacity, and
+              curriculum rules.
             </p>
           </div>
 
           <div className="shatter-container">
             <div className="composite-card">
-              <div className="comp-header">CS 101: Introduction to Programming</div>
-              <div className="comp-meta">Room 404 &nbsp;•&nbsp; Prof. Alan Turing &nbsp;•&nbsp; Monday 09:30</div>
+              <div className="comp-header">
+                CS 101: Introduction to Programming
+              </div>
+              <div className="comp-meta">
+                Room 404 &nbsp;•&nbsp; Prof. Alan Turing &nbsp;•&nbsp; Monday
+                09:30
+              </div>
             </div>
 
             <div className="fly-card piece-course">
@@ -139,12 +183,14 @@ export default function LandingPage() {
               <strong>Course Req</strong>
               <span>3 Credits, Level 1</span>
             </div>
-            
+
             <div className="fly-card piece-room">
               <span className="piece-icon">🏫</span>
               <strong>Room Capacity</strong>
               <span>Min 120 seats needed</span>
-              <div className="micro-bar"><div className="micro-fill" style={{width: '80%'}}></div></div>
+              <div className="micro-bar">
+                <div className="micro-fill" style={{ width: "80%" }}></div>
+              </div>
             </div>
 
             <div className="fly-card piece-staff">
@@ -152,7 +198,9 @@ export default function LandingPage() {
               <strong>Prof. Turing</strong>
               <span>Prefers Morning</span>
               <div className="times-grid">
-                <span className="day-dot active"></span><span className="day-dot"></span><span className="day-dot active"></span>
+                <span className="day-dot active"></span>
+                <span className="day-dot"></span>
+                <span className="day-dot active"></span>
               </div>
             </div>
 
@@ -170,13 +218,16 @@ export default function LandingPage() {
         <div className="sticky-viewport">
           <div className="balance-text">
             <h2>Weighing Human Preferences</h2>
-            <p>Conflicts are hard limits, but preferences are delicate. Schedula evaluates thousands of paths to maximize happiness.</p>
+            <p>
+              Conflicts are hard limits, but preferences are delicate. Schedula
+              evaluates thousands of paths to maximize happiness.
+            </p>
           </div>
-          
+
           <div className="seesaw-container">
             {/* The Pivot Triangle */}
             <div className="pivot-base"></div>
-            
+
             {/* The Rotating Beam */}
             <div className="see-saw-beam">
               <div className="weight-left">
@@ -186,7 +237,7 @@ export default function LandingPage() {
                 <div className="weight-box box-accent">Staff Happiness</div>
               </div>
             </div>
-            
+
             <div className="balance-meter">
               <div className="bm-track">
                 <div className="bm-indicator"></div>
@@ -203,20 +254,46 @@ export default function LandingPage() {
           <div className="grid-layout">
             <div className="grid-copy">
               <h2>The puzzle solves itself.</h2>
-              <p>Watch as scattered fragments independently snap into a perfectly validated, zero-conflict weekly calendar.</p>
+              <p>
+                Watch as scattered fragments independently snap into a perfectly
+                validated, zero-conflict weekly calendar.
+              </p>
             </div>
-            
+
             <div className="timetable-puzzle">
               <div className="table-skeleton">
-                <div className="skel-row"><div/><div/><div/><div/></div>
-                <div className="skel-row"><div/><div/><div/><div/></div>
-                <div className="skel-row"><div/><div/><div/><div/></div>
-                <div className="skel-row"><div/><div/><div/><div/></div>
-                <div className="skel-row"><div/><div/><div/><div/></div>
+                <div className="skel-row">
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                </div>
+                <div className="skel-row">
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                </div>
+                <div className="skel-row">
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                </div>
+                <div className="skel-row">
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                </div>
+                <div className="skel-row">
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                </div>
               </div>
-              <div className="puzzle-overlay">
-                {generateBlocks()}
-              </div>
+              <div className="puzzle-overlay">{blocks}</div>
             </div>
           </div>
         </div>
@@ -229,11 +306,13 @@ export default function LandingPage() {
             <div className="graph-copy">
               <h2>From weeks to seconds.</h2>
               <p>
-                As the OR-Tools constraint solver runs, hundreds of thousands of permutations are tested. 
-                What once took coordinators weeks of spreadsheet wrangling is compressed into a 60-second optimization pass.
+                As the OR-Tools constraint solver runs, hundreds of thousands of
+                permutations are tested. What once took coordinators weeks of
+                spreadsheet wrangling is compressed into a 60-second
+                optimization pass.
               </p>
             </div>
-            
+
             <div className="interactive-chart">
               <div className="chart-bars">
                 <div className="chart-col">
@@ -247,7 +326,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="conflict-graph">
                 <div className="cg-label">Double-booking Conflicts</div>
                 <div className="cg-track">
@@ -269,17 +348,26 @@ export default function LandingPage() {
             <div className="p-card reveal stagger-1">
               <div className="p-icon">1</div>
               <h3>Intelligent Import</h3>
-              <p>Upload your messy CSVs. Schedula's fuzzy-matching engine automatically assigns courses and headers.</p>
+              <p>
+                Upload your messy CSVs. Schedula&apos;s fuzzy-matching engine
+                automatically assigns courses and headers.
+              </p>
             </div>
             <div className="p-card reveal stagger-2">
               <div className="p-icon">2</div>
               <h3>Availability Sync</h3>
-              <p>Professors log in to an intuitive mobile-friendly portal to drag-and-drop their teaching availability.</p>
+              <p>
+                Professors log in to an intuitive mobile-friendly portal to
+                drag-and-drop their teaching availability.
+              </p>
             </div>
             <div className="p-card reveal stagger-3">
               <div className="p-icon">3</div>
               <h3>Publish & Export</h3>
-              <p>One click to publish to the whole institution. Students instantly access gorgeous, personalized PDF timetables.</p>
+              <p>
+                One click to publish to the whole institution. Students
+                instantly access gorgeous, personalized PDF timetables.
+              </p>
             </div>
           </div>
         </div>
@@ -288,9 +376,18 @@ export default function LandingPage() {
       {/* ── Bottom Marquee ────────────────────────────────────────────────── */}
       <div className="marquee-wrapper invert">
         <div className="marquee-track reverse">
-          <span>OR-TOOLS SOLVER ENGINE • DYNAMIC HEURISTICS • FLEXIBLE CSV INGESTION • EDGE MIDDLEWARE AUTH •</span>
-          <span>OR-TOOLS SOLVER ENGINE • DYNAMIC HEURISTICS • FLEXIBLE CSV INGESTION • EDGE MIDDLEWARE AUTH •</span>
-          <span>OR-TOOLS SOLVER ENGINE • DYNAMIC HEURISTICS • FLEXIBLE CSV INGESTION • EDGE MIDDLEWARE AUTH •</span>
+          <span>
+            OR-TOOLS SOLVER ENGINE • DYNAMIC HEURISTICS • FLEXIBLE CSV INGESTION
+            • EDGE MIDDLEWARE AUTH •
+          </span>
+          <span>
+            OR-TOOLS SOLVER ENGINE • DYNAMIC HEURISTICS • FLEXIBLE CSV INGESTION
+            • EDGE MIDDLEWARE AUTH •
+          </span>
+          <span>
+            OR-TOOLS SOLVER ENGINE • DYNAMIC HEURISTICS • FLEXIBLE CSV INGESTION
+            • EDGE MIDDLEWARE AUTH •
+          </span>
         </div>
       </div>
 
@@ -298,8 +395,13 @@ export default function LandingPage() {
       <div className="cta-banner reveal">
         <div className="cta-glass">
           <h2>Ready to revolutionize your semester?</h2>
-          <p>Join the institutions managing thousands of sessions without a single conflict.</p>
-          <Link href="/signup" className="btn-hero-primary mt-4">Create your instance</Link>
+          <p>
+            Join the institutions managing thousands of sessions without a
+            single conflict.
+          </p>
+          <Link href="/signup" className="btn-hero-primary mt-4">
+            Create your instance
+          </Link>
         </div>
       </div>
 

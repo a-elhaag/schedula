@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/htmlcov
 
 # data exports
 /data
@@ -19,6 +20,12 @@
 # next.js
 /.next/
 /out/
+.swc/
+
+# IDE / Code Review
+.vscode/
+.code-review-graph/
+.claude/
 
 # production
 /build
