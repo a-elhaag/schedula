@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import "./styles.css";
 
 // ── Components from components/ folder ───────────────────────────────────────
-import Button      from "../../../components/Button";
-import SessionCard from "../../../components/SessionCard";
-import Skeleton    from "../../../components/Skeleton";
-import ErrorState  from "../../../components/ErrorState";
+import Button        from "../../../components/Button";
+import SessionCard   from "../../../components/SessionCard";
+import ScheduleTable from "../../../components/ScheduleTable";
+import Skeleton      from "../../../components/Skeleton";
+import ErrorState    from "../../../components/ErrorState";
 import { DownloadIcon } from "../../../components/icons/index";
 
 
@@ -306,6 +307,12 @@ export default function StudentSchedulePage() {
             );
           })}
         </div>
+      </section>
+
+      {/* Full week timetable */}
+      <section className="timetable-section">
+        <h2 className="timetable-section__title">Full Schedule</h2>
+        <ScheduleTable sessions={sessions} days={days} />
       </section>
 
     </div>

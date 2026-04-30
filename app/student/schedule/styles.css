@@ -391,6 +391,23 @@
 .week-session-dot--tutorial { background: rgba(0, 113, 227, 0.35); }
 .week-session-dot--lab      { background: rgba(0, 113, 227, 0.85); }
 
+/* ── Timetable section ── */
+.timetable-section {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  animation: pagefadeUp 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 350ms;
+  margin-top: 3rem;
+}
+
+.timetable-section__title {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.625rem;
+  color: var(--color-text-primary);
+  margin: 0 0 1.125rem;
+  letter-spacing: -0.03em;
+}
+
 /* ── Page-level animations ── */
 @keyframes pagefadeUp {
   from {
