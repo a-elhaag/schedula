@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo, useState } from "react";
 import "./landing.css";
 
 export default function LandingPage() {
@@ -9,6 +9,11 @@ export default function LandingPage() {
   const graphRef = useRef(null);
   const gridRef = useRef(null);
   const balanceRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,8 +80,9 @@ export default function LandingPage() {
     return x - Math.floor(x);
   };
 
-  // Generate 25 scatter blocks for the timetable grid puzzle (memoized to avoid re-rendering)
+  // Generate 25 scatter blocks for the timetable grid puzzle (only on client after mount)
   const blocks = useMemo(() => {
+    if (!mounted) return [];
     const blockList = [];
     const colors = ["#0071E3", "#34C759", "#FF9500", "#5856D6", "#FF2D55"];
     for (let i = 0; i < 20; i++) {
@@ -99,7 +105,7 @@ export default function LandingPage() {
       );
     }
     return blockList;
-  }, []);
+  }, [mounted]);
 
   return (
     <div className="landing-wrapper">

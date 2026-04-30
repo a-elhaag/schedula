@@ -1,0 +1,80 @@
+[
+  {
+    "name": "Lecture Hall A207",
+    "label": "A207",
+    "building": "Building A",
+    "capacity": 120
+  },
+  {
+    "name": "Lecture Hall A302",
+    "label": "A302",
+    "building": "Building A",
+    "capacity": 100
+  },
+  {
+    "name": "Lecture Hall A307",
+    "label": "A307",
+    "building": "Building A",
+    "capacity": 110
+  },
+  {
+    "name": "Lecture Hall A308",
+    "label": "A308",
+    "building": "Building A",
+    "capacity": 115
+  },
+  {
+    "name": "Tutorial Room D101",
+    "label": "D101",
+    "building": "Building D",
+    "capacity": 40
+  },
+  {
+    "name": "Tutorial Room D103",
+    "label": "D103",
+    "building": "Building D",
+    "capacity": 40
+  },
+  {
+    "name": "Tutorial Room D104",
+    "label": "D104",
+    "building": "Building D",
+    "capacity": 40
+  },
+  {
+    "name": "Tutorial Room D110",
+    "label": "D110",
+    "building": "Building D",
+    "capacity": 40
+  },
+  {
+    "name": "Lab A206 SET012",
+    "label": "A206",
+    "building": "Building A",
+    "capacity": 50
+  },
+  {
+    "name": "Lab A203 SET012",
+    "label": "A203",
+    "building": "Building A",
+    "capacity": 50
+  },
+  {
+    "name": "Metal Workshop C120",
+    "label": "C120",
+    "building": "Building C",
+    "capacity": 35
+  },
+  {
+    "name": "Physics Lab E102",
+    "label": "E102",
+    "building": "Building E",
+    "capacity": 45
+  },
+  {
+    "name": "Physics Lab E103",
+    "label": "E103",
+    "building": "Building E",
+    "capacity": 45
+  }
+]

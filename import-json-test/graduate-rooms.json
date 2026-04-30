@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Graduate Seminar A312",
+    "label": "A312",
+    "building": "Building A",
+    "capacity": 60
+  },
+  {
+    "name": "Graduate Lab C107",
+    "label": "C107",
+    "building": "Building C",
+    "capacity": 40
+  },
+  {
+    "name": "Research Lab E110",
+    "label": "E110",
+    "building": "Building E",
+    "capacity": 30
+  },
+  {
+    "name": "Computing Cluster Room F205",
+    "label": "F205",
+    "building": "Building F",
+    "capacity": 25
+  }
+]

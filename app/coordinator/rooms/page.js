@@ -34,11 +34,18 @@ export default function CoordinatorRoomsPage() {
     try {
       const params = new URLSearchParams();
       if (building !== "all") params.set("building", building);
-      const res  = await fetch(`/api/coordinator/rooms?${params}`);
+      const url = `/api/coordinator/rooms?${params}`;
+      console.log("📤 GET ROOMS REQUEST:", url);
+      const res  = await fetch(url);
+      console.log("📥 GET ROOMS RESPONSE STATUS:", res.status);
       const json = await res.json();
+      console.log("📥 GET ROOMS RESPONSE DATA:", json);
       if (!res.ok) throw new Error(json.message ?? "Failed to load");
-      setData(json);
-    } catch (e) { setError(e.message); }
+      setData(json.data);
+    } catch (e) {
+      console.error("❌ GET ROOMS ERROR:", e);
+      setError(e.message);
+    }
     finally { setLoading(false); }
   }, [building]);
 
@@ -53,32 +60,67 @@ export default function CoordinatorRoomsPage() {
     try {
       const url = editingId ? `/api/coordinator/rooms/${editingId}` : "/api/coordinator/rooms";
       const method = editingId ? "PUT" : "POST";
+      console.log(`📤 ${method} ROOM REQUEST:`, url);
+      console.log("📤 REQUEST BODY:", form);
       const res  = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify(form),
       });
+      console.log(`📥 ${method} ROOM RESPONSE STATUS:`, res.status);
       const json = await res.json();
+      console.log(`📥 ${method} ROOM RESPONSE DATA:`, json);
       if (!res.ok) throw new Error(json.message ?? "Failed to save");
+
+      // Merge server response into local state so the new/updated room appears immediately
+      const srvRoom = json.room || {};
+      const roomObj = {
+        id: srvRoom.id,
+        label: srvRoom.label,
+        name: srvRoom.name,
+        building: srvRoom.building || "N/A",
+        capacity: srvRoom.capacity || 30,
+        createdAt: srvRoom.created_at ? (new Date(srvRoom.created_at)).toISOString() : (srvRoom.createdAt || new Date().toISOString()),
+      };
+
+      setData(prev => {
+        const prevItems = prev?.items ?? [];
+        if (editingId) {
+          const items = prevItems.map(r => (r.id === editingId ? roomObj : r));
+          return { ...prev, items };
+        } else {
+          return { ...prev, items: [...prevItems, roomObj], total: (prev?.total ?? 0) + 1 };
+        }
+      });
+
       showToast("success", editingId ? "Room Updated" : "Room Added", `${form.name} has been saved.`);
       setShowModal(false);
       setForm({ name:"", label:"", building:"", capacity:"30" });
       setEditingId(null);
-      setBuilding("all");
-      setSearch("");
-      load();
-    } catch (e) { showToast("danger", "Error", e.message); }
+    } catch (e) {
+      console.error("❌ SAVE ROOM ERROR:", e);
+      showToast("danger", "Error", e.message);
+    }
     finally { setSaving(false); }
   }
 
   async function handleDelete(roomId) {
     if (!confirm("Are you sure you want to delete this room? This action cannot be undone.")) return;
     try {
-      const res = await fetch(`/api/coordinator/rooms/${roomId}`, { method: "DELETE" });
+      const url = `/api/coordinator/rooms/${roomId}`;
+      console.log("📤 DELETE ROOM REQUEST:", url);
+      const res = await fetch(url, { method: "DELETE" });
+      console.log("📥 DELETE ROOM RESPONSE STATUS:", res.status);
       if (!res.ok) throw new Error("Failed to delete room");
+      // Remove from local state so the UI updates immediately
+      setData(prev => {
+        const prevItems = prev?.items ?? [];
+        const items = prevItems.filter(r => r.id !== roomId);
+        return { ...prev, items, total: Math.max((prev?.total ?? 1) - 1, 0) };
+      });
       showToast("success", "Deleted", "Room has been deleted.");
-      load();
     } catch (e) {
+      console.error("❌ DELETE ROOM ERROR:", e);
       showToast("danger", "Error", e.message);
     }
   }
