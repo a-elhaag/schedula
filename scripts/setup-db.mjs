@@ -515,16 +515,15 @@ const indexes = {
 
   schedules: [
     {
-      key: { institution_id: 1, term_label: 1 },
-      options: { unique: true, name: "institution_term_unique" },
+      // One schedule document per level per term (5 docs for 5 levels)
+      key: { institution_id: 1, term_label: 1, level: 1 },
+      options: { unique: true, sparse: true, name: "institution_term_level_unique" },
     },
     {
       key: { institution_id: 1, is_published: 1 },
       options: { name: "institution_published" },
     },
-    // Multikey indexes — MongoDB creates them automatically when the field is an array
     { key: { "entries.staff_id": 1 }, options: { name: "entries_staff_id" } },
-    { key: { "entries.room_id": 1 }, options: { name: "entries_room_id" } },
   ],
 };
 
