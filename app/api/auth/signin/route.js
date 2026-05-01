@@ -86,6 +86,7 @@ export async function POST(request) {
         {
           message:
             "Your account is not yet activated. Please verify your email.",
+          code: "EMAIL_NOT_VERIFIED",
         },
         { status: 403 },
       );
