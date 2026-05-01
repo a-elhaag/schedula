@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-05-01T07:55:09.123Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/coordinator/import/page.js",
+      "root_cause": "8 lines replaced/restructured",
+      "fix": "Rewrote 27→74 lines (8 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T07:55:09.123Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-05-01T07:55:20.617Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/coordinator/import/styles.css",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 37→167 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T07:55:20.617Z"
+    }
+  ]
+}
