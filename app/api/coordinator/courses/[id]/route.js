@@ -65,7 +65,7 @@ export async function DELETE(request, { params }) {
     const db   = await getDb();
 
     const result = await db.collection("courses").updateOne(
-      { _id: new ObjectId(id), institution_id: iOid },
+      { _id: new ObjectId(id), institution_id: iOid, deleted_at: null },
       { $set: { deleted_at: new Date() } }
     );
 
