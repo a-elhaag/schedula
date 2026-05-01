@@ -191,9 +191,8 @@ export default function CoordinatorScheduleGeneratePage() {
             {[
               { key:"courses",      label:"Courses imported",             ok: readiness.courses      },
               { key:"staff",        label:"Staff members added",          ok: readiness.staff        },
-              { key:"rooms",        label:"Rooms configured",             ok: readiness.rooms        },
+              { key:"levels",       label:"Groups & levels configured",   ok: readiness.levels       },
               { key:"availability", label:"Staff availability submitted", ok: readiness.availability },
-              { key:"constraints",  label:"Scheduling constraints saved", ok: readiness.constraints  },
             ].map(item => (
               <div key={item.key} className="constraint-row">
                 <div className="constraint-row__info">
