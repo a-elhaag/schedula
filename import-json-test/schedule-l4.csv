@@ -1,0 +1,17 @@
+course_code,session_type,room,day,period,instructor_name,subgroup,groups_covered
+SET373,tutorial,D110,Sunday,3,Yara Mahmoud,,G1
+SET491,lecture,D106,Sunday,3,Hisham Reda,,G1
+SET422,tutorial,D106,Sunday,5,Asmaa El-Baghdadi,,G1
+SET422,lecture,D109,Sunday,7,Fatima Saqr,,G1
+SET373,lecture,D109,Monday,1,Doaa Mabrouk,,G1
+SET374,tutorial,D204,Monday,3,Tahia Ahmed,,G1
+SET421,lecture,D101,Monday,5,Mohammad Meiad,,G1
+SET498,lab,,Monday,8,,,G1
+SET421,tutorial,D106,Tuesday,1,Norhan Mamdouh,,G1
+SET423,lecture,D106,Tuesday,3,Sherry Ali,,G1
+SET423,tut_lab,A303,Tuesday,5,Rim Walid,,G1
+SET374,lecture,A312,Tuesday,7,Eslam Mohammad,,G1
+SET491,tutorial,A203,Tuesday,8,Mohammad Tarek,,G1
+SET423,lab,A303,Tuesday,9,Rim Walid,,G1
+SET391,tutorial,A310,Wednesday,1,Fadi Romani,,G1
+SET391,lecture,D107,Wednesday,3,Sherry Ali,,G1

@@ -8,16 +8,8 @@ import ErrorState from "@/components/ErrorState";
 import { Input } from "@/components/Input";
 import { GraduationCapIcon } from "@/components/icons/index";
 
-const DEFAULT_LEVELS = [
-  { level: 0, label: "Freshman", groups: [{ group_id: "GA", subgroup_count: 12 }, { group_id: "GB", subgroup_count: 9 }] },
-  { level: 1, label: "Level 1",  groups: [{ group_id: "G1", subgroup_count: 3 }, { group_id: "G2", subgroup_count: 3 }, { group_id: "G3", subgroup_count: 3 }] },
-  { level: 2, label: "Level 2",  groups: [{ group_id: "G1", subgroup_count: 3 }, { group_id: "G2", subgroup_count: 3 }] },
-  { level: 3, label: "Level 3",  groups: [{ group_id: "G1", subgroup_count: 3 }, { group_id: "G2", subgroup_count: 2 }] },
-  { level: 4, label: "Level 4",  groups: [{ group_id: "G1", subgroup_count: 0 }] },
-];
-
 export default function CoordinatorGroupsPage() {
-  const [levels, setLevels]   = useState(DEFAULT_LEVELS);
+  const [levels, setLevels]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
   const [saving, setSaving]   = useState(false);
@@ -32,7 +24,7 @@ export default function CoordinatorGroupsPage() {
       const res  = await fetch("/api/coordinator/groups");
       const json = await res.json();
       if (!res.ok) throw new Error(json.message ?? "Failed to load");
-      if (json.levels?.length > 0) setLevels(json.levels);
+      setLevels(json.levels ?? []);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -98,6 +90,15 @@ export default function CoordinatorGroupsPage() {
           <h1>Level Groups</h1>
           <p>Configure groups and subgroups per academic level. The solver uses this to expand courses into individual sessions.</p>
         </div>
+
+        {levels.length === 0 && (
+          <div className="panel reveal" style={{ padding: "32px 24px", textAlign: "center", color: "var(--color-text-muted)" }}>
+            <p style={{ marginBottom: 16 }}>No levels configured yet. Run <code>pnpm db:seed:ecu</code> to load ECU defaults, or add levels manually below.</p>
+            <Button variant="ghost" onClick={() => setLevels([{ level: 1, label: "Level 1", groups: [{ group_id: "G1", subgroup_count: 3 }] }])}>
+              + Add First Level
+            </Button>
+          </div>
+        )}
 
         {levels.map((lv, lvIdx) => (
           <section key={lv.level} className="panel reveal" style={{ marginBottom: 20 }}>

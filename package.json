@@ -16,7 +16,8 @@
     "db:truncate": "node --env-file=.env scripts/truncate-db.mjs",
     "send-test-email": "node --env-file=.env scripts/send-test-email.mjs",
     "indexes": "node --env-file=.env scripts/create-indexes.mjs",
-    "db:migrate": "node --env-file=.env scripts/migrate-schema.mjs"
+    "db:migrate": "node --env-file=.env scripts/migrate-schema.mjs",
+    "db:seed:ecu": "node --env-file=.env scripts/seed-ecu.mjs"
   },
   "dependencies": {
     "@azure/communication-email": "^1.0.0",
