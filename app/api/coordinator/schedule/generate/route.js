@@ -91,25 +91,17 @@ export async function POST(request) {
     // Run solver asynchronously — HTTP returns immediately for client polling
     const runAsync = async () => {
       try {
+        // Clear ALL existing schedules for this term (any status, any level)
+        // before running the solver so there's no unique index conflict on insert
+        await db.collection("schedules").deleteMany({
+          institution_id: iOid,
+          term_label:     termLabel,
+        });
+
         await updateJob({ status_message: "Expanding sessions by level..." });
 
         const result = await runSolver(iOid.toString(), termLabel);
         const { levelResults, overallStats } = result;
-
-        // Delete existing draft schedules for this term (all levels)
-        await db.collection("schedules").deleteMany({
-          institution_id: iOid,
-          term_label:     termLabel,
-          is_published:   false,
-        });
-
-        // Also delete any legacy single-schedule docs (no level field) from old format
-        await db.collection("schedules").deleteMany({
-          institution_id: iOid,
-          term_label:     termLabel,
-          is_published:   false,
-          level:          { $exists: false },
-        });
 
         // Insert one schedule document per level
         const scheduleIds = [];
