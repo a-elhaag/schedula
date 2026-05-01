@@ -60,15 +60,18 @@ export default function VerifyEmailPage() {
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(
-          data?.message ?? "Unable to verify your email right now.",
-        );
+        const errorMsg = data?.message ?? "Unable to verify your email right now.";
+        throw new Error(errorMsg);
       }
 
       setVerifyStatus("success");
       setVerifyMessage(
         data?.message ?? "Email verified successfully. You can now sign in.",
       );
+      // Add a redirect to signin after 3 seconds
+      setTimeout(() => {
+        window.location.href = "/signin";
+      }, 3000);
     } catch (error) {
       setVerifyStatus("error");
       setVerifyMessage(

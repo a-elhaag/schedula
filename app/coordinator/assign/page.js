@@ -192,6 +192,25 @@ export default function CoordinatorAssignPage() {
   const totalAssigned = courses.filter(c => c.assignedStaff.length > 0).length;
   const unassigned    = courses.filter(c => c.assignedStaff.length === 0).length;
 
+  async function handleAutoAssign() {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/coordinator/assign", {
+        method:  "PUT",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ action: "auto-assign" }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message ?? "Failed to auto-assign");
+      showToast("success", "Auto-Assigned", `${json.assigned || 0} courses assigned automatically.`);
+      await load(); // Refresh data
+    } catch (e) {
+      showToast("danger", "Error", e.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
   if (loading) return <SkeletonPage stats={3} rows={4} />;
   if (error)   return <div className="assign-page"><ErrorState message={error} onRetry={load} /></div>;
 
@@ -205,9 +224,18 @@ export default function CoordinatorAssignPage() {
           </div>
         )}
 
-        <div className="page-header">
-          <h1>Assign Staff to Courses</h1>
-          <p>Drag a professor or TA from the left panel and drop them onto a course card to assign. Click × to remove an assignment.</p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24, marginBottom: 28 }}>
+          <div className="page-header">
+            <h1>Assign Staff to Courses</h1>
+            <p>Drag a professor or TA from the left panel and drop them onto a course card to assign. Click × to remove an assignment.</p>
+          </div>
+          <Button
+            onClick={handleAutoAssign}
+            disabled={saving}
+            style={{ whiteSpace: "nowrap", marginTop: 4, flexShrink: 0 }}
+          >
+            {saving ? "Auto-assigning…" : "Auto Assign"}
+          </Button>
         </div>
 
         {/* Stats row */}

@@ -1,19 +1,20 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-01T07:58:05.584Z
-> Files: 261 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-01T20:17:07.338Z
+> Files: 281 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
 - `.DS_Store` (~1640 tok)
 - `.gitignore` — Git ignore rules (~158 tok)
 - `CLAUDE.md` — OpenWolf (~57 tok)
+- `findings.md` — Schedula — Full Project Audit (~4999 tok)
 - `jsconfig.json` (~21 tok)
+- `middleware.js` — Next.js Edge middleware: auth guard, role-based routing, x-user-* header injection, BYPASS_AUTH support (~934 tok)
 - `next.config.mjs` — Next.js configuration (~149 tok)
-- `package.json` — Node.js package manifest (~398 tok)
+- `package.json` — Node.js package manifest (~436 tok)
 - `pnpm-lock.yaml` — pnpm lock file (~66653 tok)
 - `pnpm-workspace.yaml` (~16 tok)
-- `proxy.js` — proxy.js (~1185 tok)
 
 ## .claude/
 
@@ -106,7 +107,7 @@
 
 ## app/api/auth/resend-verification/
 
-- `route.js` — Next.js API route: POST (~927 tok)
+- `route.js` — Next.js API route: POST (~1046 tok)
 
 ## app/api/auth/reset-password/
 
@@ -114,7 +115,7 @@
 
 ## app/api/auth/signin/
 
-- `route.js` — Next.js API route: POST (~1326 tok)
+- `route.js` — Next.js API route: POST (~1337 tok)
 
 ## app/api/auth/signout/
 
@@ -122,11 +123,11 @@
 
 ## app/api/auth/signup/
 
-- `route.js` — Next.js API route: POST (~1460 tok)
+- `route.js` — Next.js API route: POST (~1448 tok)
 
 ## app/api/auth/verify-email/
 
-- `route.js` — Next.js API route: POST (~755 tok)
+- `route.js` — Next.js API route: POST (~974 tok)
 
 ## app/api/coordinator/_helpers/
 
@@ -142,7 +143,7 @@
 
 ## app/api/coordinator/availability/status/
 
-- `route.js` — ── GET /api/coordinator/availability/status ────────────────────────────────── (~617 tok)
+- `route.js` — ── GET /api/coordinator/availability/status ────────────────────────────────── (~616 tok)
 
 ## app/api/coordinator/constraints/
 
@@ -150,43 +151,39 @@
 
 ## app/api/coordinator/courses/
 
-- `route.js` — ── GET /api/coordinator/courses ───────────────────────────────────────────── (~952 tok)
+- `route.js` — GET returns flat-schema courses (level, session flags, professor_id, ta_ids); POST creates course writing directly to DB (~700 tok)
 
 ## app/api/coordinator/courses/[id]/
 
-- `route.js` — ── PUT /api/coordinator/courses/[id] ───────────────────────────────────────── (~766 tok)
+- `route.js` — Next.js API route: PUT, DELETE (~973 tok)
 
 ## app/api/coordinator/enrollments/
 
 - `route.js` — GET /api/coordinator/enrollments?courseId=<id>&termLabel=<label> (~1258 tok)
 
+## app/api/coordinator/groups/
+
+- `route.js` — GET/PUT /api/coordinator/groups — reads/writes levels_config settings document; GET returns `{ levels }` array, PUT validates and upserts per-level per-group subgroup counts (~80 tok)
+
 ## app/api/coordinator/import/
 
-- `route.js` — ── GET /api/coordinator/import  (dashboard stats) ─────────────────────────── (~2896 tok)
+- `route.js` — ── GET /api/coordinator/import  (dashboard stats) ─────────────────────────── (~2900 tok)
 
 ## app/api/coordinator/import/validate/
 
 - `route.js` — ── POST /api/coordinator/import/validate ───────────────────────────────────── (~1381 tok)
 
-## app/api/coordinator/rooms/
-
-- `route.js` — Next.js API route: POST (~1604 tok)
-
-## app/api/coordinator/rooms/[id]/
-
-- `route.js` — ── PUT /api/coordinator/rooms/[id] ───────────────────────────────────────── (~704 tok)
-
 ## app/api/coordinator/schedule/generate/
 
-- `route.js` — Next.js API route: GET, POST (~3105 tok)
+- `route.js` — Next.js API route: GET, POST (~1889 tok)
 
 ## app/api/coordinator/schedule/published/
 
-- `route.js` — Next.js API route: GET, POST (~1335 tok)
+- `route.js` — ── GET /api/coordinator/schedule/published ─────────────────────────────────── (~1526 tok)
 
 ## app/api/coordinator/schedule/review/
 
-- `route.js` — Next.js API route: GET, POST (~3239 tok)
+- `route.js` — Next.js API route: GET, POST (~3532 tok)
 
 ## app/api/coordinator/schedule/revisions/
 
@@ -206,7 +203,15 @@
 
 ## app/api/coordinator/staff/
 
-- `route.js` — ── GET /api/coordinator/staff ──────────────────────────────────────────────── (~1229 tok)
+- `route.js` — ── GET /api/coordinator/staff ──────────────────────────────────────────────── (~1249 tok)
+
+## app/api/coordinator/staff/[id]/
+
+- `route.js` — ── PUT /api/coordinator/staff/[id] ────────────────────────────────────────── (~981 tok)
+
+## app/api/coordinator/staff/export/
+
+- `route.js` — ── GET /api/coordinator/staff/export ───────────────────────────────────────── (~628 tok)
 
 ## app/api/health/
 
@@ -214,7 +219,7 @@
 
 ## app/api/staff/availability/
 
-- `route.js` — GET  /api/staff/availability?userId=xxx (~1222 tok)
+- `route.js` — Next.js API route: GET, POST (~860 tok)
 
 ## app/api/staff/schedule/
 
@@ -231,7 +236,7 @@
 ## app/coordinator/
 
 - `layout.css` — Styles: 14 rules, 1 media queries (~785 tok)
-- `layout.js` — Next.js layout (~866 tok)
+- `layout.js` — Next.js layout (~871 tok)
 
 ## app/coordinator/analytics/
 
@@ -255,27 +260,27 @@
 
 ## app/coordinator/courses/
 
-- `page.js` — Next.js page component (~4933 tok)
+- `page.js` — Next.js page component — form uses new flat schema: level, has_lecture/tutorial/lab/tut_lab, groups_per_lecture, professor_id, ta_ids; loads staff for professor/TA dropdowns (~4800 tok)
 - `styles.css` — Styles: 93 rules (~4876 tok)
+
+## app/coordinator/groups/
+
+- `page.js` — Next.js page component (~1814 tok)
+- `styles.css` — Styles: 22 rules (~609 tok)
 
 ## app/coordinator/import/
 
 - `page.js` — Next.js page component (~3656 tok)
 - `styles.css` — Styles: 93 rules (~5519 tok)
 
-## app/coordinator/rooms/
-
-- `page.js` — Next.js page component (~3467 tok)
-- `styles.css` — Styles: 93 rules (~7057 tok)
-
 ## app/coordinator/schedule/generate/
 
-- `page.js` — Next.js page component (~3176 tok)
+- `page.js` — Next.js page component (~4263 tok)
 - `styles.css` — Styles: 93 rules (~7295 tok)
 
 ## app/coordinator/schedule/published/
 
-- `page.js` — Next.js page component (~4292 tok)
+- `page.js` — Next.js page component (~2023 tok)
 - `styles.css` — Styles: 93 rules (~7676 tok)
 
 ## app/coordinator/schedule/review/
@@ -295,8 +300,8 @@
 
 ## app/coordinator/staff/
 
-- `page.js` — Next.js page component (~2122 tok)
-- `styles.css` — Styles: 93 rules (~4876 tok)
+- `page.js` — Next.js page component (~3194 tok)
+- `styles.css` — Styles: 96 rules (~5129 tok)
 
 ## app/coordinator/users/
 
@@ -321,8 +326,8 @@
 
 ## app/signin/
 
-- `page.js` — Next.js page component (~1373 tok)
-- `styles.css` — Styles: 20 rules, 1 media queries, 4 animations (~869 tok)
+- `page.js` — Next.js page component (~1600 tok)
+- `styles.css` — Styles: 23 rules (~951 tok)
 
 ## app/signup/
 
@@ -351,7 +356,7 @@
 
 ## app/verify-email/
 
-- `content.js` — API routes: GET (2 endpoints) (~1642 tok)
+- `content.js` — API routes: GET (2 endpoints) (~1684 tok)
 - `page.js` — Next.js page component (~87 tok)
 - `styles.css` — Styles: 23 rules, 1 media queries, 4 animations (~1033 tok)
 
@@ -455,6 +460,14 @@
 
 - `fastapi-course-contract.md` — FastAPI Course Schema Contract (~1054 tok)
 
+## docs/superpowers/plans/
+
+- `2026-05-01-schedula-nextjs-solver.md` — Schedula Next.js Solver & Schema Redesign — Implementation Plan (~21423 tok)
+
+## docs/superpowers/specs/
+
+- `2026-05-01-schedula-nextjs-solver.md` — Schedula — Next.js Solver & Schema Redesign Spec (~4332 tok)
+
 ## hooks/
 
 - `useAuth.js` — useAuth() hook (~399 tok)
@@ -465,12 +478,16 @@
 
 - `courses-sample.csv` (~129 tok)
 - `courses-sample.json` (~410 tok)
+- `courses.csv` (~552 tok)
 - `freshman-rooms.csv` (~430 tok)
 - `freshman-rooms.json` (~646 tok)
 - `graduate-rooms.csv` (~362 tok)
 - `graduate-rooms.json` (~204 tok)
+- `schedule-l3.csv` (~459 tok)
+- `schedule-l4.csv` (~216 tok)
 - `software-engineering-rooms.csv` (~455 tok)
 - `software-engineering-rooms.json` (~546 tok)
+- `staff.csv` (~678 tok)
 
 ## lib/
 
@@ -479,6 +496,7 @@
 - `clientCache.js` — Returns the cached entry for `key`, or null if not found. (~688 tok)
 - `db.js` — Helper — resolves the connected client and returns the db handle. (~423 tok)
 - `demo-users.js` — lib/demo-users.js (~122 tok)
+- `durations.js` — lib/durations.js (~29 tok)
 - `edge-auth.js` — Verify a JWT token in the Edge runtime using jose. (~226 tok)
 - `email.js` — API routes: GET (5 endpoints) (~1754 tok)
 - `generatePDF.js` — Exports generatePDF (~1962 tok)
@@ -487,20 +505,34 @@
 - `password.js` — Hash a plaintext password using bcrypt. (~177 tok)
 - `rate-limiter.js` — Check if request is rate limited for a given action + identifier (IP / user ID). (~910 tok)
 - `request-context.js` — Exports getRequestContext, setRequestContext, withRequestContext (~145 tok)
+- `rooms.js` — lib/rooms.js (~534 tok)
 - `scheduleJobContract.js` — Exports ScheduleJobStatus, isSolverInfeasibleResult, buildInfeasibleError, normalizeStatusLabel (~480 tok)
 
 ## lib/server/
 
 - `api.js` — Exports jsonOk, jsonError, withApiErrorHandling (~255 tok)
 - `auth.js` — Extracts and verifies the current user from the incoming API request. (~972 tok)
-- `coordinatorService.js` — Exports getCoordinatorCourses, getCoordinatorRooms, createRoom, updateRoom + 7 more (~4824 tok)
+- `coordinatorService.js` — Get enrollment for a single course (~3101 tok)
 - `logger.js` — Exports logRequest, logResponse, logError (~243 tok)
 - `studentScheduleService.js` — Get student schedule with optional filters and pagination (~1562 tok)
 
+## lib/solver/
+
+- `anneal.js` — Check if moving sessionId to newSlot conflicts with the current assignment. (~1802 tok)
+- `backtrack.js` — Check if placing sessionA in slotA conflicts with any existing assignment. (~3132 tok)
+- `cost.js` — Get the scheduling unit key for a session. (~1226 tok)
+- `domains.js` — Build the full time grid from institution settings. (~1054 tok)
+- `expand.js` — Normalize a staff_id (ObjectId or string) to a plain string, or null. (~1510 tok)
+- `index.js` — Run the solver per level and return one schedule per level. (~1627 tok)
+- `subgroups.js` — Derive subgroup name list from group_id and subgroup_count. (~443 tok)
+
 ## scripts/
 
+- `add-staff-availability.mjs` — MONGO_URI: addStaffAvailability (~1398 tok)
+- `migrate-schema.mjs` — One-time migration: courses sections[]→flat flags, availability slots→available_days, settings groups→levels_config, schedule entries backfill, rooms collection drop (~1275 tok)
 - `seed-data.mjs` — scripts/seed-data.mjs (~5054 tok)
-- `setup-db.mjs` — scripts/setup-db.mjs (~4702 tok)
+- `seed-ecu.mjs` — scripts/seed-ecu.mjs (~7970 tok)
+- `setup-db.mjs` — scripts/setup-db.mjs (~4685 tok)
 - `truncate-db.mjs` — scripts/truncate-db.mjs (~284 tok)
 
 ## scripts/db/

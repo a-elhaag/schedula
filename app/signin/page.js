@@ -57,6 +57,7 @@ export default function SignInPage() {
   const isSubmitting = status === "submitting";
   const isSuccess = status === "success";
   const isError = status === "error";
+  const isNotVerified = status === "not-verified";
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -91,6 +92,12 @@ export default function SignInPage() {
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
+        // Check if error is due to unverified email
+        if (response.status === 403 && data?.code === "EMAIL_NOT_VERIFIED") {
+          setStatus("not-verified");
+          setMessage(data?.message ?? "Please verify your email before signing in.");
+          return;
+        }
         throw new Error(data?.message ?? "Unable to sign in right now.");
       }
 
@@ -168,6 +175,21 @@ export default function SignInPage() {
           <p className="feedback error" role="alert">
             {message}
           </p>
+        ) : null}
+
+        {isNotVerified ? (
+          <div className="not-verified-section">
+            <p className="feedback warning" role="alert">
+              {message}
+            </p>
+            <Button
+              variant="secondary"
+              className="verify-btn"
+              onClick={() => router.push(`/verify-email?email=${encodeURIComponent(email)}`)}
+            >
+              Check your email
+            </Button>
+          </div>
         ) : null}
 
         <p className="back-link">

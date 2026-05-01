@@ -12,18 +12,22 @@ import SkeletonPage from "@/components/SkeletonPage";
 import ErrorState  from "@/components/ErrorState";
 import { Input }   from "@/components/Input";
 import MemberCard  from "@/components/MemberCard";
-import { UserIcon, BoltIcon, WarningIcon } from "@/components/icons/index";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import { UserIcon, BoltIcon, WarningIcon, TrashIcon, EditIcon, DownloadIcon } from "@/components/icons/index";
 
 export default function CoordinatorStaffPage() {
-  const [data,      setData]      = useState(null);
-  const [loading,   setLoading]   = useState(true);
-  const [error,     setError]     = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [saving,    setSaving]    = useState(false);
-  const [filter,    setFilter]    = useState("all");
-  const [search,    setSearch]    = useState("");
-  const [toast,     setToast]     = useState({ open:false, variant:"info", title:"", message:"", id:0 });
-  const [form,      setForm]      = useState({ name:"", email:"", role:"professor" });
+  const [data,          setData]          = useState(null);
+  const [loading,       setLoading]       = useState(true);
+  const [error,         setError]         = useState(null);
+  const [showModal,     setShowModal]     = useState(false);
+  const [saving,        setSaving]        = useState(false);
+  const [filter,        setFilter]        = useState("all");
+  const [search,        setSearch]        = useState("");
+  const [toast,         setToast]         = useState({ open:false, variant:"info", title:"", message:"", id:0 });
+  const [form,          setForm]          = useState({ name:"", email:"", role:"professor" });
+  const [editingId,     setEditingId]     = useState(null);
+  const [deleteId,      setDeleteId]      = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const showToast = (variant, title, message) =>
     setToast({ open:true, variant, title, message, id:Date.now() });
@@ -50,19 +54,65 @@ export default function CoordinatorStaffPage() {
     }
     setSaving(true);
     try {
-      const res  = await fetch("/api/coordinator/staff", {
-        method:  "POST",
+      const method = editingId ? "PUT" : "POST";
+      const url    = editingId ? `/api/coordinator/staff/${editingId}` : "/api/coordinator/staff";
+      const res    = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify(form),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.message ?? "Failed to add");
-      showToast("success", "Staff Added", `${form.name} has been invited.`);
+      if (!res.ok) throw new Error(json.message ?? `Failed to ${editingId ? "update" : "add"}`);
+      showToast("success", editingId ? "Staff Updated" : "Staff Added", `${form.name} has been ${editingId ? "updated" : "invited"}.`);
       setShowModal(false);
+      setEditingId(null);
       setForm({ name:"", email:"", role:"professor" });
       load();
     } catch (e) { showToast("danger", "Error", e.message); }
     finally { setSaving(false); }
+  }
+
+  async function handleDeleteStaff() {
+    if (!deleteId) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/coordinator/staff/${deleteId}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message ?? "Failed to delete");
+      showToast("success", "Staff Deleted", "Staff member has been removed.");
+      setShowDeleteConfirm(false);
+      setDeleteId(null);
+      load();
+    } catch (e) { showToast("danger", "Error", e.message); }
+    finally { setSaving(false); }
+  }
+
+  function openEditModal(member) {
+    setForm({ name: member.name, email: member.email, role: member.role });
+    setEditingId(member.id);
+    setShowModal(true);
+  }
+
+  function openDeleteConfirm(memberId) {
+    setDeleteId(memberId);
+    setShowDeleteConfirm(true);
+  }
+
+  async function handleExportSummary() {
+    try {
+      const params = new URLSearchParams();
+      if (filter !== "all") params.set("role", filter);
+      const res = await fetch(`/api/coordinator/staff/export?${params}`);
+      if (!res.ok) throw new Error("Failed to export");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `staff-summary-${Date.now()}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      showToast("success", "Export Complete", "Staff summary exported successfully.");
+    } catch (e) { showToast("danger", "Error", e.message); }
   }
 
   const staff      = data?.items ?? [];
@@ -126,31 +176,60 @@ export default function CoordinatorStaffPage() {
             <p className="empty-msg">No staff members found.</p>
           ) : (
             <div className="staff-grid">
-              {/* MemberCard from components/ */}
               {filtered.map(member => (
-                <MemberCard key={member.id} member={member} />
+                <div key={member.id} className="member-card-wrapper">
+                  <MemberCard member={member} />
+                  <div className="member-actions">
+                    <button
+                      className="action-btn edit-btn"
+                      title="Edit"
+                      onClick={() => openEditModal(member)}
+                    >
+                      <EditIcon />
+                    </button>
+                    <button
+                      className="action-btn delete-btn"
+                      title="Delete"
+                      onClick={() => openDeleteConfirm(member.id)}
+                    >
+                      <TrashIcon />
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
           )}
         </section>
 
         <section className="quick-actions reveal reveal-4">
-          <Button variant="ghost">Export Summary</Button>
-          <Button variant="ghost">Manage Constraints</Button>
+          <Button variant="ghost" onClick={handleExportSummary}>
+            <DownloadIcon /> Export Summary
+          </Button>
+          <Button variant="ghost" onClick={() => window.location.href = "/coordinator/constraints"}>
+            Manage Constraints
+          </Button>
         </section>
 
       </main>
 
       <Modal
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title="Add Staff Member"
-        description="Invite a professor or TA to join this institution."
+        onClose={() => {
+          setShowModal(false);
+          setEditingId(null);
+          setForm({ name:"", email:"", role:"professor" });
+        }}
+        title={editingId ? "Edit Staff Member" : "Add Staff Member"}
+        description={editingId ? "Update staff member details." : "Invite a professor or TA to join this institution."}
         footer={
           <div className="modal-footer-actions">
-            <Button variant="ghost" onClick={() => setShowModal(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => {
+              setShowModal(false);
+              setEditingId(null);
+              setForm({ name:"", email:"", role:"professor" });
+            }}>Cancel</Button>
             <Button variant="primary" onClick={handleAddStaff} disabled={saving}>
-              {saving ? "Adding..." : "Send Invitation"}
+              {saving ? (editingId ? "Updating..." : "Adding...") : (editingId ? "Update Staff" : "Send Invitation")}
             </Button>
           </div>
         }
@@ -171,6 +250,21 @@ export default function CoordinatorStaffPage() {
           </div>
         </div>
       </Modal>
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Delete Staff Member"
+        message="Are you sure you want to delete this staff member? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleDeleteStaff}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setDeleteId(null);
+        }}
+        isLoading={saving}
+      />
 
       <Toast key={toast.id} open={toast.open} variant={toast.variant} title={toast.title} message={toast.message} onClose={() => setToast(p => ({ ...p, open:false }))} duration={3200} />
     </div>
