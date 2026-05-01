@@ -34,14 +34,13 @@ export async function GET(request) {
     const enriched = staff.map(s => {
       const sub = submissionMap[s._id.toString()];
       return {
-        id:        s._id.toString(),
-        name:      s.name,
-        email:     s.email,
-        role:      s.role,
-        status:    sub ? "submitted" : "missing",
-        slotCount: sub?.slots?.length ?? 0,
-        slots:     sub?.slots ?? [],
-        submittedAt: sub?.submitted_at ?? null,
+        id:             s._id.toString(),
+        name:           s.name,
+        email:          s.email,
+        role:           s.role,
+        status:         sub ? "submitted" : "missing",
+        available_days: sub?.available_days ?? [],
+        submittedAt:    sub?.submitted_at ?? null,
       };
     });
 
