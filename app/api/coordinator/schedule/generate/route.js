@@ -109,6 +109,13 @@ export async function POST(request) {
           return;
         }
 
+        // Remove any existing draft schedule for this term before inserting new one
+        await db.collection("schedules").deleteMany({
+          institution_id: iOid,
+          term_label:     termLabel,
+          is_published:   false,
+        });
+
         const scheduleResult = await db.collection("schedules").insertOne({
           institution_id: iOid,
           term_label:     termLabel,
