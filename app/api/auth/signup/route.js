@@ -111,10 +111,6 @@ export async function POST(request) {
     // Hash the password
     const passwordHash = await hashPassword(password);
 
-    // Generate initial verification token
-    const emailVerifyToken = generateToken();
-    const emailVerifyExpiresAt = new Date(Date.now() + EMAIL_VERIFY_TTL_MS);
-
     // Create user document
     const newUser = {
       institution_id: new ObjectId(DEFAULT_INSTITUTION_ID),
@@ -123,8 +119,8 @@ export async function POST(request) {
       role: "coordinator", // Coordinator-only signup
       name,
       invite_status: "pending", // User must verify email
-      email_verify_token: emailVerifyToken,
-      email_verify_expires_at: emailVerifyExpiresAt,
+      email_verify_token: null,
+      email_verify_expires_at: null,
       email_verified_at: null,
       invited_by: null,
       invite_token: null,
@@ -134,7 +130,10 @@ export async function POST(request) {
 
     // Insert user into database
     const result = await usersCollection.insertOne(newUser);
-    const userId = result.insertedId.toString();
+    const userId = result.insertedId;
+
+    // Generate and save verification token (userId is already an ObjectId)
+    const emailVerifyToken = await generateEmailVerificationToken(userId);
 
     const emailResult = await sendEmailVerification(email, emailVerifyToken, request);
 
@@ -150,7 +149,7 @@ export async function POST(request) {
       {
         ok: true,
         message: "Account created. Please verify your email to continue.",
-        user: { id: userId, email, role: "coordinator" },
+        user: { id: userId.toString(), email, role: "coordinator" },
         verificationToken:
           emailResult?.skipped && process.env.NODE_ENV !== "production"
             ? emailVerifyToken

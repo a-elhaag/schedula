@@ -32,6 +32,379 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-01T07:55:20.617Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-05-01T08:10:20.891Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/coordinator/staff/page.js",
+      "root_cause": "9 lines replaced/restructured",
+      "fix": "Rewrote 10→13 lines (9 removed) | Also: const res  = await fetch(\"/api/coordinator/staff\",; method:  \"POST\", | Also: {/* MemberCard from components/ */}; <MemberCard key={member.id} member={member} /> | Also: <Button variant=\"ghost\">Export Summary</Button>; <Button variant=\"ghost\">Manage Constraints</Button | Also: onClose={() => setShowModal(false)}; title=\"Add Staff Member\"",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 5,
+      "last_seen": "2026-05-01T08:11:16.142Z"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-05-01T08:11:44.585Z",
+      "error_message": "CSS fix: color",
+      "file": "app/coordinator/staff/styles.css",
+      "root_cause": "color: var(--color-text-muted) → #FF3B30",
+      "fix": "Changed color: var(--color-text-muted) → #FF3B30",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T08:11:44.585Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-05-01T08:12:40.071Z",
+      "error_message": "Wrong reference: Download should be DownloadIcon",
+      "file": "app/coordinator/staff/page.js",
+      "root_cause": "Used \"Download\" instead of \"DownloadIcon\"",
+      "fix": "Changed Download → DownloadIcon",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T08:12:40.071Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-05-01T08:15:20.675Z",
+      "error_message": "Null/undefined access in ",
+      "file": "app/api/coordinator/staff/[id]/route.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: const deletedUser = result?.value || result;; if (!deletedUser) {",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-01T08:15:31.091Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-05-01T16:32:00.000Z",
+      "error_message": "Email verification flow broken: invalid/expired links and account already verified",
+      "file": "app/api/auth/signup/route.js, app/api/auth/verify-email/route.js, app/api/auth/resend-verification/route.js, app/verify-email/content.js",
+      "root_cause": "1. Signup generated token but didn't save it to DB (used generateToken() instead of generateEmailVerificationToken). 2. verify-email endpoint didn't check if account was already verified. 3. resend-verification didn't log when account already verified. 4. No auto-redirect after verification.",
+      "fix": "1. Changed signup to use generateEmailVerificationToken() after creating user. 2. Added check in verify-email for already-verified accounts with clearer messaging. 3. Added logging in resend-verification for already-verified case. 4. Added auto-redirect to signin after 3 seconds on successful verification.",
+      "tags": [
+        "auth",
+        "email-verification",
+        "critical"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T16:32:00.000Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-05-01T08:29:48.496Z",
+      "error_message": "CSS fix: background-color, color, border",
+      "file": "app/signin/styles.css",
+      "root_cause": "background-color: #fff0ee → #fef3c7; color: #8f281f → #92400e; border: 1px solid #ffd2cb → 1px solid #fde68a",
+      "fix": "Changed background-color: #fff0ee → #fef3c7; color: #8f281f → #92400e; border: 1px solid #ffd2cb → 1px solid #fde68a",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T08:29:48.496Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-05-01T16:25:52.029Z",
+      "error_message": "Missing await",
+      "file": "app/api/coordinator/import/route.js",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T16:25:52.029Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-05-01T17:00:00.000Z",
+      "error_message": "Next.js middleware not running: file was named proxy.js instead of middleware.js",
+      "file": "proxy.js → middleware.js",
+      "root_cause": "Next.js requires the middleware entry point to be named middleware.js (or middleware.ts) at the project root. proxy.js was never picked up by the framework.",
+      "fix": "Renamed proxy.js → middleware.js and ensured the exported function is named `middleware`.",
+      "tags": [
+        "middleware",
+        "auth",
+        "routing",
+        "critical"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T17:00:00.000Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-05-01T17:00:00.000Z",
+      "error_message": "hashPassword is not a function (imported from @/lib/auth which does not export it)",
+      "file": "app/api/coordinator/staff/route.js",
+      "root_cause": "lib/auth.js only exports signToken, verifyToken, generateToken. hashPassword lives in lib/password.js.",
+      "fix": "Split import: `generateToken` stays in @/lib/auth; `hashPassword` moved to @/lib/password.",
+      "tags": [
+        "import",
+        "auth",
+        "password",
+        "critical"
+      ],
+      "related_bugs": [
+        "bug-010"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T17:00:00.000Z"
+    },
+    {
+      "id": "bug-012",
+      "timestamp": "2026-05-01T17:00:00.000Z",
+      "error_message": "import POST handler used raw `new ObjectId(institutionId)` instead of resolveInstitutionId()",
+      "file": "app/api/coordinator/import/route.js",
+      "root_cause": "GET handler already used resolveInstitutionId() correctly, but POST handler had a stale `new ObjectId(institutionId)` call that bypasses BYPASS_AUTH string-ID handling.",
+      "fix": "Changed POST handler line 78: `const iOid = new ObjectId(institutionId)` → `const iOid = await resolveInstitutionId(institutionId)`.",
+      "tags": [
+        "import",
+        "institution",
+        "bypass-auth",
+        "critical"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T17:00:00.000Z"
+    },
+    {
+      "id": "bug-013",
+      "timestamp": "2026-05-01T16:55:31.848Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/coordinator/courses/page.js",
+      "root_cause": "11 lines replaced/restructured",
+      "fix": "Rewrote 14→15 lines (11 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T16:55:31.848Z"
+    },
+    {
+      "id": "bug-014",
+      "timestamp": "2026-05-01T16:55:36.672Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "app/coordinator/courses/page.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T16:55:36.672Z"
+    },
+    {
+      "id": "bug-015",
+      "timestamp": "2026-05-01T16:55:46.429Z",
+      "error_message": "Wrong operator: === should be &&",
+      "file": "app/coordinator/courses/page.js",
+      "root_cause": "Used \"===\" instead of \"&&\"",
+      "fix": "Changed operator === → &&",
+      "tags": [
+        "auto-detected",
+        "operator-fix",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T16:55:46.429Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-05-01T16:56:05.307Z",
+      "error_message": "Null/undefined access in ",
+      "file": "app/coordinator/courses/page.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T16:56:05.307Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-05-01T18:36:46.538Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/coordinator/schedule/generate/page.js",
+      "root_cause": "13 lines replaced/restructured",
+      "fix": "Rewrote 15→3 lines (13 removed) | Also: <div style={{ marginTop: 16, padding: \"20px 24px\",; <p style={{ fontWeight: 700, color: \"#92400e\", mar",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-01T18:41:03.495Z"
+    },
+    {
+      "id": "bug-018",
+      "timestamp": "2026-05-01T18:37:09.938Z",
+      "error_message": "Null/undefined access in ",
+      "file": "app/coordinator/schedule/generate/page.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: const relaxed = s.availabilityRelaxed ?? false;; setGenerationError(relaxed ? {",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-01T18:41:32.387Z"
+    },
+    {
+      "id": "bug-019",
+      "timestamp": "2026-05-01T18:40:38.730Z",
+      "error_message": "Null/undefined access in ",
+      "file": "app/api/coordinator/schedule/generate/route.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T18:40:38.730Z"
+    },
+    {
+      "id": "bug-020",
+      "timestamp": "2026-05-01T18:55:07.955Z",
+      "error_message": "Missing guard clause",
+      "file": "app/api/coordinator/schedule/generate/route.js",
+      "root_cause": "No early return/throw for edge case: lr.entries.length === 0",
+      "fix": "Added guard clause: if (lr.entries.length === 0)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T18:55:07.955Z"
+    },
+    {
+      "id": "bug-021",
+      "timestamp": "2026-05-01T18:55:39.783Z",
+      "error_message": "Null/undefined access in ",
+      "file": "app/api/coordinator/schedule/review/route.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T18:55:39.783Z"
+    },
+    {
+      "id": "bug-022",
+      "timestamp": "2026-05-01T19:03:58.119Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/api/coordinator/schedule/review/route.js",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 9→5 lines (3 removed) | Also: const schedule = await db.collection(\"schedules\").; _id: new ObjectId(scheduleId),",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-01T19:04:25.332Z"
+    },
+    {
+      "id": "bug-023",
+      "timestamp": "2026-05-01T19:04:45.397Z",
+      "error_message": "Null/undefined access in ",
+      "file": "app/api/coordinator/schedule/review/route.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T19:04:45.397Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-05-01T19:19:06.348Z",
+      "error_message": "Significant refactor of ",
+      "file": "lib/solver/index.js",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 4→6 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T19:19:06.348Z"
+    },
+    {
+      "id": "bug-025",
+      "timestamp": "2026-05-01T19:19:49.179Z",
+      "error_message": "Null/undefined access in ",
+      "file": "app/coordinator/schedule/generate/page.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T19:19:49.179Z"
     }
   ]
 }

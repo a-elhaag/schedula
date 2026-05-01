@@ -93,7 +93,20 @@ export async function POST(request) {
       });
     }
 
-    // Return same message whether user exists or not (security: prevent account enumeration)
+    // Account exists but is already verified
+    if (user && user.email_verified_at) {
+      logger.info(
+        { requestId, userId: user._id.toString() },
+        "Resend verification attempted for already-verified account",
+      );
+      // Still return generic message to prevent account enumeration
+      return NextResponse.json({
+        ok: true,
+        message: DEFAULT_MESSAGE,
+      });
+    }
+
+    // Return same message whether user doesn't exist or not (security: prevent account enumeration)
     return NextResponse.json({
       ok: true,
       message: DEFAULT_MESSAGE,

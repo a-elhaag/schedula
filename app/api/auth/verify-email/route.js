@@ -64,10 +64,34 @@ export async function POST(request) {
     });
 
     if (!user) {
+      // Check if user exists but token is expired or invalid
+      const userWithInvalidToken = await usersCollection.findOne({
+        email_verify_token: token,
+      });
+
+      if (userWithInvalidToken) {
+        logger.warn(
+          { requestId, userId: userWithInvalidToken._id.toString() },
+          "Email verification attempted with expired token",
+        );
+      }
+
       return NextResponse.json(
         { message: "This verification link is invalid or has expired." },
         { status: 400 },
       );
+    }
+
+    // Check if already verified to prevent re-verification
+    if (user.email_verified_at) {
+      logger.info(
+        { requestId, userId: user._id.toString() },
+        "Email verification attempted for already-verified account",
+      );
+      return NextResponse.json({
+        ok: true,
+        message: "This email has already been verified. You can sign in.",
+      });
     }
 
     await usersCollection.updateOne(
