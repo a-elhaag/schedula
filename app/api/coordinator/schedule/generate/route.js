@@ -96,11 +96,19 @@ export async function POST(request) {
         const result = await runSolver(iOid.toString(), termLabel);
         const { levelResults, overallStats } = result;
 
-        // Delete existing draft schedules for this term
+        // Delete existing draft schedules for this term (all levels)
         await db.collection("schedules").deleteMany({
           institution_id: iOid,
           term_label:     termLabel,
           is_published:   false,
+        });
+
+        // Also delete any legacy single-schedule docs (no level field) from old format
+        await db.collection("schedules").deleteMany({
+          institution_id: iOid,
+          term_label:     termLabel,
+          is_published:   false,
+          level:          { $exists: false },
         });
 
         // Insert one schedule document per level
