@@ -13,6 +13,7 @@ import {
   SettingsIcon,
   GraduationCapIcon,
   DownloadIcon,
+  RocketIcon,
 } from "@/components/icons/index";
 import { clearAllCached } from "@/lib/clientCache";
 import "./layout.css";
@@ -21,10 +22,10 @@ const NAV_ITEMS = [
   { href: "/coordinator/setup",              label: "Setup",      Icon: HomeIcon          },
   { href: "/coordinator/courses",            label: "Courses",    Icon: BookOpenIcon      },
   { href: "/coordinator/staff",              label: "Staff",      Icon: UserIcon          },
-  { href: "/coordinator/rooms",              label: "Rooms",      Icon: GraduationCapIcon },
-  { href: "/coordinator/constraints",        label: "Constraints",Icon: BoltIcon          },
-  { href: "/coordinator/assign",             label: "Assign",     Icon: CalendarIcon      },
-  { href: "/coordinator/schedule/generate",  label: "Generate",   Icon: BoltIcon          },
+  { href: "/coordinator/groups",             label: "Groups",      Icon: GraduationCapIcon },
+  { href: "/coordinator/constraints",        label: "Constraints", Icon: SettingsIcon      },
+  { href: "/coordinator/assign",             label: "Assign",      Icon: CalendarIcon      },
+  { href: "/coordinator/schedule/generate",  label: "Generate",    Icon: RocketIcon        },
   { href: "/coordinator/schedule/review",    label: "Review",     Icon: GearIcon          },
   { href: "/coordinator/schedule/published", label: "Published",  Icon: CalendarIcon      },
   { href: "/coordinator/analytics",          label: "Analytics",  Icon: BoltIcon          },
