@@ -93,8 +93,8 @@ export default function CoordinatorScheduleGeneratePage() {
           setProgress(100);
 
           const s = json.stats ?? {};
-          const assigned = s.assignedSessions ?? 0;
-          const total    = s.totalSessions    ?? 0;
+          const assigned = s.totalAssigned ?? s.assignedSessions ?? 0;
+          const total    = s.totalSessions ?? 0;
 
           if (json.status === ScheduleJobStatus.COMPLETED) {
             setStatusMsg("Schedule generated successfully.");
