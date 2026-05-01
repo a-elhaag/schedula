@@ -124,14 +124,21 @@ export async function POST(request) {
           created_at:     new Date(),
         });
 
+        const relaxed = result.availabilityRelaxed ?? false;
+        const placed  = result.entries.length;
+        const total   = result.stats.totalSessions;
+
+        let statusMsg = result.stats.success
+          ? "Schedule generated successfully."
+          : `Partial schedule — ${placed} of ${total} sessions placed.`;
+        if (relaxed) statusMsg += " (staff availability was relaxed to fit all sessions)";
+
         await updateJob({
           status:         result.stats.success
             ? ScheduleJobStatus.COMPLETED
             : ScheduleJobStatus.COMPLETED_FALLBACK,
-          status_message: result.stats.success
-            ? "Schedule generated successfully."
-            : "Partial schedule generated — some sessions could not be placed.",
-          sessions_count: result.entries.length,
+          status_message: statusMsg,
+          sessions_count: placed,
           schedule_id:    scheduleResult.insertedId,
           error:          null,
           stats:          result.stats,
