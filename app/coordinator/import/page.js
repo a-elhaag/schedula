@@ -44,25 +44,72 @@ function ValidationCard({ result }) {
   if (!result) return null;
   const hasErrors   = result.errors?.length   > 0;
   const hasWarnings = result.warnings?.length > 0;
+  const successRate = result.total ? Math.round((result.valid / result.total) * 100) : 0;
 
   return (
     <article className={`validation-card ${hasErrors ? "validation-card--error" : ""}`}>
-      <h3>Validation Result</h3>
-      <p className="validation-summary">
-        {result.valid} valid rows &nbsp;|&nbsp;
-        {result.errors?.length ?? 0} errors &nbsp;|&nbsp;
-        {result.warnings?.length ?? 0} warnings
-      </p>
+      <div className="validation-header">
+        <h3>Validation Result</h3>
+        <div className="validation-stats-summary">
+          <Badge variant={successRate === 100 ? "success" : hasErrors ? "danger" : "warning"} size="sm">
+            {successRate}% Valid
+          </Badge>
+        </div>
+      </div>
+
+      {/* Results Table */}
+      <div className="validation-table-wrapper">
+        <table className="validation-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Count</th>
+              <th>Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="validation-row validation-row--success">
+              <td><span className="status-badge status-badge--success">✓</span> Valid Rows</td>
+              <td className="count-cell">{result.valid}</td>
+              <td className="percent-cell">{successRate}%</td>
+            </tr>
+            {result.total && result.total > result.valid && !hasErrors && (
+              <tr className="validation-row validation-row--warning">
+                <td><span className="status-badge status-badge--warning">⚠</span> Warnings</td>
+                <td className="count-cell">{result.total - result.valid}</td>
+                <td className="percent-cell">{Math.round(((result.total - result.valid) / result.total) * 100)}%</td>
+              </tr>
+            )}
+            {hasErrors && (
+              <tr className="validation-row validation-row--error">
+                <td><span className="status-badge status-badge--error">✕</span> Errors</td>
+                <td className="count-cell">{result.errors?.length ?? 0}</td>
+                <td className="percent-cell">{Math.round(((result.errors?.length ?? 0) / result.total) * 100)}%</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Details List */}
       {hasErrors && (
-        <ul className="validation-list validation-list--error">
-          {result.errors.slice(0, 5).map((e, i) => <li key={i}>{e}</li>)}
-          {result.errors.length > 5 && <li>...and {result.errors.length - 5} more</li>}
-        </ul>
+        <div className="validation-details">
+          <h4 className="details-title">Errors ({result.errors?.length ?? 0})</h4>
+          <ul className="validation-list validation-list--error">
+            {result.errors.slice(0, 10).map((e, i) => <li key={i}>{e}</li>)}
+            {(result.errors?.length ?? 0) > 10 && <li className="more-indicator">...and {result.errors.length - 10} more errors</li>}
+          </ul>
+        </div>
       )}
+
       {hasWarnings && !hasErrors && (
-        <ul className="validation-list validation-list--warning">
-          {result.warnings.slice(0, 5).map((w, i) => <li key={i}>{w}</li>)}
-        </ul>
+        <div className="validation-details">
+          <h4 className="details-title">Warnings ({result.warnings?.length ?? 0})</h4>
+          <ul className="validation-list validation-list--warning">
+            {result.warnings.slice(0, 10).map((w, i) => <li key={i}>{w}</li>)}
+            {(result.warnings?.length ?? 0) > 10 && <li className="more-indicator">...and {result.warnings.length - 10} more warnings</li>}
+          </ul>
+        </div>
       )}
     </article>
   );

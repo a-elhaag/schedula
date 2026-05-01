@@ -1,0 +1,403 @@
+{
+  "version": 1,
+  "created_at": "2026-05-01T07:40:15.031Z",
+  "lifetime": {
+    "total_tokens_estimated": 31657,
+    "total_reads": 29,
+    "total_writes": 21,
+    "total_sessions": 7,
+    "anatomy_hits": 28,
+    "anatomy_misses": 1,
+    "repeated_reads_blocked": 2,
+    "estimated_savings_vs_bare_cli": 8812
+  },
+  "sessions": [
+    {
+      "id": "session-2026-05-01-1040",
+      "started": "2026-05-01T07:40:50.979Z",
+      "ended": "2026-05-01T07:48:59.437Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/courses-sample.json",
+          "tokens_estimated": 410,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.json",
+          "tokens_estimated": 646,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/graduate-rooms.json",
+          "tokens_estimated": 204,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/software-engineering-rooms.json",
+          "tokens_estimated": 546,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/courses-sample.csv",
+          "tokens_estimated": 138,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.csv",
+          "tokens_estimated": 207,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/graduate-rooms.csv",
+          "tokens_estimated": 80,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/software-engineering-rooms.csv",
+          "tokens_estimated": 177,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 1806,
+        "output_tokens_estimated": 602,
+        "reads_count": 4,
+        "writes_count": 4,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 4
+      }
+    },
+    {
+      "id": "session-2026-05-01-1040",
+      "started": "2026-05-01T07:40:50.979Z",
+      "ended": "2026-05-01T07:50:13.520Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/courses-sample.json",
+          "tokens_estimated": 410,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.json",
+          "tokens_estimated": 646,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/graduate-rooms.json",
+          "tokens_estimated": 204,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/software-engineering-rooms.json",
+          "tokens_estimated": 546,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.csv",
+          "tokens_estimated": 194,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/rooms/route.js",
+          "tokens_estimated": 1604,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/rooms/page.js",
+          "tokens_estimated": 3467,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/courses-sample.csv",
+          "tokens_estimated": 138,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.csv",
+          "tokens_estimated": 207,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/graduate-rooms.csv",
+          "tokens_estimated": 80,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/software-engineering-rooms.csv",
+          "tokens_estimated": 177,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 7071,
+        "output_tokens_estimated": 602,
+        "reads_count": 7,
+        "writes_count": 4,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 7
+      }
+    },
+    {
+      "id": "session-2026-05-01-1040",
+      "started": "2026-05-01T07:40:50.979Z",
+      "ended": "2026-05-01T07:51:08.622Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/courses-sample.json",
+          "tokens_estimated": 410,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.json",
+          "tokens_estimated": 646,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/graduate-rooms.json",
+          "tokens_estimated": 204,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/software-engineering-rooms.json",
+          "tokens_estimated": 546,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.csv",
+          "tokens_estimated": 194,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/rooms/route.js",
+          "tokens_estimated": 1604,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/rooms/page.js",
+          "tokens_estimated": 3467,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/graduate-rooms.csv",
+          "tokens_estimated": 75,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/software-engineering-rooms.csv",
+          "tokens_estimated": 165,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/courses-sample.csv",
+          "tokens_estimated": 138,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.csv",
+          "tokens_estimated": 207,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/graduate-rooms.csv",
+          "tokens_estimated": 80,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/software-engineering-rooms.csv",
+          "tokens_estimated": 177,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.csv",
+          "tokens_estimated": 134,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 7311,
+        "output_tokens_estimated": 736,
+        "reads_count": 9,
+        "writes_count": 5,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 9
+      }
+    },
+    {
+      "id": "session-2026-05-01-1051",
+      "started": "2026-05-01T07:51:18.725Z",
+      "ended": "2026-05-01T07:52:00.861Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.csv",
+          "tokens_estimated": 195,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/graduate-rooms.csv",
+          "tokens_estimated": 81,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/software-engineering-rooms.csv",
+          "tokens_estimated": 183,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.csv",
+          "tokens_estimated": 215,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 195,
+        "output_tokens_estimated": 479,
+        "reads_count": 1,
+        "writes_count": 3,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 1
+      }
+    },
+    {
+      "id": "session-2026-05-01-1053",
+      "started": "2026-05-01T07:53:32.394Z",
+      "ended": "2026-05-01T07:56:31.661Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/import/page.js",
+          "tokens_estimated": 3018,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/import/validate/route.js",
+          "tokens_estimated": 1381,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/import/styles.css",
+          "tokens_estimated": 4876,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/import/page.js",
+          "tokens_estimated": 925,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/import/styles.css",
+          "tokens_estimated": 871,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 9275,
+        "output_tokens_estimated": 1796,
+        "reads_count": 3,
+        "writes_count": 2,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 3
+      }
+    },
+    {
+      "id": "session-2026-05-01-1057",
+      "started": "2026-05-01T07:57:25.766Z",
+      "ended": "2026-05-01T07:58:10.374Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.csv",
+          "tokens_estimated": 201,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/graduate-rooms.csv",
+          "tokens_estimated": 76,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/software-engineering-rooms.csv",
+          "tokens_estimated": 171,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/freshman-rooms.csv",
+          "tokens_estimated": 461,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/graduate-rooms.csv",
+          "tokens_estimated": 388,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/import-json-test/software-engineering-rooms.csv",
+          "tokens_estimated": 487,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 448,
+        "output_tokens_estimated": 1336,
+        "reads_count": 5,
+        "writes_count": 3,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 4
+      }
+    }
+  ],
+  "daemon_usage": [],
+  "waste_flags": [],
+  "optimization_report": {
+    "last_generated": null,
+    "patterns": []
+  }
+}
