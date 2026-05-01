@@ -171,10 +171,6 @@ export async function POST(request) {
     const body       = await request.json();
     const { action, scheduleId } = body;
 
-    if (!scheduleId || !ObjectId.isValid(scheduleId)) {
-      return NextResponse.json({ message: "Invalid scheduleId" }, { status: 400 });
-    }
-
     const db = await getDb();
     const iOid = await resolveInstitutionId(institutionId);
 
@@ -189,54 +185,41 @@ export async function POST(request) {
         return NextResponse.json({ message: "No unpublished schedules found" }, { status: 404 });
       }
 
-      const result = await db.collection("schedules").updateMany(
+      const termLabel = termSchedules[0].term_label;
+      const now       = new Date();
+      const approvedBy = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
+
+      // Publish all level schedules at once
+      await db.collection("schedules").updateMany(
         { institution_id: iOid, is_published: false },
-        {
-          $set: {
-            is_published: true,
-            published_at: new Date(),
-            approved_by:  new ObjectId(userId),
-            approved_at:  new Date(),
-          },
-        }
+        { $set: { is_published: true, published_at: now, approved_by: approvedBy, approved_at: now } }
       );
 
-      if (result.matchedCount === 0) {
-        return NextResponse.json({ message: "Schedule not found" }, { status: 404 });
-      }
-
+      // Create a single revision record summarising all levels
       const latestRevision = await db.collection("schedule_revisions").findOne(
-        {
-          institution_id: iOid,
-          term_label: schedule.term_label,
-          deleted_at: null,
-        },
+        { institution_id: iOid, term_label: termLabel, deleted_at: null },
         { sort: { revision_number: -1 } }
       );
-
       const nextRevisionNumber = (latestRevision?.revision_number ?? 0) + 1;
-      const now = new Date();
+      const allEntries = termSchedules.flatMap(s => s.entries ?? []);
 
       await db.collection("schedule_revisions").insertOne({
-        institution_id: iOid,
-        term_label: schedule.term_label,
+        institution_id:  iOid,
+        term_label:      termLabel,
         revision_number: nextRevisionNumber,
-        schedule_id: scheduleObjectId,
-        published_at: now,
-        published_by: ObjectId.isValid(userId) ? new ObjectId(userId) : userId,
-        entries: schedule.entries ?? [],
-        hard_violations: schedule.hard_violations ?? 0,
-        soft_penalty_total: schedule.soft_penalty_total ?? null,
-        warnings: schedule.warnings ?? [],
-        notes: `Auto-created from published schedule ${scheduleObjectId.toString()}`,
-        created_at: now,
-        updated_at: now,
-        deleted_at: null,
+        schedule_ids:    termSchedules.map(s => s._id),
+        published_at:    now,
+        published_by:    approvedBy,
+        entries:         allEntries,
+        notes:           `Published ${termSchedules.length} level schedules`,
+        created_at:      now,
+        updated_at:      now,
+        deleted_at:      null,
       });
 
       return NextResponse.json({
         ok: true,
-        message: "Schedule published successfully",
+        message: `${termSchedules.length} level schedules published successfully`,
         revisionNumber: nextRevisionNumber,
       });
     }
@@ -250,10 +233,10 @@ export async function POST(request) {
         return NextResponse.json({ message: "Invalid resolutionAction" }, { status: 400 });
       }
 
-      const schedule = await db.collection("schedules").findOne({
-        _id: new ObjectId(scheduleId),
-        institution_id: iOid,
-      });
+      // Find the most recent unpublished (or published) schedule for this institution
+      const schedule = scheduleId && ObjectId.isValid(scheduleId)
+        ? await db.collection("schedules").findOne({ _id: new ObjectId(scheduleId), institution_id: iOid })
+        : await db.collection("schedules").findOne({ institution_id: iOid }, { sort: { created_at: -1 } });
       if (!schedule) {
         return NextResponse.json({ message: "Schedule not found" }, { status: 404 });
       }
@@ -303,11 +286,14 @@ export async function POST(request) {
         return NextResponse.json({ message: "Conflict payload is required" }, { status: 400 });
       }
 
-      const conflictKey = getConflictKey(conflict);
+      const conflictKey  = getConflictKey(conflict);
+      const schedOid = scheduleId && ObjectId.isValid(scheduleId)
+        ? new ObjectId(scheduleId)
+        : (await db.collection("schedules").findOne({ institution_id: iOid }, { sort: { created_at: -1 } }))?._id;
       const result = await db.collection("conflict_resolutions").updateOne(
         {
           institution_id: iOid,
-          schedule_id: new ObjectId(scheduleId),
+          schedule_id: schedOid,
           conflict_key: conflictKey,
           deleted_at: null,
         },

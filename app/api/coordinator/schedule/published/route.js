@@ -121,12 +121,9 @@ export async function POST(request) {
       return NextResponse.json({ message: "Unknown action" }, { status: 400 });
     }
 
-    if (!body.scheduleId || !ObjectId.isValid(body.scheduleId)) {
-      return NextResponse.json({ message: "Invalid scheduleId" }, { status: 400 });
-    }
-
-    await db.collection("schedules").updateOne(
-      { _id: new ObjectId(body.scheduleId), institution_id: iOid },
+    // Unpublish all level schedules for this institution
+    await db.collection("schedules").updateMany(
+      { institution_id: iOid, is_published: true },
       { $set: { is_published: false, unpublished_at: new Date() } }
     );
 
