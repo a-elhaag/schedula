@@ -34,19 +34,20 @@ export default function CoordinatorCoursesPage() {
     id: 0,
   });
   const [form, setForm] = useState({
-    code: "",
-    name: "",
-    credit_hours: "3",
-    num_sections: "1",
-    year_levels: [],
-    has_lecture: false,
-    lecture_duration: "90",
-    has_lab: false,
-    lab_duration: "120",
-    has_tutorial: false,
-    tutorial_duration: "60",
+    code:               "",
+    name:               "",
+    credit_hours:       "3",
+    level:              "1",
+    has_lecture:        true,
+    has_tutorial:       false,
+    has_lab:            false,
+    has_tut_lab:        false,
+    groups_per_lecture: "1",
+    professor_id:       "",
+    ta_ids:             [],
   });
   const [editingId, setEditingId] = useState(null);
+  const [staff, setStaff] = useState([]);
 
   const showToast = (variant, title, message) =>
     setToast({ open: true, variant, title, message, id: Date.now() });
@@ -66,42 +67,43 @@ export default function CoordinatorCoursesPage() {
     }
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  const loadStaff = useCallback(async () => {
+    try {
+      const res  = await fetch("/api/coordinator/staff?limit=200");
+      const json = await res.json();
+      if (res.ok) setStaff(json.items ?? []);
+    } catch {}
+  }, []);
+
+  useEffect(() => { load(); loadStaff(); }, [load, loadStaff]);
+
+  const professors = staff.filter(s => s.role === "professor");
+  const tas        = staff.filter(s => s.role === "ta");
 
   async function handleCreateOrUpdate() {
     if (!form.code.trim() || !form.name.trim()) {
       showToast("warning", "Validation", "Course code and name are required.");
       return;
     }
-
-    if (form.year_levels.length === 0) {
-      showToast("warning", "Validation", "At least one year level must be selected.");
-      return;
-    }
-
-    const hasSessionType = form.has_lecture || form.has_lab || form.has_tutorial;
-    if (!hasSessionType) {
+    if (!form.has_lecture && !form.has_tutorial && !form.has_lab && !form.has_tut_lab) {
       showToast("warning", "Validation", "At least one session type must be selected.");
       return;
     }
 
     setSaving(true);
     try {
-      const section_types = [
-        ...(form.has_lecture ? [{ type: "lecture", duration_minutes: parseInt(form.lecture_duration) || 90 }] : []),
-        ...(form.has_lab ? [{ type: "lab", duration_minutes: parseInt(form.lab_duration) || 120 }] : []),
-        ...(form.has_tutorial ? [{ type: "tutorial", duration_minutes: parseInt(form.tutorial_duration) || 60 }] : []),
-      ];
-
       const payload = {
-        code: form.code,
-        name: form.name,
-        credit_hours: parseInt(form.credit_hours) || 3,
-        num_sections: parseInt(form.num_sections) || 1,
-        year_levels: form.year_levels.map(Number),
-        section_types,
+        code:               form.code.trim().toUpperCase(),
+        name:               form.name.trim(),
+        credit_hours:       parseInt(form.credit_hours) || 3,
+        level:              parseInt(form.level),
+        has_lecture:        form.has_lecture,
+        has_tutorial:       form.has_tutorial,
+        has_lab:            form.has_lab,
+        has_tut_lab:        form.has_tut_lab,
+        groups_per_lecture: parseInt(form.groups_per_lecture) || 1,
+        professor_id:       form.professor_id || null,
+        ta_ids:             form.ta_ids,
       };
 
       const url = editingId
@@ -122,17 +124,17 @@ export default function CoordinatorCoursesPage() {
       );
       setShowModal(false);
       setForm({
-        code: "",
-        name: "",
-        credit_hours: "3",
-        num_sections: "1",
-        year_levels: [],
-        has_lecture: false,
-        lecture_duration: "90",
-        has_lab: false,
-        lab_duration: "120",
-        has_tutorial: false,
-        tutorial_duration: "60",
+        code:               "",
+        name:               "",
+        credit_hours:       "3",
+        level:              "1",
+        has_lecture:        true,
+        has_tutorial:       false,
+        has_lab:            false,
+        has_tut_lab:        false,
+        groups_per_lecture: "1",
+        professor_id:       "",
+        ta_ids:             [],
       });
       setEditingId(null);
       load();
@@ -165,45 +167,35 @@ export default function CoordinatorCoursesPage() {
   function openCreate() {
     setEditingId(null);
     setForm({
-      code: "",
-      name: "",
-      credit_hours: "3",
-      num_sections: "1",
-      year_levels: [],
-      has_lecture: false,
-      lecture_duration: "90",
-      has_lab: false,
-      lab_duration: "120",
-      has_tutorial: false,
-      tutorial_duration: "60",
+      code:               "",
+      name:               "",
+      credit_hours:       "3",
+      level:              "1",
+      has_lecture:        true,
+      has_tutorial:       false,
+      has_lab:            false,
+      has_tut_lab:        false,
+      groups_per_lecture: "1",
+      professor_id:       "",
+      ta_ids:             [],
     });
     setShowModal(true);
   }
 
   function openEdit(course) {
     setEditingId(course.id);
-
-    const section_types = course.section_types || [];
-    const hasLecture = section_types.some(st => st.type === "lecture");
-    const hasLab = section_types.some(st => st.type === "lab");
-    const hasTutorial = section_types.some(st => st.type === "tutorial");
-
-    const lectureDuration = section_types.find(st => st.type === "lecture")?.duration_minutes || 90;
-    const labDuration = section_types.find(st => st.type === "lab")?.duration_minutes || 120;
-    const tutorialDuration = section_types.find(st => st.type === "tutorial")?.duration_minutes || 60;
-
     setForm({
-      code: course.code,
-      name: course.name,
-      credit_hours: String(course.credits || 3),
-      num_sections: String(course.sectionCount || 1),
-      year_levels: course.year_levels || [],
-      has_lecture: hasLecture,
-      lecture_duration: String(lectureDuration),
-      has_lab: hasLab,
-      lab_duration: String(labDuration),
-      has_tutorial: hasTutorial,
-      tutorial_duration: String(tutorialDuration),
+      code:               course.code ?? "",
+      name:               course.name ?? "",
+      credit_hours:       String(course.credit_hours ?? 3),
+      level:              String(course.level ?? 1),
+      has_lecture:        course.has_lecture  ?? false,
+      has_tutorial:       course.has_tutorial ?? false,
+      has_lab:            course.has_lab      ?? false,
+      has_tut_lab:        course.has_tut_lab  ?? false,
+      groups_per_lecture: String(course.groups_per_lecture ?? 1),
+      professor_id:       course.professor_id ?? "",
+      ta_ids:             course.ta_ids       ?? [],
     });
     setShowModal(true);
   }
@@ -409,136 +401,102 @@ export default function CoordinatorCoursesPage() {
           <Input
             label="Course Code"
             value={form.code}
-            onChange={(e) => setForm((p) => ({ ...p, code: e.target.value }))}
-            placeholder="e.g. CS301"
+            onChange={e => setForm(p => ({ ...p, code: e.target.value }))}
+            placeholder="e.g. SET221"
           />
           <Input
             label="Course Name"
             value={form.name}
-            onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-            placeholder="e.g. Operating Systems"
+            onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+            placeholder="e.g. Electronic Design Automation"
           />
           <Input
             label="Credit Hours"
+            type="number"
             value={form.credit_hours}
-            onChange={(e) =>
-              setForm((p) => ({ ...p, credit_hours: e.target.value }))
-            }
-            placeholder="3"
-            type="number"
-          />
-          <Input
-            label="Number of Sections"
-            value={form.num_sections}
-            onChange={(e) =>
-              setForm((p) => ({ ...p, num_sections: e.target.value }))
-            }
-            placeholder="1"
-            type="number"
+            onChange={e => setForm(p => ({ ...p, credit_hours: e.target.value }))}
           />
 
-          <div style={{ gridColumn: "1 / -1", marginTop: "1rem" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "500" }}>Year Levels</label>
-            <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
-              {[1, 2, 3, 4].map((level) => (
-                <label key={level} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div className="form-field">
+            <label className="form-label">Level</label>
+            <select
+              className="form-select"
+              value={form.level}
+              onChange={e => setForm(p => ({ ...p, level: e.target.value }))}
+              style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 14 }}
+            >
+              <option value="0">Freshman (Level 0)</option>
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+              <option value="4">Level 4</option>
+            </select>
+          </div>
+
+          <div className="form-field" style={{ gridColumn: "1 / -1", marginTop: "1rem" }}>
+            <label className="form-label">Session Types</label>
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 8 }}>
+              {[
+                { key: "has_lecture",  label: "Lecture (2h)" },
+                { key: "has_tutorial", label: "Tutorial (2h)" },
+                { key: "has_lab",      label: "Lab (1h)" },
+                { key: "has_tut_lab",  label: "Tutorial + Lab" },
+              ].map(({ key, label }) => (
+                <label key={key} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
                   <input
                     type="checkbox"
-                    checked={form.year_levels.includes(level)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setForm((p) => ({
-                          ...p,
-                          year_levels: [...p.year_levels, level].sort(),
-                        }));
-                      } else {
-                        setForm((p) => ({
-                          ...p,
-                          year_levels: p.year_levels.filter((y) => y !== level),
-                        }));
-                      }
-                    }}
+                    checked={form[key]}
+                    onChange={e => setForm(p => ({ ...p, [key]: e.target.checked }))}
                   />
-                  Year {level}
+                  {label}
                 </label>
               ))}
             </div>
           </div>
 
-          <div style={{ gridColumn: "1 / -1", marginTop: "1rem" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "500" }}>Session Types</label>
+          {form.has_lecture && (
+            <Input
+              label="Groups per Lecture"
+              type="number"
+              value={form.groups_per_lecture}
+              onChange={e => setForm(p => ({ ...p, groups_per_lecture: e.target.value }))}
+              placeholder="1 = each group gets its own lecture"
+            />
+          )}
 
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                <input
-                  type="checkbox"
-                  checked={form.has_lecture}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, has_lecture: e.target.checked }))
-                  }
-                />
-                Lecture
-              </label>
-              {form.has_lecture && (
-                <Input
-                  label="Duration (minutes)"
-                  value={form.lecture_duration}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, lecture_duration: e.target.value }))
-                  }
-                  type="number"
-                  style={{ marginLeft: "1.5rem" }}
-                />
-              )}
-            </div>
+          <div className="form-field">
+            <label className="form-label">Professor</label>
+            <select
+              className="form-select"
+              value={form.professor_id}
+              onChange={e => setForm(p => ({ ...p, professor_id: e.target.value }))}
+              style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 14 }}
+            >
+              <option value="">— Unassigned —</option>
+              {professors.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          </div>
 
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                <input
-                  type="checkbox"
-                  checked={form.has_lab}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, has_lab: e.target.checked }))
-                  }
-                />
-                Lab
-              </label>
-              {form.has_lab && (
-                <Input
-                  label="Duration (minutes)"
-                  value={form.lab_duration}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, lab_duration: e.target.value }))
-                  }
-                  type="number"
-                  style={{ marginLeft: "1.5rem" }}
-                />
-              )}
-            </div>
-
-            <div>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                <input
-                  type="checkbox"
-                  checked={form.has_tutorial}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, has_tutorial: e.target.checked }))
-                  }
-                />
-                Tutorial
-              </label>
-              {form.has_tutorial && (
-                <Input
-                  label="Duration (minutes)"
-                  value={form.tutorial_duration}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, tutorial_duration: e.target.value }))
-                  }
-                  type="number"
-                  style={{ marginLeft: "1.5rem" }}
-                />
-              )}
-            </div>
+          <div className="form-field">
+            <label className="form-label">Teaching Assistants</label>
+            <select
+              multiple
+              value={form.ta_ids}
+              onChange={e => setForm(p => ({
+                ...p,
+                ta_ids: Array.from(e.target.selectedOptions, o => o.value),
+              }))}
+              style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 14, minHeight: 80 }}
+            >
+              {tas.map(t => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+            <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 4 }}>
+              Hold Ctrl/Cmd to select multiple TAs
+            </p>
           </div>
         </div>
       </Modal>
