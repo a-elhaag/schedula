@@ -1,120 +1,80 @@
-import { getDb } from "../../../../lib/db";
+import { NextResponse } from "next/server";
+import { getDb } from "@/lib/db";
 import { ObjectId } from "mongodb";
 import { getCurrentUser } from "@/lib/server/auth";
-/**
- * GET  /api/staff/availability?userId=xxx
- *   Returns the staff member's info + previously saved availability slots.
- *
- * POST /api/staff/availability
- *   Body: { userId, slots: [{ day, slot }] }
- *   Saves (upserts) availability for the current term.
- */
 
-// ── GET ───────────────────────────────────────────────────────────────────────
+const VALID_DAYS = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
+
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
     const { userId } = getCurrentUser(request);
-
-    if (!userId) {
-      return Response.json({ error: "userId is required" }, { status: 400 });
-    }
-
     const db = await getDb();
 
-    // Get staff user
     const user = await db.collection("users").findOne({
       _id:  new ObjectId(userId),
       role: { $in: ["professor", "ta"] },
     });
 
     if (!user) {
-      return Response.json({ error: "Staff member not found" }, { status: 404 });
+      return NextResponse.json({ error: "Staff member not found" }, { status: 404 });
     }
 
-    // Get institution → active term label
-    const institution = await db.collection("institutions").findOne({
-      _id: user.institution_id,
-    });
-    const termLabel = institution?.active_term?.label ?? "Spring 2026";
+    const institution = await db.collection("institutions").findOne({ _id: user.institution_id });
+    const termLabel   = institution?.active_term?.label ?? "Spring 2026";
+    const workingDays = institution?.active_term?.working_days ?? VALID_DAYS;
 
-    // Get existing availability if any
     const existing = await db.collection("availability").findOne({
       user_id:    user._id,
       term_label: termLabel,
     });
 
-    return Response.json({
-      staff: {
-        name:  user.name,
-        role:  capitalise(user.role),
-        email: user.email,
-      },
-      term:      termLabel,
-      slots:     existing?.slots ?? [],
-      submitted: !!existing,
+    return NextResponse.json({
+      staff:          { name: user.name, role: user.role, email: user.email },
+      term:           termLabel,
+      working_days:   workingDays,
+      available_days: existing?.available_days ?? [],
+      submitted:      !!existing,
     });
 
   } catch (err) {
-    console.error("[staff/availability GET] error:", err);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-// ── POST ──────────────────────────────────────────────────────────────────────
 export async function POST(request) {
   try {
-    const body   = await request.json();
     const { userId } = getCurrentUser(request, { requiredRole: ["professor", "ta"] });
-    const { slots } = body;
+    const body = await request.json();
+    const { available_days } = body;
 
-    if (!userId) {
-      return Response.json({ error: "userId is required" }, { status: 400 });
+    if (!Array.isArray(available_days)) {
+      return NextResponse.json({ error: "available_days must be an array" }, { status: 400 });
     }
 
-    if (!Array.isArray(slots)) {
-      return Response.json({ error: "slots must be an array" }, { status: 400 });
-    }
-
-    const db = await getDb();
-
-    // Verify user is staff
+    const db   = await getDb();
     const user = await db.collection("users").findOne({
       _id:  new ObjectId(userId),
       role: { $in: ["professor", "ta"] },
     });
 
     if (!user) {
-      return Response.json({ error: "Staff member not found" }, { status: 404 });
+      return NextResponse.json({ error: "Staff member not found" }, { status: 404 });
     }
 
-    // Get active term
-    const institution = await db.collection("institutions").findOne({
-      _id: user.institution_id,
-    });
-    const termLabel = institution?.active_term?.label ?? "Spring 2026";
+    const institution = await db.collection("institutions").findOne({ _id: user.institution_id });
+    const termLabel   = institution?.active_term?.label ?? "Spring 2026";
+    const workingDays = institution?.active_term?.working_days ?? VALID_DAYS;
 
-    // Validate slots — each must have { day, slot }
-    const validDays  = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
-    const validSlots = ["07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00"];
+    const cleanDays = available_days.filter(d => workingDays.includes(d));
 
-    const cleanSlots = slots.filter(
-      s => validDays.includes(s.day) && validSlots.includes(s.slot)
-    );
-
-    // Upsert availability document
     await db.collection("availability").updateOne(
-      {
-        user_id:        user._id,
-        institution_id: user.institution_id,
-        term_label:     termLabel,
-      },
+      { user_id: user._id, institution_id: user.institution_id, term_label: termLabel },
       {
         $set: {
           user_id:        user._id,
           institution_id: user.institution_id,
           term_label:     termLabel,
-          slots:          cleanSlots,
+          available_days: cleanDays,
           submitted_at:   new Date(),
           updated_at:     new Date(),
         },
@@ -122,20 +82,9 @@ export async function POST(request) {
       { upsert: true }
     );
 
-    return Response.json({
-      success:    true,
-      term:       termLabel,
-      slotCount:  cleanSlots.length,
-      message:    "Availability saved successfully",
-    });
+    return NextResponse.json({ success: true, term: termLabel, available_days: cleanDays });
 
   } catch (err) {
-    console.error("[staff/availability POST] error:", err);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-}
-
-// ── Helper ────────────────────────────────────────────────────────────────────
-function capitalise(str) {
-  return str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 }
