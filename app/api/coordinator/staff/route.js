@@ -64,7 +64,8 @@ export async function POST(request) {
       return NextResponse.json({ message: "Role must be professor or ta." }, { status: 400 });
     }
 
-    const db = await getDb();
+    const db   = await getDb();
+    const iOid = await resolveInstitutionId(institutionId);
 
     // Check if user already exists
     const existing = await db.collection("users").findOne({ email: email.trim().toLowerCase() });
@@ -76,7 +77,7 @@ export async function POST(request) {
     const tokenHash = await hashPassword(rawToken);
 
     const newUser = {
-      institution_id:    new ObjectId(institutionId),
+      institution_id:    iOid,
       email:             email.trim().toLowerCase(),
       password_hash:     "",
       role,
