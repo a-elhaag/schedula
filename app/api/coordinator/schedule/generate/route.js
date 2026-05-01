@@ -91,57 +91,54 @@ export async function POST(request) {
     // Run solver asynchronously — HTTP returns immediately for client polling
     const runAsync = async () => {
       try {
-        await updateJob({ status_message: "Expanding sessions..." });
+        await updateJob({ status_message: "Expanding sessions by level..." });
 
         const result = await runSolver(iOid.toString(), termLabel);
+        const { levelResults, overallStats } = result;
 
-        if (result.infeasible.length > 0) {
-          await updateJob({
-            status:         ScheduleJobStatus.FAILED_INFEASIBLE,
-            status_message: "Solver could not find valid slots for some sessions.",
-            error: {
-              type:    "infeasible",
-              message: `${result.infeasible.length} session(s) have no valid slot.`,
-              details: result.infeasible,
-            },
-            stats: result.stats,
-          });
-          return;
-        }
-
-        // Remove any existing draft schedule for this term before inserting new one
+        // Delete existing draft schedules for this term
         await db.collection("schedules").deleteMany({
           institution_id: iOid,
           term_label:     termLabel,
           is_published:   false,
         });
 
-        const scheduleResult = await db.collection("schedules").insertOne({
-          institution_id: iOid,
-          term_label:     termLabel,
-          entries:        result.entries,
-          is_published:   false,
-          created_at:     new Date(),
-        });
+        // Insert one schedule document per level
+        const scheduleIds = [];
+        for (const lr of levelResults) {
+          if (lr.entries.length === 0) continue;
+          const res = await db.collection("schedules").insertOne({
+            institution_id: iOid,
+            term_label:     termLabel,
+            level:          lr.level,
+            level_label:    lr.label,
+            entries:        lr.entries,
+            is_published:   false,
+            created_at:     new Date(),
+            stats:          lr.stats,
+          });
+          scheduleIds.push(res.insertedId);
+        }
 
-        const relaxed = result.availabilityRelaxed ?? false;
-        const placed  = result.entries.length;
-        const total   = result.stats.totalSessions;
+        const placed = overallStats.totalAssigned;
+        const total  = overallStats.totalSessions;
+        const anyRelaxed = levelResults.some(lr => lr.stats.relaxed);
 
-        let statusMsg = result.stats.success
-          ? "Schedule generated successfully."
-          : `Partial schedule — ${placed} of ${total} sessions placed.`;
-        if (relaxed) statusMsg += " (staff availability was relaxed to fit all sessions)";
+        let statusMsg = overallStats.success
+          ? `Schedule generated — ${placed} sessions across ${levelResults.length} levels.`
+          : `Partial schedule — ${placed} of ${total} sessions placed across ${levelResults.length} levels.`;
+        if (anyRelaxed) statusMsg += " Some staff availability was relaxed to fit sessions.";
 
         await updateJob({
-          status:         result.stats.success
+          status:         overallStats.success
             ? ScheduleJobStatus.COMPLETED
             : ScheduleJobStatus.COMPLETED_FALLBACK,
           status_message: statusMsg,
           sessions_count: placed,
-          schedule_id:    scheduleResult.insertedId,
+          schedule_ids:   scheduleIds,
+          schedule_id:    scheduleIds[0] ?? null,
           error:          null,
-          stats:          result.stats,
+          stats:          { ...overallStats, availabilityRelaxed: anyRelaxed },
         });
 
       } catch (err) {

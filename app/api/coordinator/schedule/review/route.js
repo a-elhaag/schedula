@@ -32,11 +32,13 @@ export async function GET(request) {
 
     const db   = await getDb();
     const iOid = await resolveInstitutionId(institutionId);
-    const schedule = await db.collection("schedules").findOne({ institution_id: iOid },
-      { sort: { created_at: -1 } }
-    );
+    // Fetch all level schedules (unpublished first, then published) — merge entries
+    const allSchedules = await db.collection("schedules")
+      .find({ institution_id: iOid })
+      .sort({ created_at: -1 })
+      .toArray();
 
-    if (!schedule) {
+    if (!allSchedules.length) {
       return NextResponse.json({
         scheduleId:  null,
         sessions:    [],
@@ -45,6 +47,20 @@ export async function GET(request) {
         stats:       { totalSessions: 0, coverage: 0, unresolved: 0 },
       });
     }
+
+    // Use most-recent set of schedules (by created_at of newest)
+    const newestTime = allSchedules[0].created_at;
+    const schedules  = allSchedules.filter(s =>
+      Math.abs(new Date(s.created_at) - new Date(newestTime)) < 10000
+    );
+    // Merge into a synthetic "schedule" object for the rest of the pipeline
+    const schedule = {
+      _id:          schedules[0]._id,
+      institution_id: iOid,
+      term_label:   schedules[0].term_label,
+      is_published: schedules.every(s => s.is_published),
+      entries:      schedules.flatMap(s => s.entries ?? []),
+    };
 
     // Detect conflicts and merge persisted resolutions
     const conflicts = await detectConflicts(schedule._id.toString());
@@ -118,7 +134,14 @@ export async function GET(request) {
 
     // Sort by day then time
     const dayOrder = { Saturday:0, Sunday:1, Monday:2, Tuesday:3, Wednesday:4, Thursday:5 };
-    sessions.sort((a, b) => (dayOrder[a.day] ?? 9) - (dayOrder[b.day] ?? 9) || a.start.localeCompare(b.start));
+    sessions.sort((a, b) => {
+      const dayDiff = (dayOrder[a.day] ?? 9) - (dayOrder[b.day] ?? 9);
+      if (dayDiff !== 0) return dayDiff;
+      // Safe comparison of start times
+      const aStart = a.start ?? "";
+      const bStart = b.start ?? "";
+      return aStart.localeCompare(bStart);
+    });
 
     return NextResponse.json({
       scheduleId:  schedule._id.toString(),
@@ -156,21 +179,18 @@ export async function POST(request) {
     const iOid = await resolveInstitutionId(institutionId);
 
     if (action === "approve") {
-      const scheduleObjectId = new ObjectId(scheduleId);
-      const schedule = await db.collection("schedules").findOne({
-        _id: scheduleObjectId,
+      // Publish all unpublished level schedules for this term
+      const termSchedules = await db.collection("schedules").find({
         institution_id: iOid,
-      });
+        is_published:   false,
+      }).toArray();
 
-      if (!schedule) {
-        return NextResponse.json({ message: "Schedule not found" }, { status: 404 });
+      if (!termSchedules.length) {
+        return NextResponse.json({ message: "No unpublished schedules found" }, { status: 404 });
       }
 
-      const result = await db.collection("schedules").updateOne(
-        {
-          _id:            scheduleObjectId,
-          institution_id: iOid,
-        },
+      const result = await db.collection("schedules").updateMany(
+        { institution_id: iOid, is_published: false },
         {
           $set: {
             is_published: true,
