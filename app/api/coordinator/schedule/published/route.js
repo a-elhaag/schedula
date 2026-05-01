@@ -11,27 +11,23 @@ export async function GET(request) {
     const iOid   = await resolveInstitutionId(user.institutionId);
     const db     = await getDb();
 
-    // Get latest published schedule and institution in parallel
-    const [schedule, institution] = await Promise.all([
-      db.collection("schedules").findOne(
-        { institution_id: iOid, is_published: true },
-        { sort: { published_at: -1 } }
-      ),
+    const [publishedSchedules, institution] = await Promise.all([
+      db.collection("schedules").find({ institution_id: iOid, is_published: true })
+        .sort({ level: 1 }).toArray(),
       db.collection("institutions").findOne({ _id: iOid }),
     ]);
 
-    if (!schedule) {
+    if (!publishedSchedules.length) {
       return NextResponse.json({ scheduleId: null, levels: [], stats: {} });
     }
 
-    const entries  = schedule.entries ?? [];
+    const entries  = publishedSchedules.flatMap(s => s.entries ?? []);
     const staffIds = [...new Set(entries.map(e => e.staff_id?.toString()).filter(Boolean))];
 
-    const staff    = await db.collection("users").find(
-      { _id: { $in: staffIds.map(id => new ObjectId(id)) } }
-    ).toArray();
+    const staff = staffIds.length
+      ? await db.collection("users").find({ _id: { $in: staffIds.map(id => new ObjectId(id)) } }).toArray()
+      : [];
 
-    // Build course map from entries (courses may have been stored inline)
     const courseIds = [...new Set(entries.map(e => e.course_id?.toString()).filter(Boolean))];
     const courses   = courseIds.length
       ? await db.collection("courses").find({ _id: { $in: courseIds.map(id => new ObjectId(id)) } }).toArray()
@@ -39,6 +35,7 @@ export async function GET(request) {
 
     const courseMap = Object.fromEntries(courses.map(c => [c._id.toString(), c]));
     const staffMap  = Object.fromEntries(staff.map(s  => [s._id.toString(), s]));
+    const schedule  = publishedSchedules[0];
 
     const enriched = entries.map((e, i) => {
       const course  = courseMap[e.course_id?.toString()];
