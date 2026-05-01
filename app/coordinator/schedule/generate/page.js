@@ -79,42 +79,56 @@ export default function CoordinatorScheduleGeneratePage() {
         setProgress(Math.min(tick * 8, 95));
         setStatusMsg(json.statusMessage ?? stepMsg);
 
-        if (json.status === ScheduleJobStatus.COMPLETED || json.status === ScheduleJobStatus.COMPLETED_FALLBACK) {
+        const done = [
+          ScheduleJobStatus.COMPLETED,
+          ScheduleJobStatus.COMPLETED_FALLBACK,
+          ScheduleJobStatus.FAILED_INFEASIBLE,
+          ScheduleJobStatus.FAILED,
+        ].includes(json.status);
+
+        if (done) {
           clearInterval(pollRef.current);
           stopElapsedTimer();
-          setProgress(100);
-          setStatusMsg(
-            json.status === ScheduleJobStatus.COMPLETED_FALLBACK
-              ? "Schedule generated using fallback scheduler."
-              : "Schedule generated successfully."
-          );
           setGenerating(false);
-          if (json.status === ScheduleJobStatus.COMPLETED_FALLBACK) {
-            const msg = json.error?.message ?? "Primary solver was unavailable; basic scheduler was used.";
-            setGenerationError(msg);
-            showToast("info", "Fallback Used", msg);
+          setProgress(100);
+
+          const s = json.stats ?? {};
+          const assigned = s.assignedSessions ?? 0;
+          const total    = s.totalSessions    ?? 0;
+
+          if (json.status === ScheduleJobStatus.COMPLETED) {
+            setStatusMsg("Schedule generated successfully.");
+            const relaxed = s.availabilityRelaxed ?? false;
+            setGenerationError(relaxed ? {
+              type: "partial", assigned, total, missing: 0,
+              backtracks: s.backtracks ?? 0, relaxed: true, phase: s.phase,
+            } : null);
+            showToast("success", "Done", `${assigned} sessions scheduled.`);
+          } else if (json.status === ScheduleJobStatus.COMPLETED_FALLBACK) {
+            setStatusMsg("Partial schedule — not all sessions could be placed.");
+            setGenerationError({
+              type:       "partial",
+              assigned,
+              total,
+              missing:    total - assigned,
+              backtracks: s.backtracks ?? 0,
+              relaxed:    s.availabilityRelaxed ?? false,
+              phase:      s.phase,
+            });
+            showToast("warning", "Partial Result", `${assigned} of ${total} sessions placed.`);
+          } else if (json.status === ScheduleJobStatus.FAILED_INFEASIBLE) {
+            setStatusMsg("No valid schedule found.");
+            setGenerationError({
+              type:    "infeasible",
+              details: json.error?.details ?? [],
+              message: json.error?.message ?? "Solver could not find valid slots.",
+            });
+            showToast("danger", "Infeasible", json.error?.message ?? "No valid schedule.");
           } else {
-            setGenerationError(null);
-            showToast("success", "Done", "Schedule generated and saved.");
+            setStatusMsg("Solver error.");
+            setGenerationError({ type: "error", message: json.error?.message ?? "Unknown error." });
+            showToast("danger", "Error", json.error?.message ?? "Solver failed.");
           }
-          load();
-        } else if (json.status === ScheduleJobStatus.FAILED_INFEASIBLE) {
-          clearInterval(pollRef.current);
-          stopElapsedTimer();
-          setGenerating(false);
-          setProgress(100);
-          setStatusMsg("Solver reported an infeasible schedule.");
-          const details = json.error?.validationErrors?.[0] ?? json.error?.message ?? "No feasible schedule found.";
-          setGenerationError(details);
-          showToast("danger", "Infeasible", details);
-          load();
-        } else if (json.status === ScheduleJobStatus.FAILED) {
-          clearInterval(pollRef.current);
-          stopElapsedTimer();
-          setGenerating(false);
-          const msg = json.error?.message ?? json.error ?? "Solver encountered an error.";
-          setGenerationError(msg);
-          showToast("danger", "Failed", msg);
           load();
         }
       } catch (e) {
@@ -245,19 +259,7 @@ export default function CoordinatorScheduleGeneratePage() {
           )}
 
           {!generating && generationError && (
-            <div className="gen-status" style={{ marginTop: 16, borderColor: "#ef4444", background: "#fef2f2" }}>
-              <div className="gen-status__header">
-                <span className="gen-status__label" style={{ color: "#b91c1c" }}>
-                  Solver feedback
-                </span>
-              </div>
-              <p className="gen-status__hint" style={{ marginTop: 8, color: "#7f1d1d" }}>
-                {generationError}
-              </p>
-              <p className="gen-status__hint" style={{ marginTop: 4, color: "#7f1d1d" }}>
-                Recommended checks: room capacity, required room labels, and staff availability coverage.
-              </p>
-            </div>
+            <SolverFeedback error={generationError} />
           )}
         </section>
 
@@ -277,6 +279,84 @@ export default function CoordinatorScheduleGeneratePage() {
       </main>
 
       <Toast key={toast.id} open={toast.open} variant={toast.variant} title={toast.title} message={toast.message} onClose={() => setToast(p => ({ ...p, open:false }))} duration={4000} />
+    </div>
+  );
+}
+
+function SolverFeedback({ error }) {
+  if (!error) return null;
+
+  if (error.type === "partial") {
+    const pct = error.total > 0 ? Math.round((error.assigned / error.total) * 100) : 0;
+    const isGood = pct === 100;
+    const bg     = isGood ? "#f0fdf4" : "#fffbeb";
+    const border = isGood ? "#86efac" : "#fde68a";
+    const title  = isGood ? "#166534" : "#92400e";
+    const body   = isGood ? "#14532d" : "#78350f";
+
+    return (
+      <div style={{ marginTop: 16, padding: "20px 24px", borderRadius: 16, background: bg, border: `1px solid ${border}` }}>
+        <p style={{ fontWeight: 700, color: title, marginBottom: 12 }}>
+          {isGood ? "Schedule Generated" : "Partial Schedule Generated"}
+        </p>
+        <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginBottom: 12 }}>
+          <Stat label="Placed"     value={`${error.assigned} / ${error.total}`} color={title} />
+          <Stat label="Coverage"   value={`${pct}%`}                            color={title} />
+          {error.missing > 0 && <Stat label="Unplaced"   value={String(error.missing)} color="#b91c1c" />}
+          <Stat label="Backtracks" value={String(error.backtracks)}             color="#78716c" />
+        </div>
+        {error.relaxed && (
+          <p style={{ fontSize: 13, fontWeight: 600, color: "#1d4ed8", marginBottom: 8 }}>
+            ℹ️ Staff availability was automatically relaxed to fit all sessions. Some staff may be assigned on days outside their preferred availability.
+          </p>
+        )}
+        {error.missing > 0 && (
+          <>
+            <p style={{ fontSize: 13, color: body }}>Sessions that could not be placed — common causes:</p>
+            <ul style={{ fontSize: 13, color: body, paddingLeft: 20, marginTop: 6, lineHeight: 1.8 }}>
+              <li>A professor or TA is assigned to too many sessions relative to their available days</li>
+              <li>Two courses share the same professor and require the same time slot</li>
+              <li>Too many subgroups compete for the same limited room type (labs, tutorials)</li>
+            </ul>
+            <p style={{ fontSize: 12, color: title, marginTop: 10 }}>
+              Review Staff availability and course professor/TA assignments, then regenerate.
+            </p>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  if (error.type === "infeasible") {
+    return (
+      <div style={{ marginTop: 16, padding: "20px 24px", borderRadius: 16, background: "#fef2f2", border: "1px solid #fecaca" }}>
+        <p style={{ fontWeight: 700, color: "#991b1b", marginBottom: 8 }}>No Valid Schedule Found</p>
+        <p style={{ fontSize: 13, color: "#7f1d1d", marginBottom: 10 }}>{error.message}</p>
+        {error.details?.length > 0 && (
+          <ul style={{ fontSize: 12, color: "#7f1d1d", paddingLeft: 20, lineHeight: 1.8 }}>
+            {error.details.slice(0, 8).map((d, i) => (
+              <li key={i}>{d.course_code} {d.session_type}{d.subgroup ? ` (${d.subgroup})` : ""} — {d.reason}</li>
+            ))}
+            {error.details.length > 8 && <li>…and {error.details.length - 8} more</li>}
+          </ul>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ marginTop: 16, padding: "20px 24px", borderRadius: 16, background: "#fef2f2", border: "1px solid #fecaca" }}>
+      <p style={{ fontWeight: 700, color: "#991b1b", marginBottom: 6 }}>Solver Error</p>
+      <p style={{ fontSize: 13, color: "#7f1d1d" }}>{error.message}</p>
+    </div>
+  );
+}
+
+function Stat({ label, value, color }) {
+  return (
+    <div>
+      <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color, marginBottom: 2 }}>{label}</p>
+      <p style={{ fontSize: 24, fontWeight: 700, color }}>{value}</p>
     </div>
   );
 }
