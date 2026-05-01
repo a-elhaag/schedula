@@ -107,13 +107,14 @@ export default function CoordinatorScheduleGeneratePage() {
           } else if (json.status === ScheduleJobStatus.COMPLETED_FALLBACK) {
             setStatusMsg("Partial schedule — not all sessions could be placed.");
             setGenerationError({
-              type:       "partial",
+              type:           "partial",
               assigned,
               total,
-              missing:    total - assigned,
-              backtracks: s.backtracks ?? 0,
-              relaxed:    s.availabilityRelaxed ?? false,
-              phase:      s.phase,
+              missing:        total - assigned,
+              backtracks:     s.backtracks ?? 0,
+              relaxed:        s.availabilityRelaxed ?? false,
+              overTarget:     s.unitsOverTarget ?? null,
+              phase:          s.phase,
             });
             showToast("warning", "Partial Result", `${assigned} of ${total} sessions placed.`);
           } else if (json.status === ScheduleJobStatus.FAILED_INFEASIBLE) {
@@ -300,10 +301,16 @@ function SolverFeedback({ error }) {
           {isGood ? "Schedule Generated" : "Partial Schedule Generated"}
         </p>
         <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginBottom: 12 }}>
-          <Stat label="Placed"     value={`${error.assigned} / ${error.total}`} color={title} />
-          <Stat label="Coverage"   value={`${pct}%`}                            color={title} />
-          {error.missing > 0 && <Stat label="Unplaced"   value={String(error.missing)} color="#b91c1c" />}
-          <Stat label="Backtracks" value={String(error.backtracks)}             color="#78716c" />
+          <Stat label="Placed"       value={`${error.assigned} / ${error.total}`} color={title} />
+          <Stat label="Coverage"     value={`${pct}%`}                            color={title} />
+          {error.missing > 0 && <Stat label="Unplaced" value={String(error.missing)} color="#b91c1c" />}
+          {error.overTarget != null && (
+            <Stat
+              label="Groups >4 days"
+              value={error.overTarget === 0 ? "None ✓" : String(error.overTarget)}
+              color={error.overTarget === 0 ? "#166534" : "#92400e"}
+            />
+          )}
         </div>
         {error.relaxed && (
           <p style={{ fontSize: 13, fontWeight: 600, color: "#1d4ed8", marginBottom: 8 }}>
