@@ -75,7 +75,7 @@ export async function POST(request) {
     }
 
     const db   = await getDb();
-    const iOid = new ObjectId(institutionId);
+    const iOid = await resolveInstitutionId(institutionId);
     let imported = 0;
 
     function buildSectionTypes(obj) {

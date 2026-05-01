@@ -4,7 +4,8 @@ import { getCoordinatorStaff, getStaffWorkload } from "@/lib/server/coordinatorS
 import { getDb } from "@/lib/db";
 import { ObjectId } from "mongodb";
 import { resolveInstitutionId } from "@/app/api/coordinator/_helpers/resolve-institution";
-import { generateToken, hashPassword } from "@/lib/auth";
+import { generateToken } from "@/lib/auth";
+import { hashPassword } from "@/lib/password";
 import { getBaseUrl, buildEmailTemplate, sendEmail } from "@/lib/email";
 
 // ── GET /api/coordinator/staff ────────────────────────────────────────────────
