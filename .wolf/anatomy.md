@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-01T20:17:07.338Z
-> Files: 281 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-03T20:53:12.154Z
+> Files: 283 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -15,6 +15,7 @@
 - `package.json` — Node.js package manifest (~436 tok)
 - `pnpm-lock.yaml` — pnpm lock file (~66653 tok)
 - `pnpm-workspace.yaml` (~16 tok)
+- `schedula-api.postman_collection.json` — Declares res (~29945 tok)
 
 ## .claude/
 
@@ -265,7 +266,7 @@
 
 ## app/coordinator/groups/
 
-- `page.js` — Next.js page component (~1814 tok)
+- `page.js` — Next.js page component (~1668 tok)
 - `styles.css` — Styles: 22 rules (~609 tok)
 
 ## app/coordinator/import/
@@ -532,6 +533,7 @@
 - `migrate-schema.mjs` — One-time migration: courses sections[]→flat flags, availability slots→available_days, settings groups→levels_config, schedule entries backfill, rooms collection drop (~1275 tok)
 - `seed-data.mjs` — scripts/seed-data.mjs (~5054 tok)
 - `seed-ecu.mjs` — scripts/seed-ecu.mjs (~7970 tok)
+- `seed-levels.mjs` — INSTITUTION_SLUG: main (~448 tok)
 - `setup-db.mjs` — scripts/setup-db.mjs (~4685 tok)
 - `truncate-db.mjs` — scripts/truncate-db.mjs (~284 tok)
 

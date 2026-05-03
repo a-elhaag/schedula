@@ -315,3 +315,111 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+
+## Session: 2026-05-01 00:57
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 01:01 | Created schedula-api.postman_collection.json | — | ~11990 |
+| 01:01 | Session end: 1 writes across 1 files (schedula-api.postman_collection.json) | 24 reads | ~40046 tok |
+| 01:04 | Edited schedula-api.postman_collection.json | expanded (+424 lines) | ~4202 |
+| 01:05 | Session end: 2 writes across 1 files (schedula-api.postman_collection.json) | 27 reads | ~57508 tok |
+
+## Session: 2026-05-01 01:43
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-01 02:00
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-01 02:00
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-01 02:00
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 02:08 | Edited schedula-api.postman_collection.json | expanded (+10 lines) | ~117 |
+| 02:21 | Edited schedula-api.postman_collection.json | expanded (+15 lines) | ~275 |
+| 02:21 | Edited schedula-api.postman_collection.json | inline fix | ~38 |
+| 02:22 | Edited schedula-api.postman_collection.json | inline fix | ~19 |
+| 02:22 | Edited schedula-api.postman_collection.json | inline fix | ~35 |
+| 02:22 | Edited schedula-api.postman_collection.json | inline fix | ~46 |
+| 02:22 | Edited schedula-api.postman_collection.json | inline fix | ~94 |
+| 02:22 | Edited schedula-api.postman_collection.json | inline fix | ~43 |
+| 02:22 | Edited schedula-api.postman_collection.json | inline fix | ~32 |
+| 02:22 | Edited schedula-api.postman_collection.json | inline fix | ~14 |
+| 02:22 | Edited schedula-api.postman_collection.json | inline fix | ~37 |
+| 02:22 | Edited schedula-api.postman_collection.json | added 1 condition(s) | ~346 |
+| 02:23 | Session end: 12 writes across 1 files (schedula-api.postman_collection.json) | 0 reads | ~1096 tok |
+
+## Session: 2026-05-02 03:42
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-02 03:42
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-02 03:42
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-02 03:43
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-02 03:43
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 03:46 | Edited schedula-api.postman_collection.json | 5→5 lines | ~26 |
+| 03:46 | Session end: 1 writes across 1 files (schedula-api.postman_collection.json) | 0 reads | ~26 tok |
+| 03:48 | Session end: 1 writes across 1 files (schedula-api.postman_collection.json) | 0 reads | ~26 tok |
+
+## Session: 2026-05-02 03:55
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-02 04:09
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 04:37 | designqc: captured 6 screenshots (200KB, ~15000 tok) | /, /signin, /signup, /forgot-password, /coordinator/setup, /coordinator/import, /coordinator/staff, /coordinator/courses, /coordinator/groups, /coordinator/constraints, /coordinator/availability/status, /coordinator/assign, /coordinator/schedule/generate, /coordinator/schedule/review, /coordinator/schedule/published, /coordinator/analytics, /coordinator/settings, /coordinator/users | ready for eval | ~0 |
+| 04:38 | designqc: captured 2 screenshots (42KB, ~5000 tok) | /coordinator/analytics | ready for eval | ~0 |
+| 04:38 | designqc: captured 6 screenshots (175KB, ~15000 tok) | /signin, /signup, /forgot-password | ready for eval | ~0 |
+| 04:38 | designqc: captured 4 screenshots (109KB, ~10000 tok) | /coordinator/setup, /coordinator/import | ready for eval | ~0 |
+| 04:39 | designqc: captured 6 screenshots (130KB, ~15000 tok) | /coordinator/staff, /coordinator/courses, /coordinator/groups | ready for eval | ~0 |
+| 04:39 | designqc: captured 6 screenshots (127KB, ~15000 tok) | /coordinator/constraints, /coordinator/availability/status, /coordinator/assign | ready for eval | ~0 |
+| 04:39 | designqc: captured 6 screenshots (127KB, ~15000 tok) | /coordinator/schedule/generate, /coordinator/schedule/review, /coordinator/schedule/published | ready for eval | ~0 |
+| 04:39 | designqc: captured 4 screenshots (123KB, ~10000 tok) | /coordinator/settings, /coordinator/users | ready for eval | ~0 |
+| 08:05 | designqc: captured 4 screenshots (72KB, ~10000 tok) | /staff/availability, /staff/schedule | ready for eval | ~0 |
+| 08:06 | designqc: captured 2 screenshots (27KB, ~5000 tok) | /student/schedule | ready for eval | ~0 |
+
+## Session: 2026-05-03 20:10
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-03 20:10
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 20:13 | Edited app/coordinator/groups/page.js | removed 8 lines | ~29 |
+| 20:13 | Edited app/coordinator/groups/page.js | removed 7 lines | ~9 |
+| 20:13 | Session end: 2 writes across 1 files (page.js) | 3 reads | ~9902 tok |
+| 20:25 | Created scripts/seed-levels.mjs | — | ~448 |
+| 20:26 | Session end: 3 writes across 2 files (page.js, seed-levels.mjs) | 3 reads | ~10382 tok |
+| 23:46 | Session end: 3 writes across 2 files (page.js, seed-levels.mjs) | 3 reads | ~10382 tok |
+| 23:53 | Created schedula-api.postman_collection.json | — | ~29945 |
+| 23:53 | Session end: 4 writes across 3 files (page.js, seed-levels.mjs, schedula-api.postman_collection.json) | 4 reads | ~56935 tok |

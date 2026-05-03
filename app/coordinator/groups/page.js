@@ -56,12 +56,6 @@ export default function CoordinatorGroupsPage() {
     }));
   }
 
-  function removeGroup(lvIdx, gIdx) {
-    setLevels(prev => prev.map((lv, li) =>
-      li !== lvIdx ? lv : { ...lv, groups: lv.groups.filter((_, gi) => gi !== gIdx) }
-    ));
-  }
-
   async function handleSave() {
     setSaving(true);
     try {
@@ -137,13 +131,6 @@ export default function CoordinatorGroupsPage() {
                     title="Subgroup count (0 = no subgroups)"
                   />
                   <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>subgroups</span>
-                  <button
-                    onClick={() => removeGroup(lvIdx, gIdx)}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "#FF3B30", fontSize: 16, lineHeight: 1 }}
-                    title="Remove group"
-                  >
-                    ×
-                  </button>
                 </div>
               ))}
             </div>

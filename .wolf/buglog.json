@@ -405,6 +405,38 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-01T19:19:49.179Z"
+    },
+    {
+      "id": "bug-026",
+      "timestamp": "2026-05-01T23:21:51.340Z",
+      "error_message": "Wrong reference: testcoord should be newcoord",
+      "file": "schedula-api.postman_collection.json",
+      "root_cause": "Used \"testcoord\" instead of \"newcoord\"",
+      "fix": "Changed testcoord → newcoord",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-05-01T23:22:44.029Z"
+    },
+    {
+      "id": "bug-027",
+      "timestamp": "2026-05-01T23:22:20.718Z",
+      "error_message": "Incorrect value in code",
+      "file": "schedula-api.postman_collection.json",
+      "root_cause": "Had \": null,\\n  \\\"",
+      "fix": "Changed to \": \\\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-05-01T23:22:38.104Z"
     }
   ]
 }

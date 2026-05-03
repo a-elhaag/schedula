@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-05-01T07:40:15.031Z",
   "lifetime": {
-    "total_tokens_estimated": 2491653,
-    "total_reads": 1049,
-    "total_writes": 729,
-    "total_sessions": 18,
-    "anatomy_hits": 987,
+    "total_tokens_estimated": 2688307,
+    "total_reads": 1119,
+    "total_writes": 758,
+    "total_sessions": 32,
+    "anatomy_hits": 1057,
     "anatomy_misses": 9,
-    "repeated_reads_blocked": 363,
-    "estimated_savings_vs_bare_cli": 1142580
+    "repeated_reads_blocked": 381,
+    "estimated_savings_vs_bare_cli": 1359310
   },
   "sessions": [
     {
@@ -10979,6 +10979,737 @@
         "writes_count": 47,
         "repeated_reads_blocked": 21,
         "anatomy_lookups": 18
+      }
+    },
+    {
+      "id": "session-2026-05-01-0057",
+      "started": "2026-05-01T21:57:41.996Z",
+      "ended": "2026-05-01T22:01:41.993Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/signin/route.js",
+          "tokens_estimated": 1337,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/signup/route.js",
+          "tokens_estimated": 1448,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/refresh/route.js",
+          "tokens_estimated": 955,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/me/route.js",
+          "tokens_estimated": 468,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/signout/route.js",
+          "tokens_estimated": 404,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/verify-email/route.js",
+          "tokens_estimated": 974,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/forgot-password/route.js",
+          "tokens_estimated": 886,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/reset-password/route.js",
+          "tokens_estimated": 808,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/invite/route.js",
+          "tokens_estimated": 1313,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/courses/route.js",
+          "tokens_estimated": 700,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/staff/route.js",
+          "tokens_estimated": 1249,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/schedule/generate/route.js",
+          "tokens_estimated": 1889,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/schedule/review/route.js",
+          "tokens_estimated": 3532,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/schedule/published/route.js",
+          "tokens_estimated": 1526,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/import/route.js",
+          "tokens_estimated": 2900,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/settings/route.js",
+          "tokens_estimated": 859,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/staff/availability/route.js",
+          "tokens_estimated": 860,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/groups/route.js",
+          "tokens_estimated": 80,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/constraints/route.js",
+          "tokens_estimated": 544,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/setup/route.js",
+          "tokens_estimated": 815,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/assign/route.js",
+          "tokens_estimated": 1219,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/analytics/route.js",
+          "tokens_estimated": 1098,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/enrollments/route.js",
+          "tokens_estimated": 1258,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/middleware.js",
+          "tokens_estimated": 934,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 11990,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 28056,
+        "output_tokens_estimated": 11990,
+        "reads_count": 24,
+        "writes_count": 1,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 24
+      }
+    },
+    {
+      "id": "session-2026-05-01-0057",
+      "started": "2026-05-01T21:57:41.996Z",
+      "ended": "2026-05-01T22:05:07.477Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/signin/route.js",
+          "tokens_estimated": 1337,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/signup/route.js",
+          "tokens_estimated": 1448,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/refresh/route.js",
+          "tokens_estimated": 955,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/me/route.js",
+          "tokens_estimated": 468,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/signout/route.js",
+          "tokens_estimated": 404,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/verify-email/route.js",
+          "tokens_estimated": 974,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/forgot-password/route.js",
+          "tokens_estimated": 886,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/reset-password/route.js",
+          "tokens_estimated": 808,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/auth/invite/route.js",
+          "tokens_estimated": 1313,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/courses/route.js",
+          "tokens_estimated": 700,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/staff/route.js",
+          "tokens_estimated": 1249,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/schedule/generate/route.js",
+          "tokens_estimated": 1889,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/schedule/review/route.js",
+          "tokens_estimated": 3532,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/schedule/published/route.js",
+          "tokens_estimated": 1526,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/import/route.js",
+          "tokens_estimated": 2900,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/settings/route.js",
+          "tokens_estimated": 859,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/staff/availability/route.js",
+          "tokens_estimated": 860,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/groups/route.js",
+          "tokens_estimated": 80,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/constraints/route.js",
+          "tokens_estimated": 544,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/setup/route.js",
+          "tokens_estimated": 815,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/assign/route.js",
+          "tokens_estimated": 1219,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/analytics/route.js",
+          "tokens_estimated": 1098,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/enrollments/route.js",
+          "tokens_estimated": 1258,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/middleware.js",
+          "tokens_estimated": 934,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/health/route.js",
+          "tokens_estimated": 298,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/lib/server/auth.js",
+          "tokens_estimated": 972,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 11990,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 11990,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 4202,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 41316,
+        "output_tokens_estimated": 16192,
+        "reads_count": 27,
+        "writes_count": 2,
+        "repeated_reads_blocked": 4,
+        "anatomy_lookups": 27
+      }
+    },
+    {
+      "id": "session-2026-05-01-0143",
+      "started": "2026-05-01T22:43:51.828Z",
+      "ended": "2026-05-01T22:44:58.056Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/lib/solver/index.js",
+          "tokens_estimated": 1627,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/lib/solver/backtrack.js",
+          "tokens_estimated": 3132,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/lib/solver/anneal.js",
+          "tokens_estimated": 1802,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/lib/solver/cost.js",
+          "tokens_estimated": 1226,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/lib/solver/domains.js",
+          "tokens_estimated": 1054,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/lib/solver/expand.js",
+          "tokens_estimated": 1510,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 10351,
+        "output_tokens_estimated": 0,
+        "reads_count": 6,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 6
+      }
+    },
+    {
+      "id": "session-2026-05-01-0200",
+      "started": "2026-05-01T23:00:54.529Z",
+      "ended": "2026-05-01T23:23:44.746Z",
+      "reads": [],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 117,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 275,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 38,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 19,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 35,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 46,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 94,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 43,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 14,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 37,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 346,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 1096,
+        "reads_count": 0,
+        "writes_count": 12,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-02-0343",
+      "started": "2026-05-02T00:43:45.417Z",
+      "ended": "2026-05-02T00:46:34.799Z",
+      "reads": [],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 26,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 26,
+        "reads_count": 0,
+        "writes_count": 1,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-02-0343",
+      "started": "2026-05-02T00:43:45.417Z",
+      "ended": "2026-05-02T00:48:05.364Z",
+      "reads": [],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 26,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 26,
+        "reads_count": 0,
+        "writes_count": 1,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-03-2010",
+      "started": "2026-05-03T17:10:21.426Z",
+      "ended": "2026-05-03T17:13:54.366Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 1814,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/groups/route.js",
+          "tokens_estimated": 80,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/scripts/seed-ecu.mjs",
+          "tokens_estimated": 7970,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 29,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 9,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 9864,
+        "output_tokens_estimated": 38,
+        "reads_count": 3,
+        "writes_count": 2,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 3
+      }
+    },
+    {
+      "id": "session-2026-05-03-2010",
+      "started": "2026-05-03T17:10:21.426Z",
+      "ended": "2026-05-03T17:26:50.106Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 1814,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/groups/route.js",
+          "tokens_estimated": 80,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/scripts/seed-ecu.mjs",
+          "tokens_estimated": 7970,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 29,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 9,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/scripts/seed-levels.mjs",
+          "tokens_estimated": 480,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 9864,
+        "output_tokens_estimated": 518,
+        "reads_count": 3,
+        "writes_count": 3,
+        "repeated_reads_blocked": 3,
+        "anatomy_lookups": 3
+      }
+    },
+    {
+      "id": "session-2026-05-03-2010",
+      "started": "2026-05-03T17:10:21.426Z",
+      "ended": "2026-05-03T20:46:13.886Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 1814,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/groups/route.js",
+          "tokens_estimated": 80,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/scripts/seed-ecu.mjs",
+          "tokens_estimated": 7970,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 29,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 9,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/scripts/seed-levels.mjs",
+          "tokens_estimated": 480,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 9864,
+        "output_tokens_estimated": 518,
+        "reads_count": 3,
+        "writes_count": 3,
+        "repeated_reads_blocked": 3,
+        "anatomy_lookups": 3
+      }
+    },
+    {
+      "id": "session-2026-05-03-2010",
+      "started": "2026-05-03T17:10:21.426Z",
+      "ended": "2026-05-03T20:53:26.256Z",
+      "reads": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 1814,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/api/coordinator/groups/route.js",
+          "tokens_estimated": 80,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/scripts/seed-ecu.mjs",
+          "tokens_estimated": 7970,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 16608,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 29,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/app/coordinator/groups/page.js",
+          "tokens_estimated": 9,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/scripts/seed-levels.mjs",
+          "tokens_estimated": 480,
+          "action": "create"
+        },
+        {
+          "file": "/Users/anas/Projects/sch/schedula/schedula-api.postman_collection.json",
+          "tokens_estimated": 29945,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 26472,
+        "output_tokens_estimated": 30463,
+        "reads_count": 4,
+        "writes_count": 4,
+        "repeated_reads_blocked": 8,
+        "anatomy_lookups": 4
       }
     }
   ],
