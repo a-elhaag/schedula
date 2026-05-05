@@ -425,3 +425,71 @@
 | 23:53 | Session end: 4 writes across 3 files (page.js, seed-levels.mjs, schedula-api.postman_collection.json) | 4 reads | ~56935 tok |
 | 00:20 | Session end: 4 writes across 3 files (page.js, seed-levels.mjs, schedula-api.postman_collection.json) | 4 reads | ~56935 tok |
 | 13:01 | Session end: 4 writes across 3 files (page.js, seed-levels.mjs, schedula-api.postman_collection.json) | 4 reads | ~56935 tok |
+
+## Session: 2026-05-04 16:00
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-04 16:00
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:00 | Investigated levels config: found levels stored in DB settings collection via seed-ecu script | seed-ecu.mjs, groups/route.js, seed-levels.mjs | Ran db:truncate + db:seed:ecu; populated Freshman + Levels 1-4 with groups/subgroups | 2100 |
+| 16:05 | Edited scripts/seed-ecu.mjs | 66→68 lines | ~1765 |
+| 16:05 | Edited scripts/seed-ecu.mjs | inline fix | ~4 |
+| 16:05 | Edited scripts/seed-ecu.mjs | expanded (+32 lines) | ~424 |
+| 16:05 | Updated seed-ecu.mjs: changed all staff emails from @ecu.edu to @ecu.schedula; added coordinator account (anaselhaag@gmail.com); re-seeded database | scripts/seed-ecu.mjs | Successfully created dedicated coordinator + 58 staff with new email domain | 1200 |
+| 16:06 | Session end: 3 writes across 1 files (seed-ecu.mjs) | 5 reads | ~13252 tok |
+
+## Session: 2026-05-04 19:28
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-04 19:28
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-04 20:54
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-04 20:55
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-04 21:01
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 21:03 | Created docs/presentation.html | — | ~23323 |
+| 21:03 | Session end: 1 writes across 1 files (presentation.html) | 0 reads | ~24989 tok |
+
+## Session: 2026-05-04 22:21
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 22:27 | Created docs/technical-report.md | — | ~8363 |
+| 22:27 | Session end: 1 writes across 1 files (technical-report.md) | 11 reads | ~27454 tok |
+| 22:32 | Session end: 1 writes across 1 files (technical-report.md) | 13 reads | ~27680 tok |
+
+## Session: 2026-05-04 23:43
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 23:52 | Created schedula-api.postman_collection.json | — | ~27983 |
+| 23:52 | Rewrote full Postman collection to match ECU seed data — fixed credentials, emails, descriptions, auto-save scripts | schedula-api.postman_collection.json | done | ~8k tok |
+| 23:53 | Session end: 1 writes across 1 files (schedula-api.postman_collection.json) | 6 reads | ~71206 tok |
+| 00:03 | Session end: 1 writes across 1 files (schedula-api.postman_collection.json) | 6 reads | ~71206 tok |
+| 00:26 | Session end: 1 writes across 1 files (schedula-api.postman_collection.json) | 6 reads | ~71206 tok |
+| 00:38 | Edited scripts/seed-ecu.mjs | 39→39 lines | ~1171 |
+| 00:38 | Session end: 2 writes across 2 files (schedula-api.postman_collection.json, seed-ecu.mjs) | 6 reads | ~72460 tok |
+
+## Session: 2026-05-05 09:05
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|

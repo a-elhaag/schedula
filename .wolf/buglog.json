@@ -437,6 +437,54 @@
       "related_bugs": [],
       "occurrences": 3,
       "last_seen": "2026-05-01T23:22:38.104Z"
+    },
+    {
+      "id": "bug-028",
+      "timestamp": "2026-05-04T13:05:40.971Z",
+      "error_message": "Wrong reference: edu should be schedula",
+      "file": "scripts/seed-ecu.mjs",
+      "root_cause": "Used \"edu\" instead of \"schedula\"",
+      "fix": "Changed edu → schedula",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "mjs"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-04T13:05:40.971Z"
+    },
+    {
+      "id": "bug-029",
+      "timestamp": "2026-05-04T13:05:57.182Z",
+      "error_message": "Missing await",
+      "file": "scripts/seed-ecu.mjs",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "mjs"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-04T13:05:57.182Z"
+    },
+    {
+      "id": "bug-030",
+      "timestamp": "2026-05-04T21:38:29.681Z",
+      "error_message": "Significant refactor of ",
+      "file": "scripts/seed-ecu.mjs",
+      "root_cause": "38 lines replaced/restructured",
+      "fix": "Rewrote 39→39 lines (38 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "mjs"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-04T21:38:29.681Z"
     }
   ]
 }

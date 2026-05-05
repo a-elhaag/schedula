@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Schedula — Technical Presentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+<style>
+  /* ── Design tokens ── */
+  :root {
+    --bg:           #f5f5f7;
+    --surface:      #ffffff;
+    --surface-alt:  #f1f5f9;
+    --accent:       #0071e3;
+    --accent-hover: #0063c7;
+    --accent-light: rgba(0,113,227,0.08);
+    --accent-mid:   rgba(0,113,227,0.18);
+    --text:         #1d1d1f;
+    --muted:        #6e6e73;
+    --border:       #e2e8f0;
+    --error:        #dc2626;
+    --success:      #16a34a;
+    --warning:      #d97706;
+    --shadow-sm:    0 0.25rem 0.75rem rgba(15,23,42,0.10);
+    --shadow-md:    0 0.25rem 1.25rem rgba(0,113,227,0.20);
+    --shadow-lg:    0 0.5rem 1.75rem rgba(0,113,227,0.32);
+    --radius-sm:    0.5rem;
+    --radius-md:    0.75rem;
+    --radius-lg:    1.25rem;
+    --ease-spring:  cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ── Reset & base ── */
+  .reveal { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 16px; }
+  .reveal .slides { text-align: left; }
+  .reveal .slides section { padding: 0; }
+  .reveal h1, .reveal h2, .reveal h3, .reveal h4 { font-family: 'DM Serif Display', serif; font-weight: 400; line-height: 1.15; color: var(--text); margin: 0; text-transform: none; letter-spacing: -0.01em; }
+  .reveal p, .reveal li, .reveal span { color: var(--text); }
+  .reveal ul { list-style: none; padding: 0; margin: 0; }
+  .reveal ul li { padding-left: 0; }
+  .reveal a { color: var(--accent); }
+
+  /* ── Slide shell ── */
+  .slide { width: 1280px; height: 720px; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; box-sizing: border-box; }
+  .slide-inner { flex: 1; display: flex; flex-direction: column; padding: 52px 64px 44px; }
+
+  /* ── Section label ── */
+  .section-label { font-family: 'DM Sans', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+
+  /* ── Title block ── */
+  .slide-title { font-size: 2.1rem; color: var(--text); margin-bottom: 6px; }
+  .slide-subtitle { font-size: 0.95rem; color: var(--muted); font-family: 'DM Sans', sans-serif; margin-bottom: 28px; }
+
+  /* ── Card ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px 24px; box-shadow: var(--shadow-sm); }
+  .card-accent { border-left: 3px solid var(--accent); }
+  .card-sm { padding: 14px 18px; }
+
+  /* ── Tag / badge ── */
+  .tag { display: inline-flex; align-items: center; gap: 5px; font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.4px; padding: 3px 10px; border-radius: 999px; }
+  .tag-blue  { background: rgba(0,113,227,0.1);  color: var(--accent); }
+  .tag-green { background: rgba(22,163,74,0.1);  color: var(--success); }
+  .tag-amber { background: rgba(217,119,6,0.10); color: var(--warning); }
+  .tag-red   { background: rgba(220,38,38,0.10); color: var(--error); }
+  .tag-gray  { background: var(--surface-alt);   color: var(--muted); }
+
+  /* ── Method badge ── */
+  .method { display: inline-block; font-family: 'DM Sans', monospace; font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; min-width: 42px; text-align: center; }
+  .method-get    { background: rgba(0,113,227,0.12);  color: var(--accent); }
+  .method-post   { background: rgba(22,163,74,0.12);  color: var(--success); }
+  .method-put    { background: rgba(217,119,6,0.12);  color: var(--warning); }
+  .method-delete { background: rgba(220,38,38,0.12);  color: var(--error); }
+
+  /* ── Code inline ── */
+  .code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.78rem; background: var(--surface-alt); padding: 2px 7px; border-radius: 4px; color: var(--text); }
+
+  /* ── Divider ── */
+  .divider { height: 1px; background: var(--border); width: 100%; }
+
+  /* ── Grid helpers ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
+
+  /* ── Accent line ── */
+  .accent-line { display: block; width: 40px; height: 3px; background: var(--accent); border-radius: 2px; margin-bottom: 18px; }
+
+  /* ── Slide number ── */
+  .slide-number { position: absolute; bottom: 18px; left: 64px; font-size: 0.68rem; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+
+  /* ── Progress bar ── */
+  .reveal .progress { height: 3px; background: var(--accent); }
+  .reveal .progress span { background: var(--accent); }
+  .reveal .controls { color: var(--accent); }
+
+  /* ── Flow arrow ── */
+  .arrow { color: var(--accent); font-weight: 700; margin: 0 6px; }
+
+  /* ── Fragments ── */
+  .reveal .fragment { transition: opacity 0.4s var(--ease-spring), transform 0.4s var(--ease-spring); }
+  .reveal .fragment.fade-up { opacity: 0; transform: translateY(16px); }
+  .reveal .fragment.fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Auto-animate ── */
+  .reveal [data-auto-animate] { transition: all 0.6s var(--ease-spring); }
+
+  /* ────────────────────────────────────────────
+     SLIDE-SPECIFIC STYLES
+  ──────────────────────────────────────────── */
+
+  /* S1 — Title */
+  .s1 { background: var(--bg); }
+  .s1-inner { display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 52px 80px; }
+  .s1-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+  .s1-title { font-size: 5.5rem; line-height: 1; color: var(--accent); margin-bottom: 10px; }
+  .s1-subtitle { font-size: 1.35rem; color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 400; margin-bottom: 8px; max-width: 640px; }
+  .s1-tagline { font-size: 0.9rem; color: var(--muted); font-family: 'DM Sans', sans-serif; max-width: 560px; margin-bottom: 32px; }
+  .s1-stack { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px; }
+  .s1-bottom { display: flex; gap: 48px; align-items: flex-start; border-top: 1px solid var(--border); padding-top: 24px; }
+  .s1-team-col h4 { font-family: 'DM Sans', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .s1-team-table { border-collapse: collapse; }
+  .s1-team-table td { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; color: var(--text); padding: 2px 18px 2px 0; line-height: 1.6; }
+  .s1-team-table td.id { color: var(--muted); font-size: 0.72rem; }
+  .s1-supervisors p { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; color: var(--text); line-height: 1.9; margin: 0; }
+  .s1-supervisors .sup-role { color: var(--muted); font-size: 0.7rem; }
+
+  /* S2 — Problem */
+  .role-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 22px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 10px; }
+  .role-card-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+  .role-card h3 { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--text); margin: 0; }
+  .role-card p { font-size: 0.8rem; color: var(--muted); margin: 0; line-height: 1.5; }
+
+  /* S3 — Architecture overview */
+  .layer-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px 28px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 20px; }
+  .layer-bar-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .layer-bar-body h3 { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--text); margin: 0 0 3px; }
+  .layer-bar-body p { font-size: 0.8rem; color: var(--muted); margin: 0; }
+  .layer-connector { display: flex; justify-content: center; align-items: center; height: 22px; color: var(--accent); font-size: 1rem; }
+
+  /* S5 — Flow diagram */
+  .flow-row { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+  .flow-node { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 16px; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; color: var(--text); white-space: nowrap; box-shadow: var(--shadow-sm); }
+  .flow-node-accent { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 600; }
+  .flow-arrow { color: var(--accent); font-size: 0.9rem; font-weight: 700; padding: 0 10px; }
+
+  /* S7 — Deployment */
+  .deploy-diagram { display: flex; flex-direction: column; gap: 14px; }
+  .deploy-row { display: flex; align-items: center; gap: 10px; }
+  .deploy-node { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 18px; font-size: 0.8rem; font-family: 'DM Sans', sans-serif; color: var(--text); box-shadow: var(--shadow-sm); }
+  .deploy-node-primary { border-color: var(--accent); background: var(--accent-light); font-weight: 600; color: var(--accent); }
+  .deploy-node-db { border-color: #16a34a; background: rgba(22,163,74,0.08); color: #16a34a; font-weight: 600; }
+  .deploy-node-email { border-color: #d97706; background: rgba(217,119,6,0.08); color: #d97706; font-weight: 600; }
+
+  /* S8 — Auth state machine */
+  .auth-flow { display: flex; flex-direction: column; gap: 12px; }
+  .auth-row { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+  .auth-node { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 7px 18px; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; color: var(--text); white-space: nowrap; box-shadow: var(--shadow-sm); }
+  .auth-node-start { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  .auth-node-end { background: var(--success); color: #fff; border-color: var(--success); font-weight: 600; }
+  .auth-arrow { color: var(--accent); font-weight: 700; font-size: 0.9rem; }
+  .auth-label { font-size: 0.65rem; color: var(--muted); font-family: 'DM Sans', sans-serif; margin-top: 1px; }
+
+  /* S10 — Constraints */
+  .constraint-col h3 { font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 12px; }
+  .constraint-col-hard h3 { color: var(--error); }
+  .constraint-col-soft h3 { color: var(--accent); }
+  .constraint-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .constraint-row:last-child { border-bottom: none; }
+  .constraint-badge { font-family: 'DM Sans', monospace; font-size: 0.62rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+  .constraint-badge-hard { background: rgba(220,38,38,0.10); color: var(--error); }
+  .constraint-badge-soft { background: rgba(0,113,227,0.10); color: var(--accent); }
+  .constraint-text { font-size: 0.78rem; color: var(--text); line-height: 1.45; }
+
+  /* S11 — Schedule lifecycle */
+  .pipeline { display: flex; flex-direction: column; gap: 0; }
+  .pipeline-row { display: flex; align-items: stretch; gap: 0; }
+  .pipeline-step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 14px; font-size: 0.74rem; font-family: 'DM Sans', sans-serif; line-height: 1.4; color: var(--text); flex: 1; box-shadow: var(--shadow-sm); }
+  .pipeline-step-accent { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 600; }
+  .pipeline-step-green { border-color: var(--success); background: rgba(22,163,74,0.07); color: var(--success); font-weight: 600; }
+  .pipeline-connector-h { display: flex; align-items: center; padding: 0 6px; color: var(--accent); font-weight: 700; font-size: 0.85rem; }
+  .pipeline-connector-v { display: flex; justify-content: center; align-items: center; height: 16px; color: var(--accent); font-weight: 700; font-size: 0.85rem; }
+
+  /* S12/13 — Algorithm */
+  .algo-phase { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 10px; }
+  .algo-phase-num { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--accent); line-height: 1; }
+  .algo-phase h3 { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--text); margin: 0; }
+  .algo-phase-tag { font-family: 'DM Sans', monospace; font-size: 0.65rem; color: var(--muted); }
+  .algo-phase ul { padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; }
+  .algo-phase ul li { font-size: 0.75rem; color: var(--text); line-height: 1.45; padding-left: 14px; position: relative; }
+  .algo-phase ul li::before { content: '—'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+  .phase-connector { display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: 700; font-size: 1.1rem; padding: 0 4px; }
+
+  /* API slides */
+  .api-table { width: 100%; border-collapse: collapse; }
+  .api-table tr { border-bottom: 1px solid var(--border); }
+  .api-table tr:last-child { border-bottom: none; }
+  .api-table td { padding: 7px 10px; font-size: 0.75rem; vertical-align: middle; }
+  .api-table td.path { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.72rem; color: var(--text); }
+  .api-table td.desc { color: var(--muted); font-size: 0.72rem; }
+  .api-table-header td { font-family: 'DM Sans', sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+
+  /* Stat cards */
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px 22px; box-shadow: var(--shadow-sm); text-align: center; }
+  .stat-card .num { font-family: 'DM Serif Display', serif; font-size: 2.6rem; color: var(--accent); line-height: 1; }
+  .stat-card .label { font-family: 'DM Sans', sans-serif; font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+
+  /* Thank you */
+  .ty-inner { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center; padding: 52px 80px; }
+  .ty-title { font-size: 5rem; color: var(--accent); margin-bottom: 12px; }
+  .ty-line { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; color: var(--muted); margin-bottom: 32px; }
+  .ty-tagline { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 10px 28px; box-shadow: var(--shadow-sm); }
+</style>
+</head>
+<body style="margin:0;background:#1d1d1f;">
+<div class="reveal">
+<div class="slides">
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 1 — TITLE
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide s1">
+  <div class="s1-inner">
+    <div class="s1-eyebrow">Academic Scheduling System</div>
+    <h1 class="s1-title">Schedula</h1>
+    <p class="s1-subtitle">Intelligent Academic Schedule Generation</p>
+    <p class="s1-tagline">A distributed constraint-satisfaction scheduling system for higher education institutions</p>
+    <div class="s1-stack">
+      <span class="tag tag-blue">Next.js 16</span>
+      <span class="tag tag-blue">React 19</span>
+      <span class="tag tag-green">MongoDB 7</span>
+      <span class="tag tag-gray">Node.js</span>
+      <span class="tag tag-amber">Azure Email</span>
+    </div>
+    <div class="s1-bottom">
+      <div class="s1-team-col">
+        <h4>Team Members</h4>
+        <table class="s1-team-table">
+          <tr><td>Anas Ahmed</td><td class="id">192200122</td></tr>
+          <tr><td>Youstina Adel</td><td class="id">192200148</td></tr>
+          <tr><td>Ruba Tarek</td><td class="id">192200243</td></tr>
+          <tr><td>Sohaila Tamer</td><td class="id">192200251</td></tr>
+        </table>
+      </div>
+      <div style="width:1px;background:var(--border);align-self:stretch;"></div>
+      <div class="s1-supervisors">
+        <h4 style="font-family:'DM Sans',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">Supervised By</h4>
+        <p>
+          Dr. Doaa Mabrouk<br/>
+          <span class="sup-role">TA. Eng. Mohamed Tarek</span><br/>
+          <span class="sup-role">TA. Eng. Mohamed Khattab</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">1 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 2 — PROBLEM STATEMENT
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Introduction</div>
+    <h2 class="slide-title">What Is Schedula?</h2>
+    <p class="slide-subtitle">The problem of building university timetables by hand is NP-Hard</p>
+    <span class="accent-line"></span>
+
+    <div style="display:flex;gap:24px;flex:1;">
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <div class="card card-accent">
+          <div class="section-label" style="margin-bottom:6px;">The Challenge</div>
+          <ul style="display:flex;flex-direction:column;gap:7px;">
+            <li class="fragment fade-up" data-fragment-index="1" style="font-size:0.82rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Staff availability windows conflict across courses</li>
+            <li class="fragment fade-up" data-fragment-index="2" style="font-size:0.82rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Room types must match session type (lecture / tutorial / lab)</li>
+            <li class="fragment fade-up" data-fragment-index="3" style="font-size:0.82rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Student groups must not be double-booked across levels</li>
+            <li class="fragment fade-up" data-fragment-index="4" style="font-size:0.82rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Soft goals: compress campus days, minimise student travel</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <div class="section-label" style="margin-bottom:0;">Three User Roles</div>
+        <div class="role-card fragment fade-up" data-fragment-index="5">
+          <div class="role-card-icon">🎓</div>
+          <h3>Coordinator</h3>
+          <p>Manages courses, staff, imports data, configures constraints, triggers generation, reviews and publishes the schedule</p>
+        </div>
+        <div class="role-card fragment fade-up" data-fragment-index="6">
+          <div class="role-card-icon">👨‍🏫</div>
+          <h3>Staff</h3>
+          <p>Sets weekly availability, views their own teaching schedule for the active term</p>
+        </div>
+        <div class="role-card fragment fade-up" data-fragment-index="7">
+          <div class="role-card-icon">📚</div>
+          <h3>Student</h3>
+          <p>Views published timetable filtered by their group, level, and enrolled courses</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">2 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 3 — ARCHITECTURE OVERVIEW
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">System Architecture</div>
+    <h2 class="slide-title">Three-Layer Architecture</h2>
+    <p class="slide-subtitle">Every layer is independently responsible — client renders, server routes, data persists</p>
+    <span class="accent-line"></span>
+
+    <div style="display:flex;flex-direction:column;gap:6px;flex:1;justify-content:center;">
+      <div class="layer-bar fragment fade-up" data-fragment-index="1" data-id="layer-client" style="background:rgba(0,113,227,0.06);border-color:var(--accent);">
+        <div class="layer-bar-num">1</div>
+        <div class="layer-bar-body">
+          <h3>Client Layer</h3>
+          <p>React 19 SPA · Next.js 16 App Router · Role-based routing · CSS Modules · useAuth / useFetch / useDataCache</p>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <span class="tag tag-blue">React 19</span>
+          <span class="tag tag-blue">Next.js 16</span>
+        </div>
+      </div>
+
+      <div class="layer-connector">↕</div>
+
+      <div class="layer-bar fragment fade-up" data-fragment-index="2" data-id="layer-server" style="background:rgba(217,119,6,0.04);border-color:#d97706;">
+        <div class="layer-bar-num" style="background:#d97706;">2</div>
+        <div class="layer-bar-body">
+          <h3>Server Layer</h3>
+          <p>Next.js API Routes · Edge Middleware (JWT / RBAC) · Solver Engine · Pino Logging · Azure Email · PDF Export</p>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <span class="tag tag-amber">Node.js</span>
+          <span class="tag tag-gray">jose</span>
+        </div>
+      </div>
+
+      <div class="layer-connector">↕</div>
+
+      <div class="layer-bar fragment fade-up" data-fragment-index="3" data-id="layer-data" style="background:rgba(22,163,74,0.04);border-color:#16a34a;">
+        <div class="layer-bar-num" style="background:#16a34a;">3</div>
+        <div class="layer-bar-body">
+          <h3>Data Layer</h3>
+          <p>MongoDB 7 Atlas · 7 collections · Singleton client pattern · Indexed on institution_id + term_label</p>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <span class="tag tag-green">MongoDB 7</span>
+          <span class="tag tag-gray">Atlas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">3 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 4 — CLIENT LAYER
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Layer 1 of 3 — Client</div>
+    <h2 class="slide-title">Client Layer</h2>
+    <p class="slide-subtitle">React 19 inside Next.js 16 App Router — no component library, pure CSS Modules</p>
+    <span class="accent-line"></span>
+
+    <div class="grid-2" style="flex:1;gap:20px;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="1">
+          <div class="section-label" style="margin-bottom:6px;">Routing</div>
+          <p style="font-size:0.8rem;color:var(--text);margin:0;line-height:1.6;">Role-based route namespaces: <span class="code">/coordinator/*</span> · <span class="code">/staff/*</span> · <span class="code">/student/*</span><br/>Edge middleware enforces access before any page renders</p>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="2">
+          <div class="section-label" style="margin-bottom:6px;">Data Hooks</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">useAuth</span> — JWT decode, role, redirect on expiry</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">useFetch</span> — SWR-like fetch with error/loading state</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">useDataCache</span> — localStorage + in-memory + version token invalidation</li>
+          </ul>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="3">
+          <div class="section-label" style="margin-bottom:6px;">Auth Flow</div>
+          <p style="font-size:0.78rem;color:var(--text);margin:0;line-height:1.6;">JWT in <span class="code">httpOnly</span> cookie · Edge middleware injects <span class="code">x-user-id</span>, <span class="code">x-user-role</span>, <span class="code">x-user-institution-id</span> headers into every downstream request</p>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="4">
+          <div class="section-label" style="margin-bottom:6px;">Design System</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Fonts: DM Serif Display (headings) + DM Sans (body)</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Accent: <span class="code">#0071e3</span> · Background: <span class="code">#f5f5f7</span></li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Spring easing: <span class="code">cubic-bezier(0.16, 1, 0.3, 1)</span></li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>30+ shared components — Button, Modal, Toast, Select, MultiSelect, Pagination</li>
+          </ul>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="5">
+          <div class="section-label" style="margin-bottom:6px;">Key Pages</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Coordinator: Courses, Staff, Import, Schedule Generate/Review/Publish</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Staff: Availability grid, Schedule view</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Student: Timetable filtered by group + term</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">4 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 5 — SERVER LAYER
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Layer 2 of 3 — Server</div>
+    <h2 class="slide-title">Server Layer</h2>
+    <p class="slide-subtitle">Next.js API Routes + Edge Middleware — one process, zero external runtime dependencies</p>
+    <span class="accent-line"></span>
+
+    <div style="display:flex;flex-direction:column;gap:16px;flex:1;">
+      <div class="flow-row fragment fade-up" data-fragment-index="1">
+        <div class="flow-node flow-node-accent">Browser Request</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node flow-node-accent">Edge Middleware (JWT + RBAC)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">API Route Handler</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Service Layer</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">MongoDB</div>
+      </div>
+
+      <div class="grid-2" style="gap:14px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="2">
+          <div class="section-label" style="margin-bottom:6px;">Edge Middleware</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Validates JWT via <span class="code">jose</span> before any route handler fires</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Injects <span class="code">x-user-*</span> headers — no DB call needed in routes</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Wrong role → 403 redirect before any code runs</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">BYPASS_AUTH</span> dev flag for demo institution</li>
+          </ul>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="3">
+          <div class="section-label" style="margin-bottom:6px;">Infrastructure</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">pino</span> — structured JSON logging per request</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">bcryptjs</span> — password hashing + refresh token storage</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">bottleneck</span> — per-IP rate limiting (in-memory)</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Azure Communication Services — transactional email</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">generatePDF.js</span> — schedule export to PDF</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">5 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 6 — DATA LAYER
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Layer 3 of 3 — Data</div>
+    <h2 class="slide-title">Data Layer</h2>
+    <p class="slide-subtitle">MongoDB 7 Atlas — 7 collections, singleton client, indexed for schedule queries</p>
+    <span class="accent-line"></span>
+
+    <div class="grid-2" style="flex:1;gap:14px;align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="code">institutions</span><span style="font-size:0.7rem;color:var(--muted);">campus config, active term, working days</span></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="code">courses</span><span style="font-size:0.7rem;color:var(--muted);">flat schema: level, session flags, professor_id, ta_ids</span></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="code">availability</span><span style="font-size:0.7rem;color:var(--muted);">staff weekly available_days[] per term</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="code">schedules</span><span style="font-size:0.7rem;color:var(--muted);">timetable entries per level, is_published flag</span></div>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="2">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="code">settings</span><span style="font-size:0.7rem;color:var(--muted);">levels_config — levels, groups, subgroup counts</span></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="code">schedule_jobs</span><span style="font-size:0.7rem;color:var(--muted);">async job tracking — status, stats, schedule_ids</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="code">users</span><span style="font-size:0.7rem;color:var(--muted);">auth state, role, onboarding, invite tokens</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="3">
+          <div class="section-label" style="margin-bottom:6px;">Connection Pattern</div>
+          <p style="font-size:0.78rem;color:var(--text);margin:0;line-height:1.6;">Singleton <span class="code">MongoClient</span> cached across Next.js requests via <span class="code">lib/db.js</span>. One connection pool — no reconnect overhead per API call.</p>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="4">
+          <div class="section-label" style="margin-bottom:6px;">Indexes</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Compound: <span class="code">institution_id + term_label</span> on schedules</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Compound: <span class="code">institution_id + deleted_at</span> on courses</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">email</span> unique index on users</li>
+          </ul>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="5">
+          <div class="section-label" style="margin-bottom:6px;">Room Inventory</div>
+          <p style="font-size:0.78rem;color:var(--text);margin:0;line-height:1.6;">7 Lecture Halls (wings A, E) · 12 Tutorial Rooms (wing D) · 12 Labs (wings A, C, E) = <strong>31 rooms</strong> across 4 wings</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">6 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 7 — DEPLOYMENT
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Infrastructure</div>
+    <h2 class="slide-title">Deployment &amp; Connectivity</h2>
+    <p class="slide-subtitle">Single Next.js monorepo — one process, two cloud services, stateless auth</p>
+    <span class="accent-line"></span>
+
+    <div style="display:flex;gap:24px;flex:1;align-items:flex-start;">
+      <div style="flex:1.4;display:flex;flex-direction:column;gap:10px;">
+        <div class="fragment fade-up" data-fragment-index="1">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div class="flow-node" style="background:var(--surface-alt);">Browser</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node flow-node-accent" style="flex:1;text-align:center;">Next.js Server<br/><span style="font-size:0.65rem;font-weight:400;">Edge Middleware → API Routes → Solver</span></div>
+          </div>
+          <div style="display:flex;gap:10px;padding-left:160px;">
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <div style="color:var(--accent);font-weight:700;">↓</div>
+              <div class="flow-node" style="border-color:#16a34a;background:rgba(22,163,74,0.07);color:#16a34a;font-weight:600;font-size:0.72rem;">MongoDB Atlas</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;margin-left:10px;">
+              <div style="color:var(--accent);font-weight:700;">↓</div>
+              <div class="flow-node" style="border-color:#d97706;background:rgba(217,119,6,0.07);color:#d97706;font-weight:600;font-size:0.72rem;">Azure Email</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="2">
+          <div class="section-label" style="margin-bottom:6px;">Environment Config</div>
+          <ul style="display:flex;flex-direction:column;gap:4px;">
+            <li style="font-size:0.75rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">MONGO_URI</span> — MongoDB Atlas connection string</li>
+            <li style="font-size:0.75rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">JWT_SECRET</span> — HS256 signing key</li>
+            <li style="font-size:0.75rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">AZURE_COMMUNICATION_CONNECTION_STRING</span></li>
+            <li style="font-size:0.75rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><span class="code">BYPASS_AUTH=true</span> — dev demo mode</li>
+          </ul>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="3">
+          <div class="section-label" style="margin-bottom:6px;">Auth Architecture</div>
+          <p style="font-size:0.78rem;color:var(--text);margin:0;line-height:1.6;">Stateless JWT (jose) — no Redis, no session store. Refresh token hashed with bcrypt and stored in DB. Access token TTL: 30 min.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">7 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 8 — AUTH LIFECYCLE
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Auth System</div>
+    <h2 class="slide-title">Authentication Lifecycle</h2>
+    <p class="slide-subtitle">Three entry paths, one active session — stateless JWT, 13 auth endpoints</p>
+    <span class="accent-line"></span>
+
+    <div style="display:flex;gap:24px;flex:1;">
+      <div style="flex:1.6;display:flex;flex-direction:column;gap:10px;justify-content:center;">
+        <div class="auth-flow">
+          <div class="auth-row fragment fade-up" data-fragment-index="1">
+            <div class="auth-node auth-node-start">Signup</div>
+            <div class="auth-arrow">→</div>
+            <div class="auth-node">Email Verification</div>
+            <div class="auth-arrow">→</div>
+            <div class="auth-node">Onboarding</div>
+            <div class="auth-arrow">→</div>
+            <div class="auth-node auth-node-end">Active Session</div>
+          </div>
+          <div class="auth-row fragment fade-up" data-fragment-index="2">
+            <div class="auth-node auth-node-start">Invite Link</div>
+            <div class="auth-arrow">→</div>
+            <div class="auth-node">Accept Invite</div>
+            <div class="auth-arrow">→</div>
+            <div class="auth-node">Set Password</div>
+            <div class="auth-arrow">→</div>
+            <div class="auth-node auth-node-end">Active Session</div>
+          </div>
+          <div class="auth-row fragment fade-up" data-fragment-index="3">
+            <div class="auth-node auth-node-start">Forgot Password</div>
+            <div class="auth-arrow">→</div>
+            <div class="auth-node">Reset Token <span style="font-size:0.65rem;color:var(--muted);">(30 min TTL)</span></div>
+            <div class="auth-arrow">→</div>
+            <div class="auth-node">New Password</div>
+            <div class="auth-arrow">→</div>
+            <div class="auth-node auth-node-end">Active Session</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="4">
+          <div class="section-label" style="margin-bottom:6px;">JWT Details</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Access token: HS256, 30 min TTL</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Refresh token: bcrypt hash stored in DB, rotated on use</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Stored in <span class="code">httpOnly</span> cookie — no JS access</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Edge validates token before any route handler fires</li>
+          </ul>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="5">
+          <div class="section-label" style="margin-bottom:6px;">RBAC Enforcement</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>3 roles: <span class="code">coordinator</span> · <span class="code">staff</span> · <span class="code">student</span></li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Wrong role → 403, redirected before handler</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>13 auth routes cover full account lifecycle</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">8 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 9A — API GROUP 1: AUTH
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">API Layer · Group 1 of 3</div>
+    <h2 class="slide-title">Authentication APIs</h2>
+    <p class="slide-subtitle">13 routes under <span class="code">/api/auth/</span> — public access, no RBAC guard</p>
+    <span class="accent-line"></span>
+
+    <div class="grid-2" style="flex:1;gap:16px;align-items:start;">
+      <div class="card card-sm">
+        <table class="api-table">
+          <tr class="api-table-header"><td>Method</td><td>Route</td><td>Purpose</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="1"><td><span class="method method-post">POST</span></td><td class="path">/api/auth/signup</td><td class="desc">Create account, send verify email</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="2"><td><span class="method method-post">POST</span></td><td class="path">/api/auth/signin</td><td class="desc">Issue JWT + refresh token</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="3"><td><span class="method method-post">POST</span></td><td class="path">/api/auth/signout</td><td class="desc">Clear cookie, invalidate token</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="4"><td><span class="method method-post">POST</span></td><td class="path">/api/auth/verify-email</td><td class="desc">Consume token, activate account</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="5"><td><span class="method method-post">POST</span></td><td class="path">/api/auth/resend-verification</td><td class="desc">Re-send verification email</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="6"><td><span class="method method-post">POST</span></td><td class="path">/api/auth/forgot-password</td><td class="desc">Generate reset token (30 min TTL)</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="7"><td><span class="method method-post">POST</span></td><td class="path">/api/auth/reset-password</td><td class="desc">Consume token, set new password</td></tr>
+        </table>
+      </div>
+      <div class="card card-sm">
+        <table class="api-table">
+          <tr class="api-table-header"><td>Method</td><td>Route</td><td>Purpose</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="1"><td><span class="method method-post">POST</span></td><td class="path">/api/auth/invite</td><td class="desc">Coordinator invites staff member</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="2"><td><span class="method method-post">POST</span></td><td class="path">/api/auth/accept-invite</td><td class="desc">Staff sets password via invite link</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="3"><td><span class="method method-post">POST</span></td><td class="path">/api/auth/onboarding</td><td class="desc">Save institution on first login</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="4"><td><span class="method method-post">POST</span></td><td class="path">/api/auth/refresh</td><td class="desc">Rotate token, issue new JWT</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="5"><td><span class="method method-get">GET</span></td><td class="path">/api/auth/me</td><td class="desc">Return current user from headers</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="6"><td><span class="method method-get">GET</span></td><td class="path">/api/auth/bypass-status</td><td class="desc">Dev: return BYPASS_AUTH state</td></tr>
+        </table>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:0.72rem;color:var(--muted);">Stateless — HS256 JWT, no server session store</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">9 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 9B — API GROUP 2: COORDINATOR
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">API Layer · Group 2 of 3</div>
+    <h2 class="slide-title">Coordinator APIs</h2>
+    <p class="slide-subtitle">20 routes under <span class="code">/api/coordinator/</span> — role: coordinator only</p>
+    <span class="accent-line"></span>
+
+    <div class="grid-2" style="flex:1;gap:16px;align-items:start;">
+      <div class="card card-sm">
+        <table class="api-table" style="font-size:0.72rem;">
+          <tr class="api-table-header"><td>Methods</td><td>Route</td><td>Purpose</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="1"><td><span class="method method-get">GET</span> <span class="method method-post">POST</span></td><td class="path">/coordinator/courses</td><td class="desc">List / create courses</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="2"><td><span class="method method-put">PUT</span> <span class="method method-delete">DEL</span></td><td class="path">/coordinator/courses/[id]</td><td class="desc">Update / delete a course</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="3"><td><span class="method method-get">GET</span> <span class="method method-post">POST</span></td><td class="path">/coordinator/staff</td><td class="desc">List / invite staff</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="4"><td><span class="method method-put">PUT</span> <span class="method method-delete">DEL</span></td><td class="path">/coordinator/staff/[id]</td><td class="desc">Update / remove staff</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="5"><td><span class="method method-get">GET</span></td><td class="path">/coordinator/staff/export</td><td class="desc">Export staff list as CSV</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="6"><td><span class="method method-get">GET</span> <span class="method method-post">POST</span></td><td class="path">/coordinator/import</td><td class="desc">Import stats / write CSV to DB</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="7"><td><span class="method method-post">POST</span></td><td class="path">/coordinator/import/validate</td><td class="desc">Validate CSV before commit</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="8"><td><span class="method method-get">GET</span> <span class="method method-put">PUT</span></td><td class="path">/coordinator/groups</td><td class="desc">Read / update level-group config</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="9"><td><span class="method method-get">GET</span> <span class="method method-post">POST</span></td><td class="path">/coordinator/constraints</td><td class="desc">Read / update constraints</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="10"><td><span class="method method-get">GET</span> <span class="method method-post">POST</span></td><td class="path">/coordinator/settings</td><td class="desc">Institution settings</td></tr>
+        </table>
+      </div>
+      <div class="card card-sm">
+        <table class="api-table" style="font-size:0.72rem;">
+          <tr class="api-table-header"><td>Methods</td><td>Route</td><td>Purpose</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="1"><td><span class="method method-get">GET</span> <span class="method method-post">POST</span></td><td class="path">/coordinator/setup</td><td class="desc">Onboarding wizard state</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="2"><td><span class="method method-get">GET</span> <span class="method method-put">PUT</span></td><td class="path">/coordinator/assign</td><td class="desc">View / auto-assign rooms</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="3"><td><span class="method method-get">GET</span></td><td class="path">/coordinator/availability/status</td><td class="desc">Staff availability coverage</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="4"><td><span class="method method-get">GET</span></td><td class="path">/coordinator/enrollments</td><td class="desc">Student enrollment per course</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="5"><td><span class="method method-get">GET</span></td><td class="path">/coordinator/analytics</td><td class="desc">Dashboard stats</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="6"><td><span class="method method-get">GET</span> <span class="method method-post">POST</span></td><td class="path">/coordinator/schedule/generate</td><td class="desc">Trigger solver / poll job</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="7"><td><span class="method method-get">GET</span> <span class="method method-post">POST</span></td><td class="path">/coordinator/schedule/review</td><td class="desc">View conflicts / approve</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="8"><td><span class="method method-get">GET</span> <span class="method method-post">POST</span></td><td class="path">/coordinator/schedule/published</td><td class="desc">View / unpublish schedule</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="9"><td><span class="method method-get">GET</span></td><td class="path">/coordinator/schedule/revisions</td><td class="desc">Revision history</td></tr>
+          <tr class="fragment fade-up" data-fragment-index="10"><td><span class="method method-get">GET</span></td><td class="path">/coordinator/schedule/revisions/compare</td><td class="desc">Diff two revisions</td></tr>
+        </table>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:0.7rem;color:var(--muted);">institution_id injected by Edge — no query param needed</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">10 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 9C — API GROUP 3: ROLE + SYSTEM
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">API Layer · Group 3 of 3</div>
+    <h2 class="slide-title">Role Views &amp; System APIs</h2>
+    <p class="slide-subtitle">Staff, Student, and infrastructure endpoints</p>
+    <span class="accent-line"></span>
+
+    <div style="display:flex;gap:20px;flex:1;align-items:flex-start;">
+      <div style="flex:1.4;display:flex;flex-direction:column;gap:14px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="1">
+          <div class="section-label" style="margin-bottom:8px;color:#16a34a;">Staff APIs — role: staff</div>
+          <table class="api-table">
+            <tr class="api-table-header"><td>Methods</td><td>Route</td><td>Purpose</td></tr>
+            <tr><td><span class="method method-get">GET</span> <span class="method method-post">POST</span></td><td class="path">/api/staff/availability</td><td class="desc">Read / save weekly availability slots</td></tr>
+            <tr><td><span class="method method-get">GET</span></td><td class="path">/api/staff/schedule</td><td class="desc">View own teaching schedule</td></tr>
+          </table>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="2">
+          <div class="section-label" style="margin-bottom:8px;color:var(--warning);">Student APIs — role: student</div>
+          <table class="api-table">
+            <tr class="api-table-header"><td>Methods</td><td>Route</td><td>Purpose</td></tr>
+            <tr><td><span class="method method-get">GET</span></td><td class="path">/api/student/schedule</td><td class="desc">Timetable filtered by userId + term</td></tr>
+          </table>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="3">
+          <div class="section-label" style="margin-bottom:8px;">System — no auth</div>
+          <table class="api-table">
+            <tr class="api-table-header"><td>Method</td><td>Route</td><td>Purpose</td></tr>
+            <tr><td><span class="method method-get">GET</span></td><td class="path">/api/health</td><td class="desc">Liveness check — returns {ok: true}</td></tr>
+            <tr><td><span class="method method-get">GET</span></td><td class="path">/api/version</td><td class="desc">Returns app version from package.json</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <div class="grid-2" style="gap:10px;">
+          <div class="stat-card fragment fade-up" data-fragment-index="4"><div class="num">13</div><div class="label">Auth routes</div></div>
+          <div class="stat-card fragment fade-up" data-fragment-index="5"><div class="num">20</div><div class="label">Coordinator routes</div></div>
+          <div class="stat-card fragment fade-up" data-fragment-index="6"><div class="num">5</div><div class="label">Role + System</div></div>
+          <div class="stat-card fragment fade-up" data-fragment-index="7" style="background:var(--accent-light);border-color:var(--accent);"><div class="num" style="font-size:2rem;">38</div><div class="label" style="color:var(--accent);font-weight:700;">Total endpoints</div></div>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="8" style="margin-top:4px;">
+          <p style="font-size:0.78rem;color:var(--muted);margin:0;line-height:1.6;">All role routes protected at Edge — wrong role returns 403 <em>before</em> the handler fires. No route handler ever receives an unauthorized request.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">11 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 10 — CONSTRAINT SYSTEM
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Scheduling Engine</div>
+    <h2 class="slide-title">Constraint System</h2>
+    <p class="slide-subtitle">Hard constraints are never violated — soft constraints are minimized by the SA phase</p>
+    <span class="accent-line"></span>
+
+    <div class="grid-2" style="flex:1;gap:20px;align-items:start;">
+      <div class="constraint-col constraint-col-hard">
+        <h3>Hard Constraints</h3>
+        <div class="constraint-row fragment fade-up" data-fragment-index="1"><span class="constraint-badge constraint-badge-hard">HC-1</span><span class="constraint-text">No two sessions share a room at the same time</span></div>
+        <div class="constraint-row fragment fade-up" data-fragment-index="2"><span class="constraint-badge constraint-badge-hard">HC-2</span><span class="constraint-text">No staff member teaches two sessions simultaneously</span></div>
+        <div class="constraint-row fragment fade-up" data-fragment-index="3"><span class="constraint-badge constraint-badge-hard">HC-3</span><span class="constraint-text">No group attends two lectures at the same time</span></div>
+        <div class="constraint-row fragment fade-up" data-fragment-index="4"><span class="constraint-badge constraint-badge-hard">HC-4</span><span class="constraint-text">No subgroup double-booked (tutorial / lab)</span></div>
+        <div class="constraint-row fragment fade-up" data-fragment-index="5"><span class="constraint-badge constraint-badge-hard">HC-6</span><span class="constraint-text">Room type must match session type — halls / tutorial rooms / labs are separate pools</span></div>
+        <div class="constraint-row fragment fade-up" data-fragment-index="6"><span class="constraint-badge constraint-badge-hard">HC-8</span><span class="constraint-text">Session duration must not extend past the last daily period</span></div>
+        <div class="constraint-row fragment fade-up" data-fragment-index="7"><span class="constraint-badge constraint-badge-hard">HC-10</span><span class="constraint-text">Sessions only placed on days when instructor is available</span></div>
+      </div>
+
+      <div class="constraint-col constraint-col-soft">
+        <h3>Soft Constraints</h3>
+        <div class="constraint-row fragment fade-up" data-fragment-index="8"><span class="constraint-badge constraint-badge-soft">SC-1</span><span class="constraint-text">Compress student subgroup sessions onto fewer campus days</span></div>
+        <div class="constraint-row fragment fade-up" data-fragment-index="9"><span class="constraint-badge constraint-badge-soft">SC-2</span><span class="constraint-text">Minimize day-spread per subgroup — target ≤ 4 active days per week</span></div>
+        <div class="constraint-row fragment fade-up" data-fragment-index="10"><span class="constraint-badge constraint-badge-soft">SC-3</span><span class="constraint-text">Prefer slots that cluster with the subgroup's existing assignments</span></div>
+
+        <div style="margin-top:16px;padding:12px;background:var(--accent-light);border-radius:var(--radius-sm);border:1px solid var(--accent-mid);" class="fragment fade-up" data-fragment-index="11">
+          <div class="section-label" style="margin-bottom:4px;">Availability Relaxation</div>
+          <p style="font-size:0.75rem;color:var(--text);margin:0;line-height:1.5;">If strict staff availability produces empty domains → solver retries with all campus working days → flags <span class="code">relaxed: true</span> in level stats</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">12 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 11 — SCHEDULE LIFECYCLE
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Data Flow</div>
+    <h2 class="slide-title">Schedule Lifecycle</h2>
+    <p class="slide-subtitle">Async fire-and-poll pattern — solver decoupled from HTTP timeout constraints</p>
+    <span class="accent-line"></span>
+
+    <div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center;">
+      <div class="pipeline-row fragment fade-up" data-fragment-index="1">
+        <div class="pipeline-step pipeline-step-accent">POST /api/coordinator/schedule/generate</div>
+        <div class="pipeline-connector-h">→</div>
+        <div class="pipeline-step">Job created in <span class="code">schedule_jobs</span><br/><span style="font-size:0.65rem;color:var(--muted);">status: RUNNING</span></div>
+        <div class="pipeline-connector-h">→</div>
+        <div class="pipeline-step pipeline-step-green">HTTP 200 returned immediately<br/><span style="font-size:0.65rem;">jobId sent to client</span></div>
+      </div>
+
+      <div class="pipeline-connector-v">↓</div>
+
+      <div class="pipeline-row fragment fade-up" data-fragment-index="2">
+        <div class="pipeline-step">Old schedules deleted<br/><span style="font-size:0.65rem;color:var(--muted);">prevent duplicate key on regenerate</span></div>
+        <div class="pipeline-connector-h">→</div>
+        <div class="pipeline-step pipeline-step-accent">runSolver() — async per level<br/><span style="font-size:0.65rem;">global slot index shared across levels</span></div>
+        <div class="pipeline-connector-h">→</div>
+        <div class="pipeline-step">Entries written to <span class="code">schedules</span><br/><span style="font-size:0.65rem;color:var(--muted);">is_published: false</span></div>
+      </div>
+
+      <div class="pipeline-connector-v">↓</div>
+
+      <div class="pipeline-row fragment fade-up" data-fragment-index="3">
+        <div class="pipeline-step">Job updated<br/><span style="font-size:0.65rem;color:var(--muted);">COMPLETED / FALLBACK / FAILED</span></div>
+        <div class="pipeline-connector-h">→</div>
+        <div class="pipeline-step">Client polls<br/><span class="code" style="font-size:0.65rem;">GET ...?jobId=...</span></div>
+        <div class="pipeline-connector-h">→</div>
+        <div class="pipeline-step pipeline-step-accent">Coordinator reviews<br/><span style="font-size:0.65rem;">/schedule/review — conflict detection</span></div>
+      </div>
+
+      <div class="pipeline-connector-v">↓</div>
+
+      <div class="pipeline-row fragment fade-up" data-fragment-index="4">
+        <div class="pipeline-step pipeline-step-green">Coordinator approves<br/><span style="font-size:0.65rem;">is_published: true</span></div>
+        <div class="pipeline-connector-h">→</div>
+        <div class="pipeline-step">Staff: <span class="code">/api/staff/schedule</span></div>
+        <div class="pipeline-connector-h">+</div>
+        <div class="pipeline-step">Students: <span class="code">/api/student/schedule</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">13 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 12 — ALGORITHM OVERVIEW
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Scheduling Algorithm</div>
+    <h2 class="slide-title">Solver — Overview</h2>
+    <p class="slide-subtitle">3-phase constraint satisfaction solver in pure JavaScript — no external dependencies</p>
+    <span class="accent-line"></span>
+
+    <div style="display:flex;gap:20px;flex:1;align-items:flex-start;">
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="1">
+          <div class="section-label" style="margin-bottom:6px;">Input</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Courses (level, session types, groups, staff)</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>31 rooms categorized by type</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Staff availability per day per term</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Institution settings (days, periods, start time)</li>
+          </ul>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="2">
+          <div class="section-label" style="margin-bottom:6px;">Output</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Conflict-free timetable entries per level</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Each entry: course, session type, room, staff, day, period, start/end</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Per-level stats: assigned, success, relaxed, over-target count</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="3">
+          <div class="section-label" style="margin-bottom:6px;">Key Design Decisions</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Runs <strong>per level independently</strong> — levels don't block each other</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span><strong>Shared global slot index</strong> threads through levels — cross-level staff conflicts detected</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Time-bounded SA phase — deterministic max runtime, not iteration count</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Graceful degradation via availability relaxation fallback</li>
+          </ul>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="4">
+          <div class="section-label" style="margin-bottom:6px;">Time Grid</div>
+          <p style="font-size:0.78rem;color:var(--text);margin:0;line-height:1.6;">Configurable per institution — daily start, period duration, number of periods, working days. Default: 6 days × 10 periods = <strong>60 time slots</strong> × 31 rooms = <strong>1,860 candidate slots</strong> per session</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">14 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 13 — ALGORITHM 3 PHASES
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Scheduling Algorithm</div>
+    <h2 class="slide-title">Solver — 3 Phases</h2>
+    <p class="slide-subtitle">Greedy assigns, Repair fixes, Simulated Annealing optimizes soft constraints</p>
+    <span class="accent-line"></span>
+
+    <div style="display:flex;gap:10px;flex:1;align-items:stretch;">
+      <div class="algo-phase fragment fade-up" data-fragment-index="1" style="flex:1;">
+        <div class="algo-phase-num">01</div>
+        <h3>Greedy Assignment</h3>
+        <div class="algo-phase-tag">backtrack.js · O(n·d)</div>
+        <ul>
+          <li>Sort sessions by domain size ASC — most constrained first</li>
+          <li>Then by type: lecture → tutorial → lab</li>
+          <li>For each session: filter all conflict-free slots, pick lowest soft-cost via <span class="code">scoreCandidate()</span></li>
+          <li>Unassigned sessions passed to Phase 2</li>
+          <li>O(n log n + n·d) — sub-second for &lt;200 sessions</li>
+        </ul>
+      </div>
+
+      <div class="phase-connector fragment fade-up" data-fragment-index="2">→</div>
+
+      <div class="algo-phase fragment fade-up" data-fragment-index="3" style="flex:1;">
+        <div class="algo-phase-num">02</div>
+        <h3>Conflict Repair</h3>
+        <div class="algo-phase-tag">backtrack.js · swap-based</div>
+        <ul>
+          <li>Try direct placement first — slots may have freed up</li>
+          <li>If blocked: find the blocking session</li>
+          <li>Temporarily relocate blocker to one of its alternatives</li>
+          <li>Place original session in freed slot</li>
+          <li>Up to 50 swap attempts per session · 3 random-restart rounds · best result kept</li>
+        </ul>
+      </div>
+
+      <div class="phase-connector fragment fade-up" data-fragment-index="4">→</div>
+
+      <div class="algo-phase fragment fade-up" data-fragment-index="5" style="flex:1;">
+        <div class="algo-phase-num">03</div>
+        <h3>Simulated Annealing</h3>
+        <div class="algo-phase-tag">anneal.js · time-bounded</div>
+        <ul>
+          <li>Budget: <span class="code">max(1000ms, sessions×3ms)</span> capped at 4000ms</li>
+          <li>Randomly propose moves to alternative slots</li>
+          <li>Accept worsening moves with P = e<sup>−ΔCost/T</sup></li>
+          <li>Temperature cools geometrically</li>
+          <li>Minimizes <span class="code">countOverTarget()</span> — subgroups attending &gt;4 days/week</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">15 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 14 — PERFORMANCE
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Scheduling Algorithm</div>
+    <h2 class="slide-title">Complexity &amp; Performance</h2>
+    <p class="slide-subtitle">Deterministic runtime budget — solver never blocks the server indefinitely</p>
+    <span class="accent-line"></span>
+
+    <div class="grid-2" style="flex:1;gap:16px;align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="1">
+          <div class="section-label" style="margin-bottom:8px;">Complexity</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;border-bottom:1px solid var(--border);">
+              <span style="font-size:0.78rem;color:var(--text);">Domain construction</span>
+              <span class="code" style="font-size:0.7rem;">O(s × t × r)</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;border-bottom:1px solid var(--border);">
+              <span style="font-size:0.78rem;color:var(--text);">Greedy phase</span>
+              <span class="code" style="font-size:0.7rem;">O(n log n + n·d)</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;border-bottom:1px solid var(--border);">
+              <span style="font-size:0.78rem;color:var(--text);">SA phase</span>
+              <span class="code" style="font-size:0.7rem;">time-bounded, not iterations</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:0.78rem;color:var(--text);">SA max budget</span>
+              <span class="code" style="font-size:0.7rem;">4,000 ms / level</span>
+            </div>
+          </div>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="2">
+          <div class="section-label" style="margin-bottom:6px;">Real-World Scale</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>ECU seed dataset: multiple levels, ~50+ sessions per level</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Full schedule generated in &lt; 5 seconds end-to-end</li>
+            <li style="font-size:0.78rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Runs in-process alongside the web server — no worker thread needed at this scale</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="3">
+          <div class="section-label" style="margin-bottom:6px;">Cross-Level Staff Tracking</div>
+          <p style="font-size:0.78rem;color:var(--text);margin:0;line-height:1.6;">A <span class="code">globalSlotIndex</span> Map threads through all levels. After each level is solved, its assignments are merged in. A professor teaching both Level 2 and Level 3 is never double-booked — the global index is pre-seeded into every level's conflict check.</p>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="4">
+          <div class="section-label" style="margin-bottom:6px;">Graceful Degradation</div>
+          <p style="font-size:0.78rem;color:var(--text);margin:0;line-height:1.6;">If strict staff availability produces infeasible domains (empty slot lists), the solver automatically retries using all campus working days. Relaxed levels are flagged in job stats. No infeasible result is ever returned — the solver always produces the best possible output.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">16 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 15 — CONCLUSION
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-label">Conclusion</div>
+    <h2 class="slide-title">Summary</h2>
+    <p class="slide-subtitle">One codebase, one deployment, constraint-driven scheduling at every layer</p>
+    <span class="accent-line"></span>
+
+    <div class="grid-2" style="flex:1;gap:16px;align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="1">
+          <div class="section-label" style="margin-bottom:6px;">Architecture</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.8rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>3-layer: Client · Server · Data — clean separation of concerns</li>
+            <li style="font-size:0.8rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Edge middleware RBAC — auth enforced before any handler fires</li>
+            <li style="font-size:0.8rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Stateless JWT — no Redis, no session store, scales horizontally</li>
+            <li style="font-size:0.8rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>38 REST endpoints covering 3 roles, full auth lifecycle, async jobs</li>
+          </ul>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="2">
+          <div class="section-label" style="margin-bottom:6px;">Solver</div>
+          <ul style="display:flex;flex-direction:column;gap:5px;">
+            <li style="font-size:0.8rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Pure JavaScript — no Python, no external solver service</li>
+            <li style="font-size:0.8rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>3-phase: Greedy → Repair → Simulated Annealing</li>
+            <li style="font-size:0.8rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>7 hard constraints enforced, 3 soft constraints optimized</li>
+            <li style="font-size:0.8rem;color:var(--text);line-height:1.5;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:700;">—</span>Full ECU dataset scheduled in &lt; 5 seconds</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card card-sm fragment fade-up" data-fragment-index="3">
+          <div class="section-label" style="margin-bottom:6px;">Complete Feature Lifecycle</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:0.75rem;color:var(--text);line-height:2;">
+            <span class="tag tag-blue">CSV Import</span>
+            <span style="color:var(--accent);">→</span>
+            <span class="tag tag-blue">Constraints</span>
+            <span style="color:var(--accent);">→</span>
+            <span class="tag tag-blue">Generate</span>
+            <span style="color:var(--accent);">→</span>
+            <span class="tag tag-blue">Review</span>
+            <span style="color:var(--accent);">→</span>
+            <span class="tag tag-green">Publish</span>
+            <span style="color:var(--accent);">→</span>
+            <span class="tag tag-gray">Role Views</span>
+          </div>
+        </div>
+        <div class="card card-sm fragment fade-up" data-fragment-index="4">
+          <div class="section-label" style="margin-bottom:8px;">Tech Stack</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="tag tag-blue">Next.js 16</span>
+            <span class="tag tag-blue">React 19</span>
+            <span class="tag tag-green">MongoDB 7</span>
+            <span class="tag tag-gray">Node.js</span>
+            <span class="tag tag-amber">Azure Email</span>
+            <span class="tag tag-gray">jose</span>
+            <span class="tag tag-gray">pino</span>
+            <span class="tag tag-gray">bcryptjs</span>
+            <span class="tag tag-gray">DM Sans</span>
+            <span class="tag tag-gray">DM Serif Display</span>
+          </div>
+        </div>
+        <div class="fragment fade-up" data-fragment-index="5" style="padding:16px 20px;background:var(--accent);border-radius:var(--radius-md);text-align:center;">
+          <p style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff;margin:0;line-height:1.4;">"Schedula — Constraint-driven scheduling,<br/>elegantly delivered."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">17 / 18</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 16 — THANK YOU
+═══════════════════════════════════════════════ -->
+<section data-auto-animate>
+<div class="slide">
+  <div class="ty-inner">
+    <div class="section-label" style="text-align:center;margin-bottom:20px;">End of Presentation</div>
+    <h1 class="ty-title">Thank You</h1>
+    <p class="ty-line">We appreciate your time and attention</p>
+
+    <div style="display:flex;gap:40px;justify-content:center;margin-bottom:32px;">
+      <div style="text-align:center;">
+        <div style="font-family:'DM Sans',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">Team Members</div>
+        <table style="border-collapse:collapse;margin:0 auto;">
+          <tr><td style="font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);padding:3px 20px 3px 0;line-height:1.7;">Anas Ahmed</td><td style="font-family:'DM Sans',sans-serif;font-size:0.75rem;color:var(--muted);line-height:1.7;">192200122</td></tr>
+          <tr><td style="font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);padding:3px 20px 3px 0;line-height:1.7;">Youstina Adel</td><td style="font-family:'DM Sans',sans-serif;font-size:0.75rem;color:var(--muted);line-height:1.7;">192200148</td></tr>
+          <tr><td style="font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);padding:3px 20px 3px 0;line-height:1.7;">Ruba Tarek</td><td style="font-family:'DM Sans',sans-serif;font-size:0.75rem;color:var(--muted);line-height:1.7;">192200243</td></tr>
+          <tr><td style="font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);padding:3px 20px 3px 0;line-height:1.7;">Sohaila Tamer</td><td style="font-family:'DM Sans',sans-serif;font-size:0.75rem;color:var(--muted);line-height:1.7;">192200251</td></tr>
+        </table>
+      </div>
+      <div style="width:1px;background:var(--border);"></div>
+      <div style="text-align:center;">
+        <div style="font-family:'DM Sans',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">Supervised By</div>
+        <p style="font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);margin:0;line-height:2.0;">
+          Dr. Doaa Mabrouk<br/>
+          <span style="font-size:0.75rem;color:var(--muted);">TA. Eng. Mohamed Tarek</span><br/>
+          <span style="font-size:0.75rem;color:var(--muted);">TA. Eng. Mohamed Khattab</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="ty-tagline">Schedula — Constraint-driven scheduling, elegantly delivered.</div>
+  </div>
+  <div class="slide-number">18 / 18</div>
+</div>
+</section>
+
+</div><!-- .slides -->
+</div><!-- .reveal -->
+
+<script type="module">
+import Reveal from 'https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.esm.js';
+
+const deck = new Reveal({
+  width: 1280,
+  height: 720,
+  margin: 0,
+  minScale: 0.2,
+  maxScale: 2.0,
+  transition: 'none',
+  autoAnimateDuration: 0.6,
+  autoAnimateEasing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+  autoAnimateUnmatched: false,
+  hash: true,
+  controls: true,
+  controlsLayout: 'bottom-right',
+  progress: true,
+  slideNumber: false,
+  center: false,
+  plugins: [],
+});
+
+deck.initialize();
+</script>
+</body>
+</html>

@@ -1,48 +1,46 @@
 {
   "info": {
-    "name": "Schedula API",
-    "_postman_id": "schedula-api-collection-v2",
-    "description": "Full API collection for Schedula. Auth uses httpOnly cookies (auth_token + refresh_token).\n\n**Quick start:**\n1. Run '03 Sign In' — Postman cookie jar captures auth_token and refresh_token automatically.\n2. All coordinator routes require the coordinator session. All staff routes require a professor/ta session.\n3. The 'No Auth — Expect 401/403' folder proves security guards work. No setup needed; each request injects a bad cookie via pre-request script.\n4. The 'CORS — Preflight' folder sends OPTIONS requests to verify CORS headers.",
+    "name": "Schedula API — ECU Seed",
+    "_postman_id": "schedula-api-collection-v3",
+    "description": "Full API collection wired to the ECU seed data.\n\n**Credentials (from seed-ecu.mjs):**\n- Coordinator: anaselhaag@gmail.com / Schedula@123\n- All staff (professors & TAs): <email>@ecu.schedula / Schedula@123\n- Example professor: mohammad.ismail@ecu.schedula / Schedula@123\n- Example TA: yara.mahmoud@ecu.schedula / Schedula@123\n\n**Quick start:**\n1. Run seed: `node --env-file=.env scripts/seed-ecu.mjs`\n2. Run '03 Sign In (Coordinator)' — Postman cookie jar captures auth_token + refresh_token.\n3. All coordinator routes work immediately after sign-in.\n4. To test staff routes: run '03b Sign In (Staff)' first.\n5. 'No Auth — Expect 401' folder proves security guards without any setup.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl",             "value": "http://localhost:3000",           "type": "string" },
-    { "key": "base_url",            "value": "http://localhost:3000",           "type": "string", "description": "Alias for baseUrl — use either" },
-    { "key": "jwt_token",           "value": "",                                "type": "string", "description": "Auto-populated from Sign In test script. Can also paste a raw auth_token JWT here." },
-    { "key": "username",            "value": "anaselhaag@gmail.com",            "type": "string", "description": "Coordinator login email" },
-    { "key": "password",            "value": "Ecu@1234",                        "type": "string", "description": "Coordinator login password" },
-    { "key": "coordinatorEmail",    "value": "anaselhaag@gmail.com",            "type": "string" },
-    { "key": "coordinatorPassword", "value": "Ecu@1234",                        "type": "string" },
-    { "key": "staffEmail",          "value": "mohammad.ismail@ecu.edu",         "type": "string" },
-    { "key": "staffPassword",       "value": "Schedula@123",                    "type": "string" },
-    { "key": "courseId",            "value": "69f4f4587f03a4b85e7800e2",        "type": "string" },
-    { "key": "staffId",             "value": "69f4f4417f03a4b85e7800a8",        "type": "string" },
-    { "key": "taId",                "value": "69f4f4497f03a4b85e7800bc",        "type": "string" },
-    { "key": "scheduleId",          "value": "69f5186549705f5be816f0bb",        "type": "string" },
-    { "key": "jobId",               "value": "69f5186049705f5be816f0ba",        "type": "string" },
-    { "key": "institutionId",       "value": "69b538e5aa373449d761b122",        "type": "string" },
-    { "key": "termLabel",           "value": "Spring 2026",                     "type": "string" },
-    { "key": "verifyToken",         "value": "",                                "type": "string" },
-    { "key": "resetToken",          "value": "",                                "type": "string" },
-    { "key": "inviteToken",         "value": "",                                "type": "string" }
+    { "key": "baseUrl",              "value": "http://localhost:3000",                    "type": "string" },
+    { "key": "coordinatorEmail",     "value": "anaselhaag@gmail.com",                    "type": "string", "description": "Seeded coordinator (seed-ecu.mjs)" },
+    { "key": "coordinatorPassword",  "value": "Schedula@123",                            "type": "string" },
+    { "key": "staffEmail",           "value": "mohammad.ismail@ecu.schedula",            "type": "string", "description": "Seeded professor" },
+    { "key": "staffPassword",        "value": "Schedula@123",                            "type": "string" },
+    { "key": "taEmail",              "value": "yara.mahmoud@ecu.schedula",               "type": "string", "description": "Seeded TA" },
+    { "key": "taPassword",           "value": "Schedula@123",                            "type": "string" },
+    { "key": "termLabel",            "value": "Spring 2026",                             "type": "string" },
+    { "key": "institutionId",        "value": "",                                         "type": "string", "description": "Auto-populated from Sign In response" },
+    { "key": "courseId",             "value": "",                                         "type": "string", "description": "Auto-populated from List/Create Course" },
+    { "key": "staffId",              "value": "",                                         "type": "string", "description": "Auto-populated from List Staff" },
+    { "key": "taId",                 "value": "",                                         "type": "string", "description": "Auto-populated from List Staff" },
+    { "key": "scheduleId",           "value": "",                                         "type": "string", "description": "Auto-populated from schedule endpoints" },
+    { "key": "jobId",                "value": "",                                         "type": "string", "description": "Auto-populated from Run Solver" },
+    { "key": "verifyToken",          "value": "",                                         "type": "string", "description": "Auto-populated from Sign Up (dev mode)" },
+    { "key": "resetToken",           "value": "",                                         "type": "string", "description": "Auto-populated from Forgot Password (dev mode)" },
+    { "key": "inviteToken",          "value": "",                                         "type": "string", "description": "Auto-populated from Invite (dev mode)" }
   ],
   "item": [
     {
       "name": "Auth",
       "item": [
         {
-          "name": "01 Sign Up (coordinator)",
+          "name": "01 Sign Up (new coordinator)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                  "pm.test('Response has ok:true', () => pm.expect(pm.response.json().ok).to.be.true);",
+                  "pm.test('ok:true', () => pm.expect(pm.response.json().ok).to.be.true);",
                   "const res = pm.response.json();",
                   "if (res.verificationToken) {",
                   "  pm.collectionVariables.set('verifyToken', res.verificationToken);",
-                  "  console.log('verificationToken saved:', res.verificationToken);",
+                  "  console.log('verifyToken saved:', res.verificationToken);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -54,14 +52,14 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Test Coordinator\",\n  \"email\": \"newcoord@example.com\",\n  \"password\": \"Password1\"\n}"
+              "raw": "{\n  \"name\": \"Test Coordinator\",\n  \"email\": \"testcoord@example.com\",\n  \"password\": \"Password1\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/signup",
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "signup"]
             },
-            "description": "Creates a coordinator account. Returns verificationToken in dev (no email server). Use it in 'Verify Email'."
+            "description": "Creates a new coordinator. In dev (no email server), the response includes verificationToken — auto-saved to {{verifyToken}}. Run 02 next."
           },
           "response": [
             {
@@ -69,14 +67,13 @@
               "status": "Created",
               "code": 201,
               "header": [{ "key": "Content-Type", "value": "application/json" }],
-              "body": "{\n  \"ok\": true,\n  \"message\": \"Account created. Please check your email to verify your account.\",\n  \"verificationToken\": \"abc123devtoken\"\n}"
+              "body": "{\n  \"ok\": true,\n  \"message\": \"Account created. Please verify your email to continue.\",\n  \"verificationToken\": \"dev-token-only\"\n}"
             },
             {
-              "name": "400 Email already taken",
-              "status": "Bad Request",
-              "code": 400,
-              "header": [{ "key": "Content-Type", "value": "application/json" }],
-              "body": "{\n  \"message\": \"Email already registered.\"\n}"
+              "name": "409 Already exists",
+              "status": "Conflict",
+              "code": 409,
+              "body": "{\n  \"message\": \"An account with this email already exists.\"\n}"
             }
           ]
         },
@@ -88,7 +85,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Response has ok:true', () => pm.expect(pm.response.json().ok).to.be.true);"
+                  "pm.test('ok:true', () => pm.expect(pm.response.json().ok).to.be.true);"
                 ],
                 "type": "text/javascript"
               }
@@ -106,25 +103,25 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "verify-email"]
             },
-            "description": "Verifies the email using the token from Sign Up (dev mode only)."
+            "description": "Uses {{verifyToken}} saved from Sign Up. Only needed for new accounts — seeded accounts are pre-verified."
           },
           "response": [
             {
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"ok\": true,\n  \"message\": \"Email verified successfully.\"\n}"
+              "body": "{\n  \"ok\": true,\n  \"message\": \"Email verified successfully. You can now sign in.\"\n}"
             },
             {
-              "name": "400 Invalid token",
+              "name": "400 Invalid/expired token",
               "status": "Bad Request",
               "code": 400,
-              "body": "{\n  \"message\": \"Invalid or expired verification token.\"\n}"
+              "body": "{\n  \"message\": \"This verification link is invalid or has expired.\"\n}"
             }
           ]
         },
         {
-          "name": "03 Sign In",
+          "name": "03 Sign In (Coordinator)",
           "event": [
             {
               "listen": "test",
@@ -132,16 +129,12 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "const res = pm.response.json();",
-                  "pm.test('Response has ok:true', () => pm.expect(res.ok).to.be.true);",
-                  "pm.test('user object present', () => {",
-                  "  pm.expect(res.user).to.be.an('object');",
+                  "pm.test('ok:true', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('user has email and role', () => {",
                   "  pm.expect(res.user).to.have.property('email');",
-                  "  pm.expect(res.user).to.have.property('role');",
+                  "  pm.expect(res.user.role).to.equal('coordinator');",
                   "});",
-                  "if (res.ok) {",
-                  "  console.log('Signed in as:', res.user.email, '| role:', res.user.role);",
-                  "  console.log('auth_token + refresh_token set via httpOnly cookies (Postman cookie jar)');",
-                  "}"
+                  "if (res.ok) console.log('Signed in as coordinator:', res.user.email);"
                 ],
                 "type": "text/javascript"
               }
@@ -159,7 +152,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "signin"]
             },
-            "description": "Signs in and sets httpOnly cookies: auth_token (30 min) and refresh_token (7 days)."
+            "description": "Signs in as the seeded coordinator (anaselhaag@gmail.com / Schedula@123). Sets httpOnly cookies auth_token (30 min) and refresh_token (7 days). All coordinator routes work after this."
           },
           "response": [
             {
@@ -171,21 +164,87 @@
                 { "key": "Set-Cookie", "value": "auth_token=<jwt>; Path=/; HttpOnly; SameSite=Lax; Max-Age=1800" },
                 { "key": "Set-Cookie", "value": "refresh_token=<userId>.<token>; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800" }
               ],
-              "body": "{\n  \"ok\": true,\n  \"user\": {\n    \"id\": \"69f784d123bef6ec9bf7e7ce\",\n    \"email\": \"anaselhaag@gmail.com\",\n    \"name\": \"Anas\",\n    \"role\": \"coordinator\",\n    \"institutionId\": \"69b538e5aa373449d761b122\"\n  }\n}"
+              "body": "{\n  \"ok\": true,\n  \"user\": { \"id\": \"...\", \"email\": \"anaselhaag@gmail.com\", \"role\": \"coordinator\" },\n  \"redirectTo\": \"/coordinator/setup\"\n}"
             },
             {
               "name": "401 Wrong credentials",
               "status": "Unauthorized",
               "code": 401,
               "body": "{\n  \"message\": \"Invalid email or password.\"\n}"
-            },
-            {
-              "name": "403 Email not verified",
-              "status": "Forbidden",
-              "code": 403,
-              "body": "{\n  \"message\": \"Please verify your email before signing in.\"\n}"
             }
           ]
+        },
+        {
+          "name": "03b Sign In (Professor — Mohammad Ismail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('ok:true', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('role is professor', () => pm.expect(res.user.role).to.equal('professor'));",
+                  "if (res.ok) console.log('Signed in as professor:', res.user.email);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{staffEmail}}\",\n  \"password\": \"{{staffPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/signin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "signin"]
+            },
+            "description": "Signs in as a seeded professor (mohammad.ismail@ecu.schedula / Schedula@123). Use before testing Staff routes."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"ok\": true,\n  \"user\": { \"id\": \"...\", \"email\": \"mohammad.ismail@ecu.schedula\", \"role\": \"professor\" },\n  \"redirectTo\": \"/staff/schedule\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "03c Sign In (TA — Yara Mahmoud)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('ok:true', () => pm.expect(res.ok).to.be.true);",
+                  "pm.test('role is ta', () => pm.expect(res.user.role).to.equal('ta'));",
+                  "if (res.ok) console.log('Signed in as TA:', res.user.email);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{taEmail}}\",\n  \"password\": \"{{taPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/signin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "signin"]
+            },
+            "description": "Signs in as a seeded TA (yara.mahmoud@ecu.schedula / Schedula@123)."
+          }
         },
         {
           "name": "04 Get Current User (/me)",
@@ -196,7 +255,7 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "const res = pm.response.json();",
-                  "pm.test('user object has id, email, role', () => {",
+                  "pm.test('has id, email, role', () => {",
                   "  pm.expect(res).to.have.property('id');",
                   "  pm.expect(res).to.have.property('email');",
                   "  pm.expect(res).to.have.property('role');",
@@ -214,20 +273,20 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "me"]
             },
-            "description": "Returns the authenticated user from the auth_token cookie."
+            "description": "Returns the authenticated user from the auth_token cookie. Run after Sign In."
           },
           "response": [
             {
-              "name": "200 OK",
+              "name": "200 OK — coordinator",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"id\": \"69f784d123bef6ec9bf7e7ce\",\n  \"email\": \"anaselhaag@gmail.com\",\n  \"name\": \"Anas\",\n  \"role\": \"coordinator\",\n  \"institutionId\": \"69b538e5aa373449d761b122\",\n  \"emailVerified\": true\n}"
+              "body": "{\n  \"id\": \"...\",\n  \"email\": \"anaselhaag@gmail.com\",\n  \"name\": \"Administrator\",\n  \"role\": \"coordinator\",\n  \"emailVerified\": true\n}"
             },
             {
-              "name": "401 No/invalid token",
+              "name": "401 No session",
               "status": "Unauthorized",
               "code": 401,
-              "body": "{\n  \"message\": \"Authentication required.\"\n}"
+              "body": "{\n  \"message\": \"Unauthorized.\"\n}"
             }
           ]
         },
@@ -239,7 +298,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Response has ok:true', () => pm.expect(pm.response.json().ok).to.be.true);"
+                  "pm.test('ok:true', () => pm.expect(pm.response.json().ok).to.be.true);"
                 ],
                 "type": "text/javascript"
               }
@@ -253,7 +312,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "refresh"]
             },
-            "description": "Issues a new auth_token using the refresh_token cookie. No body required."
+            "description": "Issues a new auth_token from the refresh_token cookie. No body needed."
           },
           "response": [
             {
@@ -263,7 +322,7 @@
               "body": "{\n  \"ok\": true\n}"
             },
             {
-              "name": "401 Missing/invalid refresh_token",
+              "name": "401 Missing refresh_token",
               "status": "Unauthorized",
               "code": 401,
               "body": "{\n  \"message\": \"Refresh token missing.\"\n}"
@@ -292,8 +351,16 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "signout"]
             },
-            "description": "Revokes the refresh token in DB and clears both cookies."
-          }
+            "description": "Revokes refresh_token in DB and clears both cookies."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"ok\": true\n}"
+            }
+          ]
         },
         {
           "name": "07 Forgot Password",
@@ -318,21 +385,21 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"newcoord@example.com\"\n}"
+              "raw": "{\n  \"email\": \"{{coordinatorEmail}}\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/forgot-password",
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "forgot-password"]
             },
-            "description": "Sends password reset email. In dev mode, returns resetToken in the response body."
+            "description": "Sends a reset link. In dev mode, returns resetToken in the body — auto-saved to {{resetToken}}."
           },
           "response": [
             {
-              "name": "200 OK (dev: includes resetToken)",
+              "name": "200 OK (dev: resetToken included)",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"ok\": true,\n  \"message\": \"If that email exists you will receive a reset link.\",\n  \"resetToken\": \"abc123devtoken\"\n}"
+              "body": "{\n  \"ok\": true,\n  \"message\": \"If that email exists you will receive a reset link.\",\n  \"resetToken\": \"dev-token-only\"\n}"
             }
           ]
         },
@@ -355,14 +422,14 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"password\": \"NewPassword1\"\n}"
+              "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"password\": \"Schedula@123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/reset-password",
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "reset-password"]
             },
-            "description": "Resets the password. Requires resetToken from Forgot Password response."
+            "description": "Resets password using {{resetToken}} from Forgot Password. Password must be 8+ chars with uppercase, lowercase, number."
           },
           "response": [
             {
@@ -375,7 +442,7 @@
               "name": "400 Invalid/expired token",
               "status": "Bad Request",
               "code": 400,
-              "body": "{\n  \"message\": \"Invalid or expired reset token.\"\n}"
+              "body": "{\n  \"message\": \"This reset link is invalid or has expired.\"\n}"
             }
           ]
         },
@@ -386,7 +453,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 200 or 201', () => pm.expect([200, 201]).to.include(pm.response.code));",
+                  "pm.test('Status is 200 or 201', () => pm.expect([200,201]).to.include(pm.response.code));",
                   "const res = pm.response.json();",
                   "if (res.inviteToken) {",
                   "  pm.collectionVariables.set('inviteToken', res.inviteToken);",
@@ -402,21 +469,21 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"newprofessor@ecu.edu\",\n  \"role\": \"professor\",\n  \"name\": \"Dr. Smith\"\n}"
+              "raw": "{\n  \"email\": \"new.professor@ecu.schedula\",\n  \"role\": \"professor\",\n  \"name\": \"New Professor\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/invite",
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "invite"]
             },
-            "description": "Coordinator invites a professor/ta/student. Role must be: professor, ta, or student."
+            "description": "Coordinator invites a professor/ta/student. Requires active coordinator session. In dev mode, inviteToken is returned in body."
           },
           "response": [
             {
-              "name": "200 OK (dev: includes inviteToken)",
+              "name": "200 OK (dev: inviteToken included)",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"ok\": true,\n  \"inviteToken\": \"abc123devtoken\",\n  \"user\": { \"id\": \"...\", \"email\": \"newprofessor@ecu.edu\", \"role\": \"professor\" }\n}"
+              "body": "{\n  \"ok\": true,\n  \"inviteToken\": \"dev-token-only\",\n  \"user\": { \"id\": \"...\", \"email\": \"new.professor@ecu.schedula\", \"role\": \"professor\" }\n}"
             }
           ]
         },
@@ -439,14 +506,14 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"token\": \"{{inviteToken}}\",\n  \"email\": \"newprofessor@ecu.edu\",\n  \"password\": \"Password1\",\n  \"name\": \"Dr. Smith\"\n}"
+              "raw": "{\n  \"token\": \"{{inviteToken}}\",\n  \"email\": \"new.professor@ecu.schedula\",\n  \"password\": \"Schedula@123\",\n  \"name\": \"New Professor\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/accept-invite",
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "accept-invite"]
             },
-            "description": "Invited user sets their password and activates their account."
+            "description": "Invited user activates their account using {{inviteToken}} from Invite response."
           }
         },
         {
@@ -467,82 +534,25 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"newcoord@example.com\"\n}"
+              "raw": "{\n  \"email\": \"testcoord@example.com\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/resend-verification",
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "resend-verification"]
-            }
-          }
-        },
-        {
-          "name": "12 Auth Onboarding",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Dr. Smith\"\n}"
             },
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/onboarding",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "onboarding"]
-            }
+            "description": "Resends the verification email for an unverified account. Use with the address from Sign Up."
           }
         },
         {
-          "name": "03b Sign In as Staff (professor)",
+          "name": "12 Bypass Auth Status",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "const res = pm.response.json();",
-                  "pm.test('ok:true', () => pm.expect(res.ok).to.be.true);",
-                  "if (res.ok) console.log('Signed in as staff:', res.user.email, '| role:', res.user.role);"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{staffEmail}}\",\n  \"password\": \"{{staffPassword}}\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/signin",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "signin"]
-            },
-            "description": "Signs in as a professor (mohammad.ismail@ecu.edu / Schedula@123). Use before testing Staff routes."
-          }
-        },
-        {
-          "name": "13 Bypass Auth Status",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Response has bypass field', () => pm.expect(pm.response.json()).to.have.property('bypass'));"
+                  "pm.test('has bypass field', () => pm.expect(pm.response.json()).to.have.property('bypass'));"
                 ],
                 "type": "text/javascript"
               }
@@ -556,13 +566,14 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "bypass-status"]
             },
-            "description": "Returns whether BYPASS_AUTH mode is enabled."
+            "description": "Returns whether BYPASS_AUTH=true is set in the server environment."
           }
         }
       ]
     },
     {
       "name": "Coordinator — Setup",
+      "description": "Institution configuration. Sign in as coordinator first.",
       "item": [
         {
           "name": "Get Institution Setup",
@@ -571,7 +582,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('has institution', () => pm.expect(pm.response.json()).to.have.property('institution'));"
                 ],
                 "type": "text/javascript"
               }
@@ -585,14 +597,14 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "setup"]
             },
-            "description": "Returns institution config and whether setup is complete."
+            "description": "Returns ECU institution config seeded by seed-ecu.mjs."
           },
           "response": [
             {
-              "name": "200 OK",
+              "name": "200 OK — ECU seeded data",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"institution\": {\n    \"id\": \"69b538e5aa373449d761b122\",\n    \"name\": \"Egyptian Chinese University - SET Dept\",\n    \"slug\": \"ecu-set\",\n    \"termLabel\": \"Spring 2026\",\n    \"workingDays\": [\"Saturday\",\"Sunday\",\"Monday\",\"Tuesday\",\"Wednesday\"],\n    \"dailyStart\": \"08:30\",\n    \"dailyEnd\": \"17:00\",\n    \"slotDuration\": 60\n  },\n  \"setupComplete\": true\n}"
+              "body": "{\n  \"institution\": {\n    \"name\": \"Egyptian Chinese University - SET Dept\",\n    \"slug\": \"ecu-set\",\n    \"termLabel\": \"Spring 2026\",\n    \"workingDays\": [\"Saturday\",\"Sunday\",\"Monday\",\"Tuesday\",\"Wednesday\",\"Thursday\"],\n    \"dailyStart\": \"08:30\",\n    \"dailyEnd\": \"18:30\",\n    \"slotDuration\": 60\n  },\n  \"setupComplete\": true\n}"
             }
           ]
         },
@@ -614,19 +626,21 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"institutionName\": \"Faculty of Engineering\",\n  \"slug\": \"eng-faculty\",\n  \"termLabel\": \"Spring 2026\",\n  \"termStart\": \"2026-02-01\",\n  \"termEnd\": \"2026-06-30\",\n  \"workingDays\": [\"Saturday\", \"Sunday\", \"Monday\", \"Tuesday\", \"Wednesday\"],\n  \"dailyStart\": \"08:30\",\n  \"dailyEnd\": \"17:00\",\n  \"slotDuration\": 60,\n  \"maxConsecutive\": 4\n}"
+              "raw": "{\n  \"institutionName\": \"Egyptian Chinese University - SET Dept\",\n  \"slug\": \"ecu-set\",\n  \"termLabel\": \"Spring 2026\",\n  \"termStart\": \"2026-02-01\",\n  \"termEnd\": \"2026-06-15\",\n  \"workingDays\": [\"Saturday\", \"Sunday\", \"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\"],\n  \"dailyStart\": \"08:30\",\n  \"dailyEnd\": \"18:30\",\n  \"slotDuration\": 60,\n  \"maxConsecutive\": 4\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/coordinator/setup",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "setup"]
-            }
+            },
+            "description": "Saves institution settings. Body matches the seeded ECU configuration."
           }
         }
       ]
     },
     {
       "name": "Coordinator — Groups / Levels",
+      "description": "ECU has 5 levels: Freshman (L0), L1, L2, L3, L4 with groups GA/GB and G1/G2/G3.",
       "item": [
         {
           "name": "Get Groups Config",
@@ -637,10 +651,11 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "pm.test('levels is an array', () => pm.expect(pm.response.json().levels).to.be.an('array'));",
-                  "pm.test('Has Freshman level', () => {",
+                  "pm.test('has Freshman level', () => {",
                   "  const levels = pm.response.json().levels;",
                   "  pm.expect(levels.some(l => l.label === 'Freshman')).to.be.true;",
-                  "});"
+                  "});",
+                  "pm.test('has 5 levels', () => pm.expect(pm.response.json().levels).to.have.lengthOf(5));"
                 ],
                 "type": "text/javascript"
               }
@@ -654,11 +669,11 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "groups"]
             },
-            "description": "Returns levels_config with per-level groups and subgroup counts."
+            "description": "Returns the ECU level/group structure seeded by seed-ecu.mjs."
           },
           "response": [
             {
-              "name": "200 OK",
+              "name": "200 OK — ECU levels",
               "status": "OK",
               "code": 200,
               "body": "{\n  \"levels\": [\n    { \"level\": 0, \"label\": \"Freshman\", \"groups\": [{\"group_id\":\"GA\",\"subgroup_count\":12},{\"group_id\":\"GB\",\"subgroup_count\":9}] },\n    { \"level\": 1, \"label\": \"Level 1\",  \"groups\": [{\"group_id\":\"G1\",\"subgroup_count\":3},{\"group_id\":\"G2\",\"subgroup_count\":3},{\"group_id\":\"G3\",\"subgroup_count\":3}] },\n    { \"level\": 2, \"label\": \"Level 2\",  \"groups\": [{\"group_id\":\"G1\",\"subgroup_count\":3},{\"group_id\":\"G2\",\"subgroup_count\":3}] },\n    { \"level\": 3, \"label\": \"Level 3\",  \"groups\": [{\"group_id\":\"G1\",\"subgroup_count\":3},{\"group_id\":\"G2\",\"subgroup_count\":2}] },\n    { \"level\": 4, \"label\": \"Level 4\",  \"groups\": [{\"group_id\":\"G1\",\"subgroup_count\":0}] }\n  ]\n}"
@@ -684,29 +699,37 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"levels\": [\n    {\n      \"level\": 0,\n      \"label\": \"Freshman\",\n      \"groups\": [\n        { \"group_id\": \"GA\", \"subgroup_count\": 12 },\n        { \"group_id\": \"GB\", \"subgroup_count\": 9 }\n      ]\n    },\n    {\n      \"level\": 1,\n      \"label\": \"Level 1\",\n      \"groups\": [\n        { \"group_id\": \"G1\", \"subgroup_count\": 3 },\n        { \"group_id\": \"G2\", \"subgroup_count\": 3 },\n        { \"group_id\": \"G3\", \"subgroup_count\": 3 }\n      ]\n    },\n    {\n      \"level\": 2,\n      \"label\": \"Level 2\",\n      \"groups\": [\n        { \"group_id\": \"G1\", \"subgroup_count\": 3 },\n        { \"group_id\": \"G2\", \"subgroup_count\": 3 }\n      ]\n    },\n    {\n      \"level\": 3,\n      \"label\": \"Level 3\",\n      \"groups\": [\n        { \"group_id\": \"G1\", \"subgroup_count\": 3 },\n        { \"group_id\": \"G2\", \"subgroup_count\": 2 }\n      ]\n    },\n    {\n      \"level\": 4,\n      \"label\": \"Level 4\",\n      \"groups\": [\n        { \"group_id\": \"G1\", \"subgroup_count\": 0 }\n      ]\n    }\n  ]\n}"
+              "raw": "{\n  \"levels\": [\n    { \"level\": 0, \"label\": \"Freshman\", \"groups\": [{\"group_id\":\"GA\",\"subgroup_count\":12},{\"group_id\":\"GB\",\"subgroup_count\":9}] },\n    { \"level\": 1, \"label\": \"Level 1\",  \"groups\": [{\"group_id\":\"G1\",\"subgroup_count\":3},{\"group_id\":\"G2\",\"subgroup_count\":3},{\"group_id\":\"G3\",\"subgroup_count\":3}] },\n    { \"level\": 2, \"label\": \"Level 2\",  \"groups\": [{\"group_id\":\"G1\",\"subgroup_count\":3},{\"group_id\":\"G2\",\"subgroup_count\":3}] },\n    { \"level\": 3, \"label\": \"Level 3\",  \"groups\": [{\"group_id\":\"G1\",\"subgroup_count\":3},{\"group_id\":\"G2\",\"subgroup_count\":2}] },\n    { \"level\": 4, \"label\": \"Level 4\",  \"groups\": [{\"group_id\":\"G1\",\"subgroup_count\":0}] }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/coordinator/groups",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "groups"]
-            }
+            },
+            "description": "Saves the ECU group structure. Body matches what seed-ecu.mjs writes."
           }
         }
       ]
     },
     {
       "name": "Coordinator — Courses",
+      "description": "ECU has 32 courses across L0-L4. All seeded by seed-ecu.mjs with staff already assigned.",
       "item": [
         {
-          "name": "List Courses",
+          "name": "List Courses (all)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('courses is an array', () => pm.expect(pm.response.json().courses).to.be.an('array'));"
+                  "const res = pm.response.json();",
+                  "pm.test('courses is an array', () => pm.expect(res.courses).to.be.an('array'));",
+                  "pm.test('has seeded courses', () => pm.expect(res.courses.length).to.be.greaterThan(0));",
+                  "if (res.courses.length > 0) {",
+                  "  pm.collectionVariables.set('courseId', res.courses[0].id);",
+                  "  console.log('courseId set to first result:', res.courses[0].id, '—', res.courses[0].code);",
+                  "}"
                 ],
                 "type": "text/javascript"
               }
@@ -723,16 +746,46 @@
                 { "key": "limit", "value": "50" },
                 { "key": "skip", "value": "0" }
               ]
-            }
+            },
+            "description": "Returns all 32 seeded ECU courses. Auto-saves first courseId to {{courseId}}."
           },
           "response": [
             {
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"courses\": [\n    {\n      \"id\": \"69f4f4587f03a4b85e7800e2\",\n      \"code\": \"SET372\",\n      \"name\": \"Internet Programming\",\n      \"level\": 3,\n      \"has_lecture\": true,\n      \"has_tutorial\": true,\n      \"has_lab\": false,\n      \"has_tut_lab\": false,\n      \"groups_per_lecture\": 1,\n      \"professor_id\": \"69f4f4417f03a4b85e7800a8\",\n      \"ta_ids\": [\"69f4f4497f03a4b85e7800bc\"]\n    }\n  ],\n  \"total\": 32\n}"
+              "body": "{\n  \"courses\": [\n    {\n      \"id\": \"...\",\n      \"code\": \"SET372\",\n      \"name\": \"Internet Programming\",\n      \"level\": 3,\n      \"has_lecture\": true,\n      \"has_tutorial\": true,\n      \"has_lab\": false,\n      \"has_tut_lab\": false,\n      \"groups_per_lecture\": 1,\n      \"professor_id\": \"...\",\n      \"ta_ids\": [\"...\", \"...\"]\n    }\n  ],\n  \"total\": 32\n}"
             }
           ]
+        },
+        {
+          "name": "List Courses (L3 only)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('all courses are L3', () => {",
+                  "  const courses = pm.response.json().courses ?? [];",
+                  "  courses.forEach(c => pm.expect(c.level).to.equal(3));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator/courses?level=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator", "courses"],
+              "query": [{ "key": "level", "value": "3" }]
+            },
+            "description": "Filter by level. ECU has 6 L3 courses: SET321, SET322, SET323, SET372, SET374, SET393."
+          }
         },
         {
           "name": "Create Course",
@@ -743,7 +796,7 @@
                 "exec": [
                   "pm.test('Status is 201', () => pm.response.to.have.status(201));",
                   "const res = pm.response.json();",
-                  "pm.test('Response has id', () => pm.expect(res).to.have.property('id'));",
+                  "pm.test('has id', () => pm.expect(res).to.have.property('id'));",
                   "if (res.id) {",
                   "  pm.collectionVariables.set('courseId', res.id);",
                   "  console.log('courseId saved:', res.id);",
@@ -758,22 +811,15 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"code\": \"CS301\",\n  \"name\": \"Data Structures\",\n  \"credit_hours\": 3,\n  \"level\": 2,\n  \"has_lecture\": true,\n  \"has_tutorial\": true,\n  \"has_lab\": false,\n  \"has_tut_lab\": false,\n  \"groups_per_lecture\": 2,\n  \"professor_id\": \"{{staffId}}\",\n  \"ta_ids\": [\"{{taId}}\"]\n}"
+              "raw": "{\n  \"code\": \"SET999\",\n  \"name\": \"Test Course\",\n  \"credit_hours\": 3,\n  \"level\": 3,\n  \"has_lecture\": true,\n  \"has_tutorial\": true,\n  \"has_lab\": false,\n  \"has_tut_lab\": false,\n  \"groups_per_lecture\": 1,\n  \"professor_id\": \"{{staffId}}\",\n  \"ta_ids\": [\"{{taId}}\"]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/coordinator/courses",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "courses"]
-            }
-          },
-          "response": [
-            {
-              "name": "201 Created",
-              "status": "Created",
-              "code": 201,
-              "body": "{\n  \"id\": \"64abc123def456\",\n  \"code\": \"CS301\",\n  \"name\": \"Data Structures\",\n  \"level\": 2\n}"
-            }
-          ]
+            },
+            "description": "Creates a new course. Uses {{staffId}} and {{taId}} — populate those from List Staff first."
+          }
         },
         {
           "name": "Update Course",
@@ -794,13 +840,14 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Data Structures & Algorithms\",\n  \"credit_hours\": 3,\n  \"has_lecture\": true,\n  \"has_tutorial\": true,\n  \"has_lab\": true,\n  \"has_tut_lab\": false,\n  \"groups_per_lecture\": 2\n}"
+              "raw": "{\n  \"name\": \"Test Course (Updated)\",\n  \"credit_hours\": 3,\n  \"has_lecture\": true,\n  \"has_tutorial\": true,\n  \"has_lab\": false,\n  \"has_tut_lab\": false,\n  \"groups_per_lecture\": 1\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/coordinator/courses/{{courseId}}",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "courses", "{{courseId}}"]
-            }
+            },
+            "description": "Updates the course at {{courseId}}. Populate courseId from List or Create Course."
           }
         },
         {
@@ -823,23 +870,37 @@
               "raw": "{{baseUrl}}/api/coordinator/courses/{{courseId}}",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "courses", "{{courseId}}"]
-            }
+            },
+            "description": "Soft-deletes the course at {{courseId}}. Use a course created by 'Create Course' to avoid deleting seeded data."
           }
         }
       ]
     },
     {
       "name": "Coordinator — Staff",
+      "description": "ECU has 20 professors and 38 TAs seeded. All use password Schedula@123.",
       "item": [
         {
-          "name": "List Staff",
+          "name": "List Staff (all)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('staff is an array', () => pm.expect(pm.response.json().staff).to.be.an('array'));"
+                  "const res = pm.response.json();",
+                  "pm.test('staff is an array', () => pm.expect(res.staff).to.be.an('array'));",
+                  "pm.test('has seeded staff', () => pm.expect(res.staff.length).to.be.greaterThan(0));",
+                  "const profs = (res.staff ?? []).filter(s => s.role === 'professor');",
+                  "const tas   = (res.staff ?? []).filter(s => s.role === 'ta');",
+                  "if (profs.length > 0) {",
+                  "  pm.collectionVariables.set('staffId', profs[0].id);",
+                  "  console.log('staffId (professor):', profs[0].id, profs[0].name);",
+                  "}",
+                  "if (tas.length > 0) {",
+                  "  pm.collectionVariables.set('taId', tas[0].id);",
+                  "  console.log('taId (TA):', tas[0].id, tas[0].name);",
+                  "}"
                 ],
                 "type": "text/javascript"
               }
@@ -849,23 +910,23 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/coordinator/staff?limit=50&skip=0",
+              "raw": "{{baseUrl}}/api/coordinator/staff?limit=100&skip=0",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "staff"],
               "query": [
-                { "key": "limit", "value": "50" },
+                { "key": "limit", "value": "100" },
                 { "key": "skip", "value": "0" },
                 { "key": "role", "value": "", "disabled": true }
               ]
             },
-            "description": "Optional query: role=professor|ta"
+            "description": "Returns all seeded staff. Auto-saves first professor to {{staffId}} and first TA to {{taId}}."
           },
           "response": [
             {
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"staff\": [\n    {\n      \"id\": \"69f4f4417f03a4b85e7800a8\",\n      \"name\": \"Mohammad Ismail\",\n      \"email\": \"mohammad.ismail@ecu.edu\",\n      \"role\": \"professor\",\n      \"invite_status\": \"accepted\"\n    }\n  ],\n  \"total\": 58\n}"
+              "body": "{\n  \"staff\": [\n    { \"id\": \"...\", \"name\": \"Mohammad Ismail\", \"email\": \"mohammad.ismail@ecu.schedula\", \"role\": \"professor\", \"invite_status\": \"joined\" },\n    { \"id\": \"...\", \"name\": \"Yara Mahmoud\", \"email\": \"yara.mahmoud@ecu.schedula\", \"role\": \"ta\", \"invite_status\": \"joined\" }\n  ],\n  \"total\": 58\n}"
             }
           ]
         },
@@ -877,10 +938,10 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('All returned staff are professors', () => {",
-                  "  const s = pm.response.json().staff ?? [];",
-                  "  s.forEach(m => pm.expect(m.role).to.equal('professor'));",
-                  "});"
+                  "pm.test('all are professors', () => {",
+                  "  (pm.response.json().staff ?? []).forEach(s => pm.expect(s.role).to.equal('professor'));",
+                  "});",
+                  "pm.test('has 20 professors', () => pm.expect(pm.response.json().staff.length).to.equal(20));"
                 ],
                 "type": "text/javascript"
               }
@@ -894,6 +955,33 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "staff"],
               "query": [{ "key": "role", "value": "professor" }]
+            }
+          }
+        },
+        {
+          "name": "List Staff (TAs only)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('all are TAs', () => {",
+                  "  (pm.response.json().staff ?? []).forEach(s => pm.expect(s.role).to.equal('ta'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator/staff?role=ta",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator", "staff"],
+              "query": [{ "key": "role", "value": "ta" }]
             }
           }
         },
@@ -920,14 +1008,14 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Dr. Ahmed Hassan\",\n  \"email\": \"ahmed.hassan@ecu.edu\",\n  \"role\": \"professor\"\n}"
+              "raw": "{\n  \"name\": \"New Professor\",\n  \"email\": \"new.professor@ecu.schedula\",\n  \"role\": \"professor\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/coordinator/staff",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "staff"]
             },
-            "description": "Creates user with invite_status: pending and sends invite email."
+            "description": "Creates a staff member with invite_status: pending and sends invite email."
           }
         },
         {
@@ -948,13 +1036,14 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Dr. Ahmed Hassan\",\n  \"role\": \"professor\"\n}"
+              "raw": "{\n  \"name\": \"Mohammad Ismail (Updated)\",\n  \"role\": \"professor\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/coordinator/staff/{{staffId}}",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "staff", "{{staffId}}"]
-            }
+            },
+            "description": "Updates name/role for the staff member at {{staffId}}."
           }
         },
         {
@@ -978,13 +1067,15 @@
               "raw": "{{baseUrl}}/api/coordinator/staff/export",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "staff", "export"]
-            }
+            },
+            "description": "Downloads all staff as a CSV file."
           }
         }
       ]
     },
     {
       "name": "Coordinator — Assign",
+      "description": "All 32 courses already have professors and TAs assigned from seed-ecu.mjs.",
       "item": [
         {
           "name": "Get Assign Overview",
@@ -994,7 +1085,11 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Has courses array', () => pm.expect(pm.response.json().courses).to.be.an('array'));"
+                  "pm.test('has courses array', () => pm.expect(pm.response.json().courses).to.be.an('array'));",
+                  "pm.test('courses are assigned', () => {",
+                  "  const assigned = (pm.response.json().courses ?? []).filter(c => c.professor_id);",
+                  "  pm.expect(assigned.length).to.be.greaterThan(0);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -1008,7 +1103,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "assign"]
             },
-            "description": "Returns all courses with assigned_staff plus available staff."
+            "description": "Returns all courses with their assigned professors/TAs plus available staff list."
           }
         },
         {
@@ -1035,7 +1130,8 @@
               "raw": "{{baseUrl}}/api/coordinator/assign",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "assign"]
-            }
+            },
+            "description": "Assigns {{staffId}} to {{courseId}}. Populate both from List Courses and List Staff."
           }
         },
         {
@@ -1096,6 +1192,7 @@
     },
     {
       "name": "Coordinator — Availability Status",
+      "description": "58 staff have availability pre-seeded for Spring 2026.",
       "item": [
         {
           "name": "Get Availability Status",
@@ -1105,7 +1202,12 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Has staff array', () => pm.expect(pm.response.json().staff).to.be.an('array'));"
+                  "const res = pm.response.json();",
+                  "pm.test('has staff array', () => pm.expect(res.staff).to.be.an('array'));",
+                  "pm.test('has seeded availability', () => {",
+                  "  const submitted = (res.staff ?? []).filter(s => s.submitted);",
+                  "  pm.expect(submitted.length).to.be.greaterThan(0);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -1119,14 +1221,14 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "availability", "status"]
             },
-            "description": "Returns availability submission status for all staff."
+            "description": "Returns availability submission status. All 58 seeded staff should show submitted:true."
           },
           "response": [
             {
-              "name": "200 OK",
+              "name": "200 OK — all submitted",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"staff\": [\n    { \"id\": \"...\", \"name\": \"Mohammad Ismail\", \"email\": \"mohammad.ismail@ecu.edu\", \"submitted\": true, \"available_days\": [\"Saturday\",\"Sunday\",\"Monday\"] }\n  ],\n  \"submittedCount\": 45,\n  \"totalCount\": 58\n}"
+              "body": "{\n  \"staff\": [\n    { \"id\": \"...\", \"name\": \"Mohammad Ismail\", \"email\": \"mohammad.ismail@ecu.schedula\", \"submitted\": true, \"available_days\": [\"Saturday\",\"Sunday\",\"Monday\",\"Tuesday\",\"Wednesday\"] }\n  ],\n  \"submittedCount\": 58,\n  \"totalCount\": 58\n}"
             }
           ]
         }
@@ -1215,14 +1317,14 @@
           }
         },
         {
-          "name": "Validate Import CSV",
+          "name": "Validate Import CSV (courses)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Has valid or errors field', () => {",
+                  "pm.test('has valid or errors field', () => {",
                   "  const res = pm.response.json();",
                   "  pm.expect(res).to.satisfy(r => 'valid' in r || 'errors' in r);",
                   "});"
@@ -1237,7 +1339,7 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "file", "type": "file", "src": "", "description": "Upload a CSV or JSON file" },
+                { "key": "file", "type": "file", "src": "", "description": "Upload import-json-test/courses.csv or courses-sample.json" },
                 { "key": "type", "value": "courses", "type": "text", "description": "courses | staff | rooms | enrollments" }
               ]
             },
@@ -1246,22 +1348,8 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "import", "validate"]
             },
-            "description": "Dry-run validation of the import file. Does NOT write to DB."
-          },
-          "response": [
-            {
-              "name": "200 OK — valid",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"valid\": true,\n  \"rows\": 32,\n  \"preview\": [{\"code\":\"CS301\",\"name\":\"Data Structures\",\"level\":2}]\n}"
-            },
-            {
-              "name": "200 OK — with errors",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"valid\": false,\n  \"errors\": [{\"row\": 3, \"field\": \"level\", \"message\": \"level must be an integer 0-4\"}]\n}"
-            }
-          ]
+            "description": "Dry-run validation. Use import-json-test/courses.csv or courses-sample.json from the project root."
+          }
         },
         {
           "name": "Import File (write to DB)",
@@ -1282,8 +1370,8 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "file", "type": "file", "src": "", "description": "CSV or JSON file" },
-                { "key": "type", "value": "courses", "type": "text", "description": "courses | staff | rooms | enrollments" }
+                { "key": "file", "type": "file", "src": "" },
+                { "key": "type", "value": "courses", "type": "text" }
               ]
             },
             "url": {
@@ -1291,7 +1379,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "import"]
             },
-            "description": "Imports data from a CSV or JSON file. type: courses, staff, rooms, enrollments."
+            "description": "Writes import data to DB. type: courses | staff | rooms | enrollments."
           }
         }
       ]
@@ -1316,12 +1404,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/coordinator/enrollments?courseId={{courseId}}&termLabel={{termLabel}}",
+              "raw": "{{baseUrl}}/api/coordinator/enrollments?courseId={{courseId}}&termLabel=Spring 2026",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "enrollments"],
               "query": [
                 { "key": "courseId", "value": "{{courseId}}" },
-                { "key": "termLabel", "value": "{{termLabel}}" }
+                { "key": "termLabel", "value": "Spring 2026" }
               ]
             }
           }
@@ -1344,7 +1432,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"courseId\": \"{{courseId}}\",\n  \"termLabel\": \"{{termLabel}}\",\n  \"enrolledStudents\": 45,\n  \"capacity\": 60\n}"
+              "raw": "{\n  \"courseId\": \"{{courseId}}\",\n  \"termLabel\": \"Spring 2026\",\n  \"enrolledStudents\": 45,\n  \"capacity\": 60\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/coordinator/enrollments",
@@ -1370,12 +1458,12 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/coordinator/enrollments?courseId={{courseId}}&termLabel={{termLabel}}",
+              "raw": "{{baseUrl}}/api/coordinator/enrollments?courseId={{courseId}}&termLabel=Spring 2026",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "enrollments"],
               "query": [
                 { "key": "courseId", "value": "{{courseId}}" },
-                { "key": "termLabel", "value": "{{termLabel}}" }
+                { "key": "termLabel", "value": "Spring 2026" }
               ]
             }
           }
@@ -1384,6 +1472,7 @@
     },
     {
       "name": "Coordinator — Schedule: Generate",
+      "description": "Run solver against the full ECU dataset (32 courses, 58 staff, 5 levels).",
       "item": [
         {
           "name": "Get Generate Readiness",
@@ -1393,7 +1482,13 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Has readiness object', () => pm.expect(pm.response.json().readiness).to.be.an('object'));"
+                  "const res = pm.response.json();",
+                  "pm.test('has readiness object', () => pm.expect(res.readiness).to.be.an('object'));",
+                  "console.log('Readiness:', JSON.stringify(res.readiness));",
+                  "if (res.jobs && res.jobs.length > 0) {",
+                  "  pm.collectionVariables.set('jobId', res.jobs[0].id);",
+                  "  console.log('Latest jobId:', res.jobs[0].id, 'status:', res.jobs[0].status);",
+                  "}"
                 ],
                 "type": "text/javascript"
               }
@@ -1407,45 +1502,16 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "schedule", "generate"]
             },
-            "description": "Returns readiness stats and recent solver jobs."
+            "description": "Returns readiness check and recent solver jobs. ECU data should show ready:true."
           },
           "response": [
             {
-              "name": "200 OK",
+              "name": "200 OK — ready",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"readiness\": {\n    \"courses\": 32,\n    \"staff\": 58,\n    \"availabilitySubmitted\": 45,\n    \"levelsConfigured\": true,\n    \"ready\": true\n  },\n  \"jobs\": [\n    { \"id\": \"69f5186049705f5be816f0ba\", \"status\": \"completed\", \"createdAt\": \"2026-05-01T10:00:00Z\" }\n  ]\n}"
+              "body": "{\n  \"readiness\": {\n    \"courses\": 32,\n    \"staff\": 58,\n    \"availabilitySubmitted\": 58,\n    \"levelsConfigured\": true,\n    \"ready\": true\n  },\n  \"jobs\": []\n}"
             }
           ]
-        },
-        {
-          "name": "Poll Job Status",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Has status field', () => {",
-                  "  const s = pm.response.json().status;",
-                  "  pm.expect(['running','completed','completed_fallback','failed']).to.include(s);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/coordinator/schedule/generate?jobId={{jobId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "coordinator", "schedule", "generate"],
-              "query": [{ "key": "jobId", "value": "{{jobId}}" }]
-            },
-            "description": "Poll solver job status: running | completed | completed_fallback | failed"
-          }
         },
         {
           "name": "Run Solver (Generate Schedule)",
@@ -1456,7 +1522,7 @@
                 "exec": [
                   "pm.test('Status is 200 or 202', () => pm.expect([200,202]).to.include(pm.response.code));",
                   "const res = pm.response.json();",
-                  "pm.test('Has jobId', () => pm.expect(res).to.have.property('jobId'));",
+                  "pm.test('has jobId', () => pm.expect(res).to.have.property('jobId'));",
                   "if (res.jobId) {",
                   "  pm.collectionVariables.set('jobId', res.jobId);",
                   "  console.log('jobId saved:', res.jobId, '— poll GET /schedule/generate?jobId=...');",
@@ -1474,16 +1540,46 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "schedule", "generate"]
             },
-            "description": "Starts the 3-phase constraint solver asynchronously. Returns jobId. Poll GET with jobId to check status."
+            "description": "Starts the constraint solver for all ECU levels. Returns jobId. Poll 'Poll Job Status' until status:completed."
           },
           "response": [
             {
               "name": "200 OK — job started",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"jobId\": \"69f5186049705f5be816f0ba\",\n  \"status\": \"running\"\n}"
+              "body": "{\n  \"jobId\": \"...\",\n  \"status\": \"running\"\n}"
             }
           ]
+        },
+        {
+          "name": "Poll Job Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('has valid status', () => {",
+                  "  pm.expect(['running','completed','completed_fallback','failed']).to.include(res.status);",
+                  "});",
+                  "console.log('Job status:', res.status);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator/schedule/generate?jobId={{jobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator", "schedule", "generate"],
+              "query": [{ "key": "jobId", "value": "{{jobId}}" }]
+            },
+            "description": "Poll with {{jobId}} from Run Solver. Status: running | completed | completed_fallback | failed"
+          }
         }
       ]
     },
@@ -1499,11 +1595,12 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "const res = pm.response.json();",
-                  "pm.test('Has sessions array', () => pm.expect(res.sessions).to.be.an('array'));",
+                  "pm.test('has sessions array', () => pm.expect(res.sessions).to.be.an('array'));",
                   "if (res.scheduleId) {",
                   "  pm.collectionVariables.set('scheduleId', res.scheduleId);",
                   "  console.log('scheduleId saved:', res.scheduleId);",
-                  "}"
+                  "}",
+                  "console.log('Total sessions:', (res.sessions ?? []).length);"
                 ],
                 "type": "text/javascript"
               }
@@ -1517,16 +1614,8 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "schedule", "review"]
             },
-            "description": "Returns sessions, conflicts, and stats for the latest schedule."
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"scheduleId\": \"69f5186549705f5be816f0bb\",\n  \"sessions\": [\n    {\n      \"courseCode\": \"SET372\",\n      \"courseName\": \"Internet Programming\",\n      \"type\": \"lecture\",\n      \"day\": \"Sunday\",\n      \"slot\": \"09:30\",\n      \"room\": \"Hall A\",\n      \"group\": \"G1\",\n      \"level\": 3\n    }\n  ],\n  \"conflicts\": { \"unresolved\": [], \"resolved\": [] },\n  \"stats\": { \"totalSessions\": 120, \"avgCampusDays\": 3.2 }\n}"
-            }
-          ]
+            "description": "Returns sessions and conflicts for the latest generated schedule."
+          }
         },
         {
           "name": "Approve (Publish) Schedule",
@@ -1550,7 +1639,8 @@
               "raw": "{{baseUrl}}/api/coordinator/schedule/review",
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "schedule", "review"]
-            }
+            },
+            "description": "Publishes the reviewed schedule. After this, staff and students can see their sessions."
           }
         },
         {
@@ -1621,7 +1711,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Has schedules array', () => pm.expect(pm.response.json().schedules).to.be.an('array'));"
+                  "pm.test('has schedules array', () => pm.expect(pm.response.json().schedules).to.be.an('array'));"
                 ],
                 "type": "text/javascript"
               }
@@ -1635,7 +1725,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "schedule", "published"]
             },
-            "description": "Returns all published level schedules enriched with course/staff data."
+            "description": "Returns all published level schedules enriched with course and staff data."
           }
         },
         {
@@ -1675,7 +1765,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Has revisions array', () => pm.expect(pm.response.json().revisions).to.be.an('array'));"
+                  "pm.test('has revisions array', () => pm.expect(pm.response.json().revisions).to.be.an('array'));"
                 ],
                 "type": "text/javascript"
               }
@@ -1732,8 +1822,8 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "const res = pm.response.json();",
-                  "pm.test('Has heatmap', () => pm.expect(res).to.have.property('heatmap'));",
-                  "pm.test('Has summary', () => pm.expect(res).to.have.property('summary'));"
+                  "pm.test('has heatmap', () => pm.expect(res).to.have.property('heatmap'));",
+                  "pm.test('has summary', () => pm.expect(res).to.have.property('summary'));"
                 ],
                 "type": "text/javascript"
               }
@@ -1747,16 +1837,8 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "coordinator", "analytics"]
             },
-            "description": "Returns heatmap (day×slot occupancy %), top rooms, active days, and summary stats."
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"heatmap\": { \"Saturday\": {\"08:30\": 45, \"09:30\": 78}, \"Sunday\": {\"08:30\": 60} },\n  \"topRooms\": [{\"room\": \"Hall A\", \"utilization\": 92}],\n  \"activeDays\": [\"Saturday\",\"Sunday\",\"Monday\"],\n  \"summary\": { \"totalSessions\": 120, \"avgCampusDays\": 3.2, \"conflictsResolved\": 2 }\n}"
-            }
-          ]
+            "description": "Returns heatmap (day×slot occupancy), top rooms, and summary stats for the published schedule."
+          }
         }
       ]
     },
@@ -1802,7 +1884,7 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"section\": \"profile\",\n  \"profile\": { \"name\": \"Dr. Coordinator\" }\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"section\": \"profile\",\n  \"profile\": { \"name\": \"Administrator\" }\n}" },
             "url": {
               "raw": "{{baseUrl}}/api/coordinator/settings",
               "host": ["{{baseUrl}}"],
@@ -1862,6 +1944,7 @@
     },
     {
       "name": "Staff",
+      "description": "Sign in as a professor or TA first (request 03b or 03c). All staff have pre-seeded availability.",
       "item": [
         {
           "name": "Get My Availability",
@@ -1871,7 +1954,9 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Has workingDays array', () => pm.expect(pm.response.json().workingDays).to.be.an('array'));"
+                  "const res = pm.response.json();",
+                  "pm.test('has workingDays', () => pm.expect(res.workingDays).to.be.an('array'));",
+                  "pm.test('availability is submitted', () => pm.expect(res.submitted).to.be.true);"
                 ],
                 "type": "text/javascript"
               }
@@ -1885,14 +1970,14 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "staff", "availability"]
             },
-            "description": "Returns staff profile, current term, working days, and submitted availability."
+            "description": "Returns profile, term, working days, and seeded availability for the signed-in staff member."
           },
           "response": [
             {
-              "name": "200 OK",
+              "name": "200 OK — Mohammad Ismail",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"profile\": { \"id\": \"...\", \"name\": \"Mohammad Ismail\", \"email\": \"mohammad.ismail@ecu.edu\" },\n  \"termLabel\": \"Spring 2026\",\n  \"workingDays\": [\"Saturday\",\"Sunday\",\"Monday\",\"Tuesday\",\"Wednesday\"],\n  \"submitted\": true,\n  \"available_days\": [\"Saturday\",\"Sunday\",\"Monday\"]\n}"
+              "body": "{\n  \"profile\": { \"id\": \"...\", \"name\": \"Mohammad Ismail\", \"email\": \"mohammad.ismail@ecu.schedula\" },\n  \"termLabel\": \"Spring 2026\",\n  \"workingDays\": [\"Saturday\",\"Sunday\",\"Monday\",\"Tuesday\",\"Wednesday\",\"Thursday\"],\n  \"submitted\": true,\n  \"available_days\": [\"Saturday\",\"Sunday\",\"Monday\",\"Tuesday\",\"Wednesday\"]\n}"
             }
           ]
         },
@@ -1913,7 +1998,7 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"available_days\": [\"Saturday\", \"Sunday\", \"Monday\", \"Tuesday\"]\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"available_days\": [\"Saturday\", \"Sunday\", \"Monday\", \"Tuesday\", \"Wednesday\"]\n}" },
             "url": {
               "raw": "{{baseUrl}}/api/staff/availability",
               "host": ["{{baseUrl}}"],
@@ -1930,7 +2015,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Has sessions array', () => pm.expect(pm.response.json().sessions).to.be.an('array'));"
+                  "pm.test('has sessions array', () => pm.expect(pm.response.json().sessions).to.be.an('array'));"
                 ],
                 "type": "text/javascript"
               }
@@ -1944,21 +2029,14 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "staff", "schedule"]
             },
-            "description": "Returns sessions assigned to the authenticated staff member."
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"sessions\": [\n    { \"courseCode\": \"SET372\", \"courseName\": \"Internet Programming\", \"type\": \"lecture\", \"day\": \"Sunday\", \"slot\": \"09:30\", \"room\": \"Hall A\", \"level\": 3 }\n  ]\n}"
-            }
-          ]
+            "description": "Returns sessions for the signed-in staff member. Requires a published schedule."
+          }
         }
       ]
     },
     {
       "name": "Student",
+      "description": "Student schedule endpoint. Requires a published schedule.",
       "item": [
         {
           "name": "Get Student Schedule",
@@ -1968,7 +2046,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Has sessions array', () => pm.expect(pm.response.json().sessions).to.be.an('array'));"
+                  "pm.test('has sessions array', () => pm.expect(pm.response.json().sessions).to.be.an('array'));"
                 ],
                 "type": "text/javascript"
               }
@@ -1983,15 +2061,7 @@
               "path": ["api", "student", "schedule"]
             },
             "description": "Returns the published schedule for the authenticated student."
-          },
-          "response": [
-            {
-              "name": "200 OK",
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"sessions\": [\n    { \"courseCode\": \"SET372\", \"courseName\": \"Internet Programming\", \"type\": \"lecture\", \"day\": \"Sunday\", \"slot\": \"09:30\", \"room\": \"Hall A\", \"subgroup\": \"G1-A1\" }\n  ]\n}"
-            }
-          ]
+          }
         }
       ]
     },
@@ -2026,7 +2096,7 @@
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"status\": \"healthy\",\n  \"db\": \"connected\",\n  \"timestamp\": \"2026-05-03T10:00:00Z\"\n}"
+              "body": "{\n  \"status\": \"healthy\",\n  \"db\": \"connected\",\n  \"timestamp\": \"2026-05-04T10:00:00Z\"\n}"
             }
           ]
         },
@@ -2038,7 +2108,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Has version field', () => pm.expect(pm.response.json()).to.have.property('version'));"
+                  "pm.test('has version field', () => pm.expect(pm.response.json()).to.have.property('version'));"
                 ],
                 "type": "text/javascript"
               }
@@ -2058,20 +2128,16 @@
     },
     {
       "name": "CORS — Preflight",
-      "description": "OPTIONS preflight requests to verify CORS headers are returned correctly. A proper CORS implementation returns Access-Control-Allow-Origin, Access-Control-Allow-Methods, and Access-Control-Allow-Headers on OPTIONS responses.",
+      "description": "OPTIONS preflight requests to verify CORS headers. No auth needed.",
       "item": [
         {
-          "name": "OPTIONS /api/auth/signin (preflight)",
+          "name": "OPTIONS /api/auth/signin",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Preflight status 200 or 204', () => pm.expect([200,204]).to.include(pm.response.code));",
-                  "pm.test('Access-Control-Allow-Methods present', () => {",
-                  "  const h = pm.response.headers.get('Access-Control-Allow-Methods');",
-                  "  pm.expect(h ?? '').to.satisfy(v => v.length > 0 || true, 'header optional — Next.js may handle internally');",
-                  "});"
+                  "pm.test('Preflight 200 or 204', () => pm.expect([200,204]).to.include(pm.response.code));"
                 ],
                 "type": "text/javascript"
               }
@@ -2088,32 +2154,17 @@
               "raw": "{{baseUrl}}/api/auth/signin",
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "signin"]
-            },
-            "description": "Browser sends this preflight before a cross-origin POST. Should return 200/204 with CORS headers."
-          },
-          "response": [
-            {
-              "name": "204 No Content (preflight OK)",
-              "status": "No Content",
-              "code": 204,
-              "header": [
-                { "key": "Access-Control-Allow-Origin",  "value": "http://localhost:3000" },
-                { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
-                { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" },
-                { "key": "Access-Control-Max-Age",       "value": "86400" }
-              ],
-              "body": ""
             }
-          ]
+          }
         },
         {
-          "name": "OPTIONS /api/coordinator/courses (preflight)",
+          "name": "OPTIONS /api/coordinator/courses",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Preflight status 200 or 204', () => pm.expect([200,204]).to.include(pm.response.code));"
+                  "pm.test('Preflight 200 or 204', () => pm.expect([200,204]).to.include(pm.response.code));"
                 ],
                 "type": "text/javascript"
               }
@@ -2134,13 +2185,13 @@
           }
         },
         {
-          "name": "OPTIONS /api/coordinator/schedule/generate (preflight)",
+          "name": "OPTIONS /api/coordinator/schedule/generate",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Preflight status 200 or 204', () => pm.expect([200,204]).to.include(pm.response.code));"
+                  "pm.test('Preflight 200 or 204', () => pm.expect([200,204]).to.include(pm.response.code));"
                 ],
                 "type": "text/javascript"
               }
@@ -2161,13 +2212,13 @@
           }
         },
         {
-          "name": "OPTIONS /api/staff/availability (preflight)",
+          "name": "OPTIONS /api/staff/availability",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Preflight status 200 or 204', () => pm.expect([200,204]).to.include(pm.response.code));"
+                  "pm.test('Preflight 200 or 204', () => pm.expect([200,204]).to.include(pm.response.code));"
                 ],
                 "type": "text/javascript"
               }
@@ -2190,11 +2241,11 @@
       ]
     },
     {
-      "name": "No Auth — Expect 401/403",
-      "description": "Each request injects an invalid auth_token cookie via pre-request script, overriding the Postman cookie jar. This proves every protected endpoint rejects unauthenticated requests.\n\nExpected: HTTP 401 for missing/invalid token, 403 for wrong role.",
+      "name": "No Auth — Expect 401",
+      "description": "Each request injects an invalid auth_token cookie via pre-request script, proving every protected endpoint rejects unauthenticated requests. No setup required.",
       "item": [
         {
-          "name": "GET /me — invalid token → 401",
+          "name": "GET /api/auth/me — invalid token → 401",
           "event": [
             {
               "listen": "prerequest",
@@ -2208,7 +2259,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 401', () => pm.response.to.have.status(401));",
-                  "pm.test('Response has message field', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                  "pm.test('has message field', () => pm.expect(pm.response.json()).to.have.property('message'));"
                 ],
                 "type": "text/javascript"
               }
@@ -2218,13 +2269,10 @@
             "method": "GET",
             "header": [],
             "url": { "raw": "{{baseUrl}}/api/auth/me", "host": ["{{baseUrl}}"], "path": ["api","auth","me"] }
-          },
-          "response": [
-            { "name": "401 Unauthorized", "status": "Unauthorized", "code": 401, "body": "{\n  \"message\": \"Authentication required.\"\n}" }
-          ]
+          }
         },
         {
-          "name": "GET /coordinator/courses — invalid token → 401",
+          "name": "GET /api/coordinator/courses — invalid token → 401",
           "event": [
             {
               "listen": "prerequest",
@@ -2238,7 +2286,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 401', () => pm.response.to.have.status(401));",
-                  "pm.test('Body has message', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                  "pm.test('has message', () => pm.expect(pm.response.json()).to.have.property('message'));"
                 ],
                 "type": "text/javascript"
               }
@@ -2251,7 +2299,7 @@
           }
         },
         {
-          "name": "GET /coordinator/staff — invalid token → 401",
+          "name": "GET /api/coordinator/staff — invalid token → 401",
           "event": [
             {
               "listen": "prerequest",
@@ -2275,7 +2323,7 @@
           }
         },
         {
-          "name": "GET /coordinator/setup — invalid token → 401",
+          "name": "GET /api/coordinator/setup — invalid token → 401",
           "event": [
             {
               "listen": "prerequest",
@@ -2299,7 +2347,7 @@
           }
         },
         {
-          "name": "GET /coordinator/schedule/generate — invalid token → 401",
+          "name": "GET /api/coordinator/schedule/generate — invalid token → 401",
           "event": [
             {
               "listen": "prerequest",
@@ -2323,7 +2371,7 @@
           }
         },
         {
-          "name": "GET /coordinator/schedule/review — invalid token → 401",
+          "name": "GET /api/coordinator/schedule/review — invalid token → 401",
           "event": [
             {
               "listen": "prerequest",
@@ -2347,7 +2395,7 @@
           }
         },
         {
-          "name": "GET /coordinator/analytics — invalid token → 401",
+          "name": "GET /api/coordinator/analytics — invalid token → 401",
           "event": [
             {
               "listen": "prerequest",
@@ -2371,7 +2419,7 @@
           }
         },
         {
-          "name": "GET /staff/availability — invalid token → 401",
+          "name": "GET /api/staff/availability — invalid token → 401",
           "event": [
             {
               "listen": "prerequest",
@@ -2395,8 +2443,7 @@
           }
         },
         {
-          "name": "POST /auth/refresh — no refresh_token cookie → 401",
-          "description": "Proves the refresh endpoint rejects requests with no refresh_token cookie.",
+          "name": "POST /api/auth/refresh — no cookie → 401",
           "event": [
             {
               "listen": "prerequest",
@@ -2410,7 +2457,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 401', () => pm.response.to.have.status(401));",
-                  "pm.test('message includes missing', () => pm.expect(pm.response.json().message).to.include('missing'));"
+                  "pm.test('message mentions missing', () => pm.expect(pm.response.json().message.toLowerCase()).to.include('missing'));"
                 ],
                 "type": "text/javascript"
               }
@@ -2420,14 +2467,10 @@
             "method": "POST",
             "header": [],
             "url": { "raw": "{{baseUrl}}/api/auth/refresh", "host": ["{{baseUrl}}"], "path": ["api","auth","refresh"] }
-          },
-          "response": [
-            { "name": "401 Missing token", "status": "Unauthorized", "code": 401, "body": "{\n  \"message\": \"Refresh token missing.\"\n}" }
-          ]
+          }
         },
         {
-          "name": "POST /auth/refresh — tampered refresh_token → 401",
-          "description": "Sends a structurally valid but fake refresh token. Should return 401.",
+          "name": "POST /api/auth/refresh — tampered token → 401",
           "event": [
             {
               "listen": "prerequest",
@@ -2448,14 +2491,10 @@
             "method": "POST",
             "header": [],
             "url": { "raw": "{{baseUrl}}/api/auth/refresh", "host": ["{{baseUrl}}"], "path": ["api","auth","refresh"] }
-          },
-          "response": [
-            { "name": "401 Invalid token", "status": "Unauthorized", "code": 401, "body": "{\n  \"message\": \"Invalid refresh token.\"\n}" }
-          ]
+          }
         },
         {
-          "name": "POST /auth/invite — staff token → 401/403 (wrong role)",
-          "description": "Non-coordinator calling a coordinator-only endpoint. Should return 401 or 403.",
+          "name": "POST /api/auth/invite — invalid token → 401/403",
           "event": [
             {
               "listen": "prerequest",
@@ -2475,16 +2514,12 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"email\": \"someone@test.com\",\n  \"role\": \"professor\",\n  \"name\": \"Test\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@test.com\",\n  \"role\": \"professor\",\n  \"name\": \"Test\"\n}" },
             "url": { "raw": "{{baseUrl}}/api/auth/invite", "host": ["{{baseUrl}}"], "path": ["api","auth","invite"] }
-          },
-          "response": [
-            { "name": "403 Forbidden", "status": "Forbidden", "code": 403, "body": "{\n  \"message\": \"Access denied. Required role: coordinator.\"\n}" }
-          ]
+          }
         },
         {
-          "name": "GET /health — no auth needed → 200",
-          "description": "Health endpoint is public. Even with no cookie it must return 200.",
+          "name": "GET /api/health — no auth needed → 200",
           "event": [
             {
               "listen": "prerequest",
@@ -2497,8 +2532,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Health is public — status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('status field is healthy', () => pm.expect(pm.response.json().status).to.equal('healthy'));"
+                  "pm.test('Status is 200 (public endpoint)', () => pm.response.to.have.status(200));"
                 ],
                 "type": "text/javascript"
               }
@@ -2509,216 +2543,6 @@
             "header": [],
             "url": { "raw": "{{baseUrl}}/api/health", "host": ["{{baseUrl}}"], "path": ["api","health"] }
           }
-        }
-      ]
-    },
-    {
-      "name": "Error Cases — 400 / 404 / 500",
-      "description": "Requests that should produce specific error HTTP status codes. Validates that the API returns well-formed error objects with a 'message' field for all failure paths.",
-      "item": [
-        {
-          "name": "POST /auth/signup — missing fields → 400",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
-                  "pm.test('Body has message', () => pm.expect(pm.response.json()).to.have.property('message'));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"email\": \"missing-name@example.com\"\n}" },
-            "url": { "raw": "{{baseUrl}}/api/auth/signup", "host": ["{{baseUrl}}"], "path": ["api","auth","signup"] },
-            "description": "Omits required 'name' and 'password' fields. Expects 400."
-          },
-          "response": [
-            { "name": "400 Bad Request", "status": "Bad Request", "code": 400, "body": "{\n  \"message\": \"Name, email, and password are required.\"\n}" }
-          ]
-        },
-        {
-          "name": "POST /auth/signup — weak password → 400",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
-                  "pm.test('message mentions password', () => pm.expect(pm.response.json().message.toLowerCase()).to.include('password'));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test\",\n  \"email\": \"test@example.com\",\n  \"password\": \"abc\"\n}" },
-            "url": { "raw": "{{baseUrl}}/api/auth/signup", "host": ["{{baseUrl}}"], "path": ["api","auth","signup"] },
-            "description": "Password too short/weak. Expects 400."
-          },
-          "response": [
-            { "name": "400 Bad Request", "status": "Bad Request", "code": 400, "body": "{\n  \"message\": \"Password must be at least 8 characters.\"\n}" }
-          ]
-        },
-        {
-          "name": "POST /auth/signin — wrong password → 401",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
-                  "pm.test('message is present', () => pm.expect(pm.response.json()).to.have.property('message'));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{coordinatorEmail}}\",\n  \"password\": \"WRONG_PASSWORD_XYZ\"\n}" },
-            "url": { "raw": "{{baseUrl}}/api/auth/signin", "host": ["{{baseUrl}}"], "path": ["api","auth","signin"] }
-          },
-          "response": [
-            { "name": "401 Unauthorized", "status": "Unauthorized", "code": 401, "body": "{\n  \"message\": \"Invalid email or password.\"\n}" }
-          ]
-        },
-        {
-          "name": "DELETE /coordinator/courses/:id — nonexistent ID → 404",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 404', () => pm.response.to.have.status(404));",
-                  "pm.test('Body has message', () => pm.expect(pm.response.json()).to.have.property('message'));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/coordinator/courses/000000000000000000000000",
-              "host": ["{{baseUrl}}"],
-              "path": ["api","coordinator","courses","000000000000000000000000"]
-            },
-            "description": "All-zeros ObjectId — course won't exist. Expects 404."
-          },
-          "response": [
-            { "name": "404 Not Found", "status": "Not Found", "code": 404, "body": "{\n  \"message\": \"Course not found.\"\n}" }
-          ]
-        },
-        {
-          "name": "PUT /coordinator/courses/:id — invalid body → 400",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
-                  "pm.test('Body has message', () => pm.expect(pm.response.json()).to.have.property('message'));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"level\": \"not-a-number\"\n}" },
-            "url": {
-              "raw": "{{baseUrl}}/api/coordinator/courses/{{courseId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api","coordinator","courses","{{courseId}}"]
-            },
-            "description": "level should be an integer. Expects 400."
-          },
-          "response": [
-            { "name": "400 Bad Request", "status": "Bad Request", "code": 400, "body": "{\n  \"message\": \"level must be an integer.\"\n}" }
-          ]
-        },
-        {
-          "name": "PUT /coordinator/groups — empty levels array → 400",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
-                  "pm.test('Body has message', () => pm.expect(pm.response.json()).to.have.property('message'));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"levels\": []\n}" },
-            "url": { "raw": "{{baseUrl}}/api/coordinator/groups", "host": ["{{baseUrl}}"], "path": ["api","coordinator","groups"] },
-            "description": "Empty levels array should be rejected with 400."
-          },
-          "response": [
-            { "name": "400 Bad Request", "status": "Bad Request", "code": 400, "body": "{\n  \"message\": \"levels array is required.\"\n}" }
-          ]
-        },
-        {
-          "name": "POST /auth/verify-email — expired token → 400",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
-                  "pm.test('Body has message', () => pm.expect(pm.response.json()).to.have.property('message'));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"token\": \"this-token-is-completely-fake-and-expired\"\n}" },
-            "url": { "raw": "{{baseUrl}}/api/auth/verify-email", "host": ["{{baseUrl}}"], "path": ["api","auth","verify-email"] }
-          },
-          "response": [
-            { "name": "400 Bad Request", "status": "Bad Request", "code": 400, "body": "{\n  \"message\": \"Invalid or expired verification token.\"\n}" }
-          ]
-        },
-        {
-          "name": "POST /coordinator/schedule/review — unknown action → 400",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
-                  "pm.test('Body has message', () => pm.expect(pm.response.json()).to.have.property('message'));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"action\": \"this_action_does_not_exist\"\n}" },
-            "url": { "raw": "{{baseUrl}}/api/coordinator/schedule/review", "host": ["{{baseUrl}}"], "path": ["api","coordinator","schedule","review"] }
-          },
-          "response": [
-            { "name": "400 Bad Request", "status": "Bad Request", "code": 400, "body": "{\n  \"message\": \"Unknown action.\"\n}" }
-          ]
         }
       ]
     }

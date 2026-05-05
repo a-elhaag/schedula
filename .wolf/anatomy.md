@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-03T20:53:12.154Z
-> Files: 283 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-04T21:38:29.671Z
+> Files: 285 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -15,7 +15,7 @@
 - `package.json` — Node.js package manifest (~436 tok)
 - `pnpm-lock.yaml` — pnpm lock file (~66653 tok)
 - `pnpm-workspace.yaml` (~16 tok)
-- `schedula-api.postman_collection.json` — Declares res (~29945 tok)
+- `schedula-api.postman_collection.json` — Declares res (~27983 tok)
 
 ## .claude/
 
@@ -460,6 +460,8 @@
 ## docs/
 
 - `fastapi-course-contract.md` — FastAPI Course Schema Contract (~1054 tok)
+- `presentation.html` — Schedula — Technical Presentation (~23323 tok)
+- `technical-report.md` — Schedula — Technical Report (~7840 tok)
 
 ## docs/superpowers/plans/
 
@@ -532,7 +534,7 @@
 - `add-staff-availability.mjs` — MONGO_URI: addStaffAvailability (~1398 tok)
 - `migrate-schema.mjs` — One-time migration: courses sections[]→flat flags, availability slots→available_days, settings groups→levels_config, schedule entries backfill, rooms collection drop (~1275 tok)
 - `seed-data.mjs` — scripts/seed-data.mjs (~5054 tok)
-- `seed-ecu.mjs` — scripts/seed-ecu.mjs (~7970 tok)
+- `seed-ecu.mjs` — scripts/seed-ecu.mjs (~8830 tok)
 - `seed-levels.mjs` — INSTITUTION_SLUG: main (~448 tok)
 - `setup-db.mjs` — scripts/setup-db.mjs (~4685 tok)
 - `truncate-db.mjs` — scripts/truncate-db.mjs (~284 tok)
