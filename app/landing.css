@@ -75,6 +75,17 @@ body {
 .hero-title em { font-style: normal; color: var(--color-accent); }
 .hero-subtitle { font-size: 1.25rem; color: var(--color-text-muted); max-width: 48ch; margin: 0 auto 3rem; line-height: 1.6; }
 
+/* Roster shown in hero */
+.hero-roster { margin-top: 1.5rem; display: flex; flex-direction: column; align-items: center; }
+.roster-title { font-size: 0.95rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 0.5rem; }
+.roster-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 1rem; flex-direction: column; align-items: center; }
+.roster-list li { background: rgba(0,0,0,0.04); padding: 0.45rem 0.75rem; border-radius: 999px; font-weight: 600; color: var(--color-text-primary); font-size: 0.95rem; }
+
+@media (min-width: 900px) {
+  .roster-list { flex-direction: row; }
+  .roster-list li { font-size: 1rem; }
+}
+
 /* ── Infinite Scroll Marquee ────────────────────────────────────────────── */
 .marquee-wrapper {
   overflow: hidden;

@@ -140,6 +140,16 @@ export default function LandingPage() {
               Start your instance
             </Link>
           </div>
+          <div className="hero-roster reveal stagger-5">
+            <h3 className="roster-title">Name — ID</h3>
+            <ul className="roster-list">
+              <li>Anas Ahmed — 192200122</li>
+              <li>Youstina Adel — 192200148</li>
+              <li>Farida Hassan — 192200221</li>
+              <li>Ruba Tarek — 192200243</li>
+              <li>Sohaila Tamer — 192200251</li>
+            </ul>
+          </div>
         </div>
       </section>
 
