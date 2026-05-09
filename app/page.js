@@ -142,7 +142,7 @@ export default function LandingPage() {
           </div>
           <div className="hero-roster reveal stagger-5">
             <ul className="roster-list">
-              <li> </li>
+             
               <li>Anas Ahmed — 192200122</li>
               <li>Youstina Adel — 192200148</li>
               <li>Farida Hassan — 192200221</li>
