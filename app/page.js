@@ -141,7 +141,6 @@ export default function LandingPage() {
             </Link>
           </div>
           <div className="hero-roster reveal stagger-5">
-            <h3 className="roster-title">Name — ID</h3>
             <ul className="roster-list">
               <li>Anas Ahmed — 192200122</li>
               <li>Youstina Adel — 192200148</li>
